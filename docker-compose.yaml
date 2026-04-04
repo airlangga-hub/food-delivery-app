@@ -1,0 +1,20 @@
+services:
+      user:
+            image: airlangga491/final-project-user:latest
+            container_name: user
+            env_file: .env
+            restart: always
+            
+      order:
+            image: airlangga491/final-project-order:latest
+            container_name: order
+            env_file: .env
+            restart: always
+
+      gateway:
+            image: airlangga491/final-project-gateway:latest
+            container_name: gateway
+            env_file: .env
+            ports:
+                  - "${GATEWAY_PORT_HOST}:${CONTAINER_PORT}"
+            restart: always
