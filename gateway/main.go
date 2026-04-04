@@ -8,7 +8,9 @@ import (
 
 	"github.com/airlangga-hub/food-delivery-app/gateway/auth"
 	"github.com/go-playground/validator/v10"
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/joho/godotenv"
+	echojwt "github.com/labstack/echo-jwt/v5"
 	"github.com/labstack/echo/v5"
 	"github.com/labstack/echo/v5/middleware"
 	"google.golang.org/grpc"
@@ -94,4 +96,37 @@ func main() {
 			return nil
 		},
 	}))
+	// echo jwt config
+	config := echojwt.Config{
+		SigningKey: []byte(jwtSecret),
+		NewClaimsFunc: func(c *echo.Context) jwt.Claims {
+			return new(helper.MyClaims)
+		},
+	}
+
+	// user
+	users := e.Group("/users")
+	// user public endpoints
+	users.POST("/register", h.Register)
+	users.POST("/login", h.Login)
+	// user private endpoints
+	usersPrivate := users.Group("", echojwt.WithConfig(config))
+	usersPrivate.POST("/balance", h.TopUpBalance)
+	usersPrivate.GET("/info", h.GetUserInfo)
+
+	// order
+	orders := e.Group("/orders")
+
+	// customer
+	customers := orders.Group("/customers", echojwt.WithConfig(config))
+	customers.POST("/create", h.CreateOrder)
+	customers.GET("/drivers", h.GetDrivers)
+	customers.POST("/drivers", h.ChooseDriver)
+	customers.GET("", h.GetOrders)
+
+	// driver
+	drivers := orders.Group("/drivers", echojwt.WithConfig(config))
+	drivers.GET("/pending", h.DriverGetPendingOrders)
+	drivers.POST("/apply", h.DriverApplyToTakeOrder)
+	drivers.POST("/done", h.MarkOrderAsDone)
 }
