@@ -5,8 +5,12 @@ import (
 	"log"
 	"log/slog"
 	"os"
+	"os/signal"
+	"syscall"
+	"time"
 
 	"github.com/airlangga-hub/food-delivery-app/gateway/auth"
+	"github.com/airlangga-hub/food-delivery-app/gateway/helper"
 	"github.com/go-playground/validator/v10"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/joho/godotenv"
@@ -129,4 +133,17 @@ func main() {
 	drivers.GET("/pending", h.DriverGetPendingOrders)
 	drivers.POST("/apply", h.DriverApplyToTakeOrder)
 	drivers.POST("/done", h.MarkOrderAsDone)
+
+	// graceful shutdown
+	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+	defer stop()
+
+	sc := echo.StartConfig{
+		Address:         ":" + port,
+		GracefulTimeout: 15 * time.Second,
+	}
+
+	if err := sc.Start(ctx, e); err != nil {
+		e.Logger.Error("failed to start server", "error", err)
+	}
 }
