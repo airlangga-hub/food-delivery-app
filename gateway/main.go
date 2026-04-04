@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/airlangga-hub/food-delivery-app/gateway/auth"
+	"github.com/airlangga-hub/food-delivery-app/gateway/handler"
 	"github.com/airlangga-hub/food-delivery-app/gateway/helper"
 	"github.com/go-playground/validator/v10"
 	"github.com/golang-jwt/jwt/v5"
@@ -63,9 +64,10 @@ func main() {
 	// dependency injection
 	userClient := userpb.NewUserServiceClient(userCC)
 	orderClient := orderpb.NewOrderServiceClient(orderCC)
-	svc := service.New(userClient, orderClient)
+	userSvc := service.NewUserService(userClient)
+	orderSvc := service.NewOrderService(orderClient)
 	validate := validator.New(validator.WithRequiredStructEnabled())
-	h := handler.New(svc, validate)
+	h := handler.New(userSvc, orderSvc, validate)
 
 	// echo
 	e := echo.New()
