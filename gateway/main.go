@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"log"
 	"log/slog"
 	"os"
@@ -8,6 +9,8 @@ import (
 	"github.com/airlangga-hub/food-delivery-app/gateway/auth"
 	"github.com/go-playground/validator/v10"
 	"github.com/joho/godotenv"
+	"github.com/labstack/echo/v5"
+	"github.com/labstack/echo/v5/middleware"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
@@ -58,4 +61,37 @@ func main() {
 	validate := validator.New(validator.WithRequiredStructEnabled())
 	h := handler.New(svc, validate)
 
+	// echo
+	e := echo.New()
+	e.Use(middleware.Recover())
+	e.Use(middleware.RequestID())
+	e.Use(middleware.RequestLoggerWithConfig(middleware.RequestLoggerConfig{
+		LogStatus:    true,
+		LogMethod:    true,
+		LogURI:       true,
+		LogRequestID: true,
+		LogLatency:   true,
+		HandleError:  true, // forwards error to the global error handler, so it can decide appropriate status code
+		LogValuesFunc: func(c *echo.Context, v middleware.RequestLoggerValues) error {
+			if v.Error == nil {
+				logger.LogAttrs(context.Background(), slog.LevelInfo, "REQUEST",
+					slog.Int("status", v.Status),
+					slog.String("method", v.Method),
+					slog.String("uri", v.URI),
+					slog.String("request_id", v.RequestID),
+					slog.Int64("latency", int64(v.Latency)),
+				)
+			} else {
+				logger.LogAttrs(context.Background(), slog.LevelError, "REQUEST_ERROR",
+					slog.Int("status", v.Status),
+					slog.String("method", v.Method),
+					slog.String("uri", v.URI),
+					slog.String("request_id", v.RequestID),
+					slog.Int64("latency", int64(v.Latency)),
+					slog.String("error", v.Error.Error()),
+				)
+			}
+			return nil
+		},
+	}))
 }
