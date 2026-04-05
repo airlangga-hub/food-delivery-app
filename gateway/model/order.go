@@ -11,13 +11,17 @@ const (
 )
 
 type Order struct {
-	OrderID           uuid.UUID   `json:"order_id"`
-	RestaurantName    string      `json:"restaurant_name"`
-	RestaurantAddress string      `json:"restaurant_address"`
-	ItemName          string      `json:"item_name"`
-	DeliveryAddress   string      `json:"delivery_address"`
-	OrderStatus       OrderStatus `json:"order_status"`
-	Driver            *Driver     `json:"driver,omitempty"`
+	OrderID         uuid.UUID    `json:"order_id"`
+	Restaurants     []Restaurant `json:"restaurants"`
+	DeliveryAddress string       `json:"delivery_address"`
+	OrderStatus     OrderStatus  `json:"order_status"`
+	Driver          *Driver      `json:"driver,omitempty"`
+}
+
+type Restaurant struct {
+	Name    string `json:"name"`
+	Address string `json:"address"`
+	Items   []Item `json:"items"`
 }
 
 type Driver struct {
@@ -31,4 +35,10 @@ type Driver struct {
 type FindDriver struct {
 	OrderID          uuid.UUID `json:"order_id"`
 	ApplicantDrivers []Driver  `json:"applicant_driver"`
+}
+
+type Item struct {
+	ItemID   uuid.UUID
+	ItemName string
+	Quantity int
 }

@@ -22,12 +22,17 @@ type TopUpBalanceRequest struct {
 	Amount int `json:"amount" validate:"required"`
 }
 
+type ItemRequest struct {
+	ItemID   string `json:"item_id"`
+	Quantity int    `json:"quantity"`
+}
+
 type CreateOrderRequest struct {
-	ItemID []string `json:"item_id" validate:"required"`
+	Items []ItemRequest `json:"items" validate:"required"`
 }
 
 type GiveRatingRequest struct {
-	Rating  int    `json:"rating" validate:"required"`
+	Rating int `json:"rating" validate:"required"`
 }
 
 type ChooseDriverRequest struct {

@@ -20,7 +20,7 @@ type UserService interface {
 }
 
 type OrderService interface {
-	CreateOrder(userID, itemID uuid.UUID) (model.Order, error)
+	CreateOrder(userID uuid.UUID, items []model.Item) (model.Order, error)
 	GetDrivers(orderID uuid.UUID) (model.FindDriver, error)
 	ChooseDriver(orderID, driverID uuid.UUID) (model.Order, error)
 	GetOrders(userID uuid.UUID) ([]model.Order, error)
@@ -157,12 +157,21 @@ func (h *Handler) CreateOrder(c *echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, "invalid request body").Wrap(err)
 	}
 
-	itemID, err := uuid.Parse(payload.ItemID)
-	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, "invalid item id format").Wrap(err)
+	items := make([]model.Item, len(payload.Items))
+
+	for i, item := range payload.Items {
+		itemID, err := uuid.Parse(item.ItemID)
+		if err != nil {
+			return echo.NewHTTPError(http.StatusBadRequest, "invalid item id format").Wrap(err)
+		}
+
+		items[i] = model.Item{
+			ItemID:   itemID,
+			Quantity: item.Quantity,
+		}
 	}
 
-	order, err := h.OrderSvc.CreateOrder(claims.UserID, itemID)
+	order, err := h.OrderSvc.CreateOrder(claims.UserID, items)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "create order failed").Wrap(err)
 	}
@@ -183,7 +192,7 @@ func (h *Handler) GetDrivers(c *echo.Context) error {
 	if !ok {
 		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized user")
 	}
-	
+
 	orderID, err := uuid.Parse(c.Param("order_id"))
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, "invalid order id format").Wrap(err)
@@ -279,7 +288,7 @@ func (h *Handler) GiveRating(c *echo.Context) error {
 	if !ok {
 		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized user")
 	}
-	
+
 	var payload GiveRatingRequest
 	if err := c.Bind(&payload); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, "invalid query params").Wrap(err)
@@ -288,16 +297,16 @@ func (h *Handler) GiveRating(c *echo.Context) error {
 	if err := h.Validate.Struct(payload); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, "invalid query params").Wrap(err)
 	}
-	
+
 	orderID, err := uuid.Parse(c.Param("order_id"))
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, "invalid order id format").Wrap(err)
 	}
-	
+
 	if err := h.OrderSvc.GiveRating(orderID); err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "give rating failed").Wrap(err)
 	}
-	
+
 	return c.JSON(http.StatusCreated, Response{
 		Message: http.StatusText(http.StatusCreated),
 	})
