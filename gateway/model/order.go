@@ -5,9 +5,9 @@ import "github.com/google/uuid"
 type OrderStatus string
 
 const (
-	OrderLookingForDriver OrderStatus = "pending"
-	OrderDriverOTW        OrderStatus = "otw"
-	OrderDone             OrderStatus = "done"
+	OrderStatusLookingForDriver OrderStatus = "pending"
+	OrderStatusDriverOTW        OrderStatus = "otw"
+	OrderStatusDone             OrderStatus = "done"
 )
 
 type Order struct {
