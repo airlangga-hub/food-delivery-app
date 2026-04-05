@@ -26,6 +26,7 @@ type OrderService interface {
 	GetOrders(userID uuid.UUID) ([]model.Order, error)
 	GiveRating(orderID uuid.UUID) error
 	DriverGetPendingOrders() ([]model.Order, error)
+	DriverApplyToTakeOrder(driverID, orderID uuid.UUID) error
 }
 
 type Handler struct {
@@ -95,7 +96,7 @@ func (h *Handler) TopUpBalance(c *echo.Context) error {
 	if !ok {
 		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized user")
 	}
-	
+
 	if claims.Role != helper.RoleCustomer {
 		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized user")
 	}
@@ -130,7 +131,7 @@ func (h *Handler) GetUserInfo(c *echo.Context) error {
 	if !ok {
 		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized user")
 	}
-	
+
 	if claims.Role != helper.RoleCustomer {
 		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized user")
 	}
@@ -156,7 +157,7 @@ func (h *Handler) CreateOrder(c *echo.Context) error {
 	if !ok {
 		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized user")
 	}
-	
+
 	if claims.Role != helper.RoleCustomer {
 		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized user")
 	}
@@ -205,7 +206,7 @@ func (h *Handler) GetDrivers(c *echo.Context) error {
 	if !ok {
 		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized user")
 	}
-	
+
 	if claims.Role != helper.RoleCustomer {
 		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized user")
 	}
@@ -239,7 +240,7 @@ func (h *Handler) ChooseDriver(c *echo.Context) error {
 	if !ok {
 		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized user")
 	}
-	
+
 	if claims.Role != helper.RoleCustomer {
 		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized user")
 	}
@@ -284,7 +285,7 @@ func (h *Handler) GetOrders(c *echo.Context) error {
 	if !ok {
 		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized user")
 	}
-	
+
 	if claims.Role != helper.RoleCustomer {
 		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized user")
 	}
@@ -313,7 +314,7 @@ func (h *Handler) GiveRating(c *echo.Context) error {
 	if !ok {
 		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized user")
 	}
-	
+
 	if claims.Role != helper.RoleCustomer {
 		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized user")
 	}
@@ -367,5 +368,34 @@ func (h *Handler) DriverGetPendingOrders(c *echo.Context) error {
 	return c.JSON(http.StatusOK, Response{
 		Message: http.StatusText(http.StatusOK),
 		Data:    orders,
+	})
+}
+
+func (h *Handler) DriverApplyToTakeOrder(c *echo.Context) error {
+	token, ok := c.Get("user").(*jwt.Token)
+	if !ok {
+		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized user")
+	}
+
+	claims, ok := token.Claims.(*helper.MyClaims)
+	if !ok {
+		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized user")
+	}
+
+	if claims.Role != helper.RoleDriver {
+		return echo.NewHTTPError(http.StatusUnauthorized, "you're not a driver")
+	}
+
+	orderID, err := uuid.Parse(c.Param("order_id"))
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, "invalid order id format").Wrap(err)
+	}
+
+	if err := h.OrderSvc.DriverApplyToTakeOrder(claims.UserID, orderID); err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "apply to take order failed").Wrap(err)
+	}
+
+	return c.JSON(http.StatusCreated, Response{
+		Message: http.StatusText(http.StatusCreated),
 	})
 }
