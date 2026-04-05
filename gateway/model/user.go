@@ -15,3 +15,7 @@ type UserInfo struct {
 	Address   string  `json:"address"`
 	Balance   int     `json:"balance"`
 }
+
+type PaymentLink struct {
+	PaymentLink string `json:"payment_link"`
+}
