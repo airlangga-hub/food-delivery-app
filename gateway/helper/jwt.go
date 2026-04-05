@@ -7,14 +7,21 @@ import (
 	"github.com/google/uuid"
 )
 
+type Role string
+
+const (
+	RoleCustomer Role = "customer"
+	RoleDriver   Role = "driver"
+)
+
 type MyClaims struct {
 	jwt.RegisteredClaims
 	UserID uuid.UUID
 	Email  string
-	Role   string
+	Role   Role
 }
 
-func MakeJWT(userID uuid.UUID, email, role string, key []byte) (string, error) {
+func MakeJWT(userID uuid.UUID, email string, role Role, key []byte) (string, error) {
 	token := jwt.NewWithClaims(
 		jwt.SigningMethodHS256,
 		&MyClaims{

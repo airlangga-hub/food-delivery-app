@@ -25,6 +25,7 @@ type OrderService interface {
 	ChooseDriver(orderID, driverID uuid.UUID) (model.Order, error)
 	GetOrders(userID uuid.UUID) ([]model.Order, error)
 	GiveRating(orderID uuid.UUID) error
+	DriverGetPendingOrders() ([]model.Order, error)
 }
 
 type Handler struct {
@@ -309,5 +310,34 @@ func (h *Handler) GiveRating(c *echo.Context) error {
 
 	return c.JSON(http.StatusCreated, Response{
 		Message: http.StatusText(http.StatusCreated),
+	})
+}
+
+func (h *Handler) DriverGetPendingOrders(c *echo.Context) error {
+	token, ok := c.Get("user").(*jwt.Token)
+	if !ok {
+		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized user")
+	}
+
+	claims, ok := token.Claims.(*helper.MyClaims)
+	if !ok {
+		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized user")
+	}
+
+	if claims.Role != helper.RoleDriver {
+		return echo.NewHTTPError(http.StatusUnauthorized, "you're not a driver")
+	}
+
+	orders, err := h.OrderSvc.DriverGetPendingOrders()
+	if err != nil {
+		if errors.Is(err, model.ErrNotFound) {
+			return echo.NewHTTPError(http.StatusNotFound, "no pending orders found").Wrap(err)
+		}
+		return echo.NewHTTPError(http.StatusInternalServerError, "get pending orders failed").Wrap(err)
+	}
+
+	return c.JSON(http.StatusOK, Response{
+		Message: http.StatusText(http.StatusOK),
+		Data:    orders,
 	})
 }
