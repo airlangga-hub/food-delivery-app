@@ -87,20 +87,20 @@ func (h *Handler) TopUpBalance(c *echo.Context) error {
 	if !ok {
 		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized user")
 	}
-	
+
 	var payload TopUpBalanceRequest
 	if err := c.Bind(&payload); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, "invalid request body").Wrap(err)
 	}
-	
+
 	paymentLink, err := h.UserSvc.TopUpBalance(claims.UserID, payload.Amount)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "top up failed").Wrap(err)
 	}
-	
+
 	return c.JSON(http.StatusOK, Response{
 		Message: http.StatusText(http.StatusOK),
-		Data: paymentLink,
+		Data:    paymentLink,
 	})
 }
 
@@ -114,14 +114,14 @@ func (h *Handler) GetUserInfo(c *echo.Context) error {
 	if !ok {
 		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized user")
 	}
-	
+
 	userInfo, err := h.UserSvc.GetUserInfo(claims.UserID)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "get user info failed").Wrap(err)
 	}
-	
+
 	return c.JSON(http.StatusOK, Response{
 		Message: http.StatusText(http.StatusOK),
-		Data: userInfo,
+		Data:    userInfo,
 	})
 }
