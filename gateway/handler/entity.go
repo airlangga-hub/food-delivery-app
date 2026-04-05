@@ -2,7 +2,7 @@ package handler
 
 type Response struct {
 	Message string `json:"message"`
-	Data    any    `json:"data"`
+	Data    any    `json:"data,omitempty"`
 }
 
 type RegisterRequest struct {
@@ -28,6 +28,10 @@ type CreateOrderParam struct {
 
 type GetDriversParam struct {
 	OrderID string `query:"order_id" validate:"required"`
+}
+
+type GiveRatingRequest struct {
+	Rating  int    `json:"rating" validate:"required"`
 }
 
 type ChooseDriverRequest struct {

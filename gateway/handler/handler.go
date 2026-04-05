@@ -24,6 +24,7 @@ type OrderService interface {
 	GetDrivers(orderID uuid.UUID) (model.FindDriver, error)
 	ChooseDriver(orderID, driverID uuid.UUID) (model.Order, error)
 	GetOrders(userID uuid.UUID) ([]model.Order, error)
+	GiveRating(orderID uuid.UUID) error
 }
 
 type Handler struct {
@@ -274,5 +275,39 @@ func (h *Handler) GetOrders(c *echo.Context) error {
 	return c.JSON(http.StatusOK, Response{
 		Message: http.StatusText(http.StatusOK),
 		Data:    orders,
+	})
+}
+
+func (h *Handler) GiveRating(c *echo.Context) error {
+	token, ok := c.Get("user").(*jwt.Token)
+	if !ok {
+		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized user")
+	}
+
+	_, ok = token.Claims.(*helper.MyClaims)
+	if !ok {
+		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized user")
+	}
+	
+	var payload GiveRatingRequest
+	if err := c.Bind(&payload); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, "invalid query params").Wrap(err)
+	}
+
+	if err := h.Validate.Struct(payload); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, "invalid query params").Wrap(err)
+	}
+	
+	orderID, err := uuid.Parse(c.Param("order_id"))
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, "invalid order id format").Wrap(err)
+	}
+	
+	if err := h.OrderSvc.GiveRating(orderID); err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "give rating failed").Wrap(err)
+	}
+	
+	return c.JSON(http.StatusCreated, Response{
+		Message: http.StatusText(http.StatusCreated),
 	})
 }

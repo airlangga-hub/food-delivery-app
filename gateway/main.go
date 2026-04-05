@@ -119,7 +119,6 @@ func main() {
 	usersPrivate := users.Group("", echojwt.WithConfig(config))
 	usersPrivate.POST("/balance", h.TopUpBalance)
 	usersPrivate.GET("/info", h.GetUserInfo)
-	usersPrivate.POST("/rating", h.GiveRating)
 
 	// order
 	orders := e.Group("/orders")
@@ -130,6 +129,7 @@ func main() {
 	customers.GET("/drivers", h.GetDrivers)
 	customers.POST("/drivers", h.ChooseDriver)
 	customers.GET("", h.GetOrders)
+	customers.POST("/:order_id/rating", h.GiveRating)
 
 	// driver
 	drivers := orders.Group("/drivers", echojwt.WithConfig(config))
