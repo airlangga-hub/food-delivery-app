@@ -232,7 +232,7 @@ func (h *Handler) ChooseDriver(c *echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, "invalid request body").Wrap(err)
 	}
 
-	orderID, err := uuid.Parse(payload.OrderID)
+	orderID, err := uuid.Parse(c.Param("order_id"))
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, "invalid order id format").Wrap(err)
 	}

@@ -36,6 +36,5 @@ type GiveRatingRequest struct {
 }
 
 type ChooseDriverRequest struct {
-	OrderID  string `json:"order_id" validate:"required"`
 	DriverID string `json:"driver_id" validate:"required"`
 }

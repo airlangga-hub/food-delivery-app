@@ -127,7 +127,7 @@ func main() {
 	customers := orders.Group("/customers", echojwt.WithConfig(config))
 	customers.POST("/create", h.CreateOrder)
 	customers.GET("/:order_id/drivers", h.GetDrivers)
-	customers.POST("/drivers", h.ChooseDriver)
+	customers.POST("/:order_id/drivers", h.ChooseDriver)
 	customers.GET("", h.GetOrders)
 	customers.POST("/:order_id/rating", h.GiveRating)
 
