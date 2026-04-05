@@ -107,8 +107,8 @@ func (h *Handler) TopUpBalance(c *echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, "top up failed").Wrap(err)
 	}
 
-	return c.JSON(http.StatusOK, Response{
-		Message: http.StatusText(http.StatusOK),
+	return c.JSON(http.StatusCreated, Response{
+		Message: http.StatusText(http.StatusCreated),
 		Data:    paymentLink,
 	})
 }
