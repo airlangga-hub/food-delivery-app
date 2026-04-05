@@ -148,16 +148,16 @@ func (h *Handler) CreateOrder(c *echo.Context) error {
 		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized user")
 	}
 
-	var param CreateOrderParam
-	if err := c.Bind(&param); err != nil {
+	var payload CreateOrderRequest
+	if err := c.Bind(&payload); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, "invalid request body").Wrap(err)
 	}
 
-	if err := h.Validate.Struct(param); err != nil {
+	if err := h.Validate.Struct(payload); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, "invalid request body").Wrap(err)
 	}
 
-	itemID, err := uuid.Parse(param.ItemID)
+	itemID, err := uuid.Parse(payload.ItemID)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, "invalid item id format").Wrap(err)
 	}
