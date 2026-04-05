@@ -183,17 +183,8 @@ func (h *Handler) GetDrivers(c *echo.Context) error {
 	if !ok {
 		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized user")
 	}
-
-	var params GetDriversParam
-	if err := c.Bind(&params); err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, "invalid query params").Wrap(err)
-	}
-
-	if err := h.Validate.Struct(params); err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, "invalid query params").Wrap(err)
-	}
-
-	orderID, err := uuid.Parse(params.OrderID)
+	
+	orderID, err := uuid.Parse(c.Param("order_id"))
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, "invalid order id format").Wrap(err)
 	}
