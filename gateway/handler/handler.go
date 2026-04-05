@@ -95,16 +95,16 @@ func (h *Handler) TopUpBalance(c *echo.Context) error {
 		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized user")
 	}
 
-	var param TopUpBalanceParam
-	if err := c.Bind(&param); err != nil {
+	var payload TopUpBalanceRequest
+	if err := c.Bind(&payload); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, "invalid request body").Wrap(err)
 	}
 
-	if err := h.Validate.Struct(param); err != nil {
+	if err := h.Validate.Struct(payload); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, "invalid request body").Wrap(err)
 	}
 
-	paymentLink, err := h.UserSvc.TopUpBalance(claims.UserID, param.Amount)
+	paymentLink, err := h.UserSvc.TopUpBalance(claims.UserID, payload.Amount)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "top up failed").Wrap(err)
 	}

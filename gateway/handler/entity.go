@@ -18,8 +18,8 @@ type LoginRequest struct {
 	Password string `json:"password" validate:"required"`
 }
 
-type TopUpBalanceParam struct {
-	Amount int `query:"amount" validate:"required"`
+type TopUpBalanceRequest struct {
+	Amount int `json:"amount" validate:"required"`
 }
 
 type CreateOrderParam struct {
