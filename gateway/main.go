@@ -119,6 +119,7 @@ func main() {
 	usersPrivate := users.Group("", echojwt.WithConfig(config))
 	usersPrivate.POST("/balance", h.TopUpBalance)
 	usersPrivate.GET("/info", h.GetUserInfo)
+	usersPrivate.POST("/rating", h.GiveRating)
 
 	// order
 	orders := e.Group("/orders")
