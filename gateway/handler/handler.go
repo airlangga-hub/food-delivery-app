@@ -15,6 +15,7 @@ type UserService interface {
 	UserRegister(user model.UserRegister) (model.UserInfo, error)
 	UserLogin(email, password string) (string, error)
 	TopUpBalance(userID uuid.UUID, amount int) (model.PaymentLink, error)
+	GetUserInfo(userID uuid.UUID) (model.UserInfo, error)
 }
 
 type OrderService interface{}
@@ -100,5 +101,27 @@ func (h *Handler) TopUpBalance(c *echo.Context) error {
 	return c.JSON(http.StatusOK, Response{
 		Message: http.StatusText(http.StatusOK),
 		Data: paymentLink,
+	})
+}
+
+func (h *Handler) GetUserInfo(c *echo.Context) error {
+	token, ok := c.Get("user").(*jwt.Token)
+	if !ok {
+		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized user")
+	}
+
+	claims, ok := token.Claims.(*helper.MyClaims)
+	if !ok {
+		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized user")
+	}
+	
+	userInfo, err := h.UserSvc.GetUserInfo(claims.UserID)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "get user info failed").Wrap(err)
+	}
+	
+	return c.JSON(http.StatusOK, Response{
+		Message: http.StatusText(http.StatusOK),
+		Data: userInfo,
 	})
 }
