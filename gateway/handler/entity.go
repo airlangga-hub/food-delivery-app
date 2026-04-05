@@ -19,12 +19,12 @@ type LoginRequest struct {
 	Password string `json:"password" validate:"required"`
 }
 
-type TopUpBalanceRequest struct {
-	Amount int `json:"amount" validate:"required"`
+type TopUpBalanceParam struct {
+	Amount int `query:"amount" validate:"required"`
 }
 
-type CreateOrderRequest struct {
-	ItemID string `json:"item_id" validate:"required"`
+type CreateOrderParam struct {
+	ItemID string `query:"item_id" validate:"required"`
 }
 
 type GetDriversParam struct {

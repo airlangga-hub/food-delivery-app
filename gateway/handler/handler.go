@@ -92,16 +92,16 @@ func (h *Handler) TopUpBalance(c *echo.Context) error {
 		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized user")
 	}
 
-	var payload TopUpBalanceRequest
-	if err := c.Bind(&payload); err != nil {
+	var param TopUpBalanceParam
+	if err := c.Bind(&param); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, "invalid request body").Wrap(err)
 	}
 
-	if err := h.Validate.Struct(payload); err != nil {
+	if err := h.Validate.Struct(param); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, "invalid request body").Wrap(err)
 	}
 
-	paymentLink, err := h.UserSvc.TopUpBalance(claims.UserID, payload.Amount)
+	paymentLink, err := h.UserSvc.TopUpBalance(claims.UserID, param.Amount)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "top up failed").Wrap(err)
 	}
@@ -145,16 +145,16 @@ func (h *Handler) CreateOrder(c *echo.Context) error {
 		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized user")
 	}
 
-	var payload CreateOrderRequest
-	if err := c.Bind(&payload); err != nil {
+	var param CreateOrderParam
+	if err := c.Bind(&param); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, "invalid request body").Wrap(err)
 	}
 
-	if err := h.Validate.Struct(payload); err != nil {
+	if err := h.Validate.Struct(param); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, "invalid request body").Wrap(err)
 	}
 
-	itemID, err := uuid.Parse(payload.ItemID)
+	itemID, err := uuid.Parse(param.ItemID)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, "invalid item id format").Wrap(err)
 	}
