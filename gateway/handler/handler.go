@@ -27,6 +27,7 @@ type OrderService interface {
 	GiveRating(orderID uuid.UUID) error
 	DriverGetPendingOrders() ([]model.Order, error)
 	DriverApplyToTakeOrder(driverID, orderID uuid.UUID) error
+	MarkOrderAsDone(orderID, driverID uuid.UUID) error
 }
 
 type Handler struct {
@@ -393,6 +394,35 @@ func (h *Handler) DriverApplyToTakeOrder(c *echo.Context) error {
 
 	if err := h.OrderSvc.DriverApplyToTakeOrder(claims.UserID, orderID); err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "apply to take order failed").Wrap(err)
+	}
+
+	return c.JSON(http.StatusCreated, Response{
+		Message: http.StatusText(http.StatusCreated),
+	})
+}
+
+func (h *Handler) MarkOrderAsDone(c *echo.Context) error {
+	token, ok := c.Get("user").(*jwt.Token)
+	if !ok {
+		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized user")
+	}
+
+	claims, ok := token.Claims.(*helper.MyClaims)
+	if !ok {
+		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized user")
+	}
+
+	if claims.Role != helper.RoleDriver {
+		return echo.NewHTTPError(http.StatusUnauthorized, "you're not a driver")
+	}
+
+	orderID, err := uuid.Parse(c.Param("order_id"))
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, "invalid order id format").Wrap(err)
+	}
+
+	if err := h.OrderSvc.MarkOrderAsDone(orderID, claims.UserID); err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "mark order as done failed").Wrap(err)
 	}
 
 	return c.JSON(http.StatusCreated, Response{
