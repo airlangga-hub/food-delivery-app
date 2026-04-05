@@ -95,6 +95,10 @@ func (h *Handler) TopUpBalance(c *echo.Context) error {
 	if !ok {
 		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized user")
 	}
+	
+	if claims.Role != helper.RoleCustomer {
+		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized user")
+	}
 
 	var payload TopUpBalanceRequest
 	if err := c.Bind(&payload); err != nil {
@@ -126,6 +130,10 @@ func (h *Handler) GetUserInfo(c *echo.Context) error {
 	if !ok {
 		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized user")
 	}
+	
+	if claims.Role != helper.RoleCustomer {
+		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized user")
+	}
 
 	userInfo, err := h.UserSvc.GetUserInfo(claims.UserID)
 	if err != nil {
@@ -146,6 +154,10 @@ func (h *Handler) CreateOrder(c *echo.Context) error {
 
 	claims, ok := token.Claims.(*helper.MyClaims)
 	if !ok {
+		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized user")
+	}
+	
+	if claims.Role != helper.RoleCustomer {
 		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized user")
 	}
 
@@ -189,8 +201,12 @@ func (h *Handler) GetDrivers(c *echo.Context) error {
 		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized user")
 	}
 
-	_, ok = token.Claims.(*helper.MyClaims)
+	claims, ok := token.Claims.(*helper.MyClaims)
 	if !ok {
+		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized user")
+	}
+	
+	if claims.Role != helper.RoleCustomer {
 		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized user")
 	}
 
@@ -219,8 +235,12 @@ func (h *Handler) ChooseDriver(c *echo.Context) error {
 		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized user")
 	}
 
-	_, ok = token.Claims.(*helper.MyClaims)
+	claims, ok := token.Claims.(*helper.MyClaims)
 	if !ok {
+		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized user")
+	}
+	
+	if claims.Role != helper.RoleCustomer {
 		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized user")
 	}
 
@@ -264,6 +284,10 @@ func (h *Handler) GetOrders(c *echo.Context) error {
 	if !ok {
 		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized user")
 	}
+	
+	if claims.Role != helper.RoleCustomer {
+		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized user")
+	}
 
 	orders, err := h.OrderSvc.GetOrders(claims.UserID)
 	if err != nil {
@@ -285,8 +309,12 @@ func (h *Handler) GiveRating(c *echo.Context) error {
 		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized user")
 	}
 
-	_, ok = token.Claims.(*helper.MyClaims)
+	claims, ok := token.Claims.(*helper.MyClaims)
 	if !ok {
+		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized user")
+	}
+	
+	if claims.Role != helper.RoleCustomer {
 		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized user")
 	}
 
