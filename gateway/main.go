@@ -134,8 +134,8 @@ func main() {
 	// driver
 	drivers := orders.Group("/drivers", echojwt.WithConfig(config))
 	drivers.GET("/pending", h.DriverGetPendingOrders)
-	drivers.POST("/apply", h.DriverApplyToTakeOrder)
-	drivers.POST("/done", h.MarkOrderAsDone)
+	drivers.POST("/:order_id/apply", h.DriverApplyToTakeOrder)
+	drivers.POST("/:order_id/done", h.MarkOrderAsDone)
 
 	// graceful shutdown
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
