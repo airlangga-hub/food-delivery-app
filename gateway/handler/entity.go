@@ -2,8 +2,7 @@ package handler
 
 type Response struct {
 	Message string `json:"message"`
-	Data    any    `json:"data,omitempty"`
-	Error   string `json:"error,omitempty"`
+	Data    any    `json:"data"`
 }
 
 type RegisterRequest struct {

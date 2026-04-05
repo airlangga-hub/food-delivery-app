@@ -23,6 +23,7 @@ type OrderService interface {
 	CreateOrder(userID, itemID uuid.UUID) (model.Order, error)
 	GetDrivers(orderID uuid.UUID) (model.FindDriver, error)
 	ChooseDriver(orderID, driverID uuid.UUID) (model.Order, error)
+	GetOrders(userID uuid.UUID) ([]model.Order, error)
 }
 
 type Handler struct {
@@ -248,5 +249,30 @@ func (h *Handler) ChooseDriver(c *echo.Context) error {
 	return c.JSON(http.StatusCreated, Response{
 		Message: http.StatusText(http.StatusCreated),
 		Data:    order,
+	})
+}
+
+func (h *Handler) GetOrders(c *echo.Context) error {
+	token, ok := c.Get("user").(*jwt.Token)
+	if !ok {
+		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized user")
+	}
+
+	claims, ok := token.Claims.(*helper.MyClaims)
+	if !ok {
+		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized user")
+	}
+
+	orders, err := h.OrderSvc.GetOrders(claims.UserID)
+	if err != nil {
+		if errors.Is(err, model.ErrNotFound) {
+			return echo.NewHTTPError(http.StatusNotFound, "you haven't made any orders yet").Wrap(err)
+		}
+		return echo.NewHTTPError(http.StatusInternalServerError, "get orders failed").Wrap(err)
+	}
+
+	return c.JSON(http.StatusOK, Response{
+		Message: http.StatusText(http.StatusOK),
+		Data:    orders,
 	})
 }
