@@ -30,3 +30,8 @@ type CreateOrderParam struct {
 type GetDriversParam struct {
 	OrderID string `query:"order_id" validate:"required"`
 }
+
+type ChooseDriverRequest struct {
+	OrderID  string `json:"order_id" validate:"required"`
+	DriverID string `json:"driver_id" validate:"required"`
+}
