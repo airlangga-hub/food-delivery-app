@@ -30,21 +30,21 @@ func New(userSvc UserService, orderSvc OrderService, val *validator.Validate) *H
 }
 
 func (h *Handler) Register(c *echo.Context) error {
-	var request RegisterRequest
-	if err := c.Bind(&request); err != nil {
+	var payload RegisterRequest
+	if err := c.Bind(&payload); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, "invalid request body").Wrap(err)
 	}
 
-	if err := h.Validate.Struct(request); err != nil {
+	if err := h.Validate.Struct(payload); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, "invalid request body").Wrap(err)
 	}
 
 	user := model.UserRegister{
-		FirstName: request.FirstName,
-		LastName:  request.LastName,
-		Email:     request.Email,
-		Password:  request.Password,
-		Address:   request.Address,
+		FirstName: payload.FirstName,
+		LastName:  payload.LastName,
+		Email:     payload.Email,
+		Password:  payload.Password,
+		Address:   payload.Address,
 	}
 
 	userInfo, err := h.UserSvc.UserRegister(user)
@@ -59,16 +59,16 @@ func (h *Handler) Register(c *echo.Context) error {
 }
 
 func (h *Handler) Login(c *echo.Context) error {
-	var request LoginRequest
-	if err := c.Bind(&request); err != nil {
+	var payload LoginRequest
+	if err := c.Bind(&payload); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, "invalid request body").Wrap(err)
 	}
 
-	if err := h.Validate.Struct(request); err != nil {
+	if err := h.Validate.Struct(payload); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, "invalid request body").Wrap(err)
 	}
 
-	token, err := h.UserSvc.UserLogin(request.Email, request.Password)
+	token, err := h.UserSvc.UserLogin(payload.Email, payload.Password)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusUnauthorized, "invalid email or password").Wrap(err)
 	}
