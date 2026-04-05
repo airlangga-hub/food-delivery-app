@@ -18,7 +18,9 @@ type UserService interface {
 	GetUserInfo(userID uuid.UUID) (model.UserInfo, error)
 }
 
-type OrderService interface{}
+type OrderService interface {
+	CreateOrder(userID, itemID uuid.UUID) (model.Order, error)
+}
 
 type Handler struct {
 	UserSvc  UserService
@@ -93,6 +95,10 @@ func (h *Handler) TopUpBalance(c *echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, "invalid request body").Wrap(err)
 	}
 
+	if err := h.Validate.Struct(payload); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, "invalid request body").Wrap(err)
+	}
+
 	paymentLink, err := h.UserSvc.TopUpBalance(claims.UserID, payload.Amount)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "top up failed").Wrap(err)
@@ -123,5 +129,41 @@ func (h *Handler) GetUserInfo(c *echo.Context) error {
 	return c.JSON(http.StatusOK, Response{
 		Message: http.StatusText(http.StatusOK),
 		Data:    userInfo,
+	})
+}
+
+func (h *Handler) CreateOrder(c *echo.Context) error {
+	token, ok := c.Get("user").(*jwt.Token)
+	if !ok {
+		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized user")
+	}
+
+	claims, ok := token.Claims.(*helper.MyClaims)
+	if !ok {
+		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized user")
+	}
+
+	var payload CreateOrderRequest
+	if err := c.Bind(&payload); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, "invalid request body").Wrap(err)
+	}
+
+	if err := h.Validate.Struct(payload); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, "invalid request body").Wrap(err)
+	}
+
+	itemID, err := uuid.Parse(payload.ItemID)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, "invalid item id format").Wrap(err)
+	}
+
+	order, err := h.OrderSvc.CreateOrder(claims.UserID, itemID)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "create order failed").Wrap(err)
+	}
+
+	return c.JSON(http.StatusCreated, Response{
+		Message: http.StatusText(http.StatusCreated),
+		Data:    order,
 	})
 }

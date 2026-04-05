@@ -22,3 +22,7 @@ type LoginRequest struct {
 type TopUpBalanceRequest struct {
 	Amount int `json:"amount" validate:"required"`
 }
+
+type CreateOrderRequest struct {
+	ItemID string `json:"item_id" validate:"required"`
+}
