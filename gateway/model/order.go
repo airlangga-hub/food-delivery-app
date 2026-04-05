@@ -27,3 +27,8 @@ type Driver struct {
 	DriverBike          string    `json:"driver_bike"`
 	DriverLicensePlate  string    `json:"driver_license_plate"`
 }
+
+type FindDriver struct {
+	OrderID          uuid.UUID `json:"order_id"`
+	ApplicantDrivers []Driver  `json:"applicant_driver"`
+}

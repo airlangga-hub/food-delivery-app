@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/airlangga-hub/food-delivery-app/gateway/helper"
@@ -20,6 +21,7 @@ type UserService interface {
 
 type OrderService interface {
 	CreateOrder(userID, itemID uuid.UUID) (model.Order, error)
+	GetDrivers(orderID uuid.UUID) (model.FindDriver, error)
 }
 
 type Handler struct {
@@ -165,5 +167,44 @@ func (h *Handler) CreateOrder(c *echo.Context) error {
 	return c.JSON(http.StatusCreated, Response{
 		Message: http.StatusText(http.StatusCreated),
 		Data:    order,
+	})
+}
+
+func (h *Handler) GetDrivers(c *echo.Context) error {
+	token, ok := c.Get("user").(*jwt.Token)
+	if !ok {
+		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized user")
+	}
+
+	_, ok = token.Claims.(*helper.MyClaims)
+	if !ok {
+		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized user")
+	}
+
+	var params GetDriversParam
+	if err := c.Bind(&params); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, "invalid query params").Wrap(err)
+	}
+
+	if err := h.Validate.Struct(params); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, "invalid query params").Wrap(err)
+	}
+
+	orderID, err := uuid.Parse(params.OrderID)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, "invalid order id format").Wrap(err)
+	}
+
+	findDrivers, err := h.OrderSvc.GetDrivers(orderID)
+	if err != nil {
+		if errors.Is(err, model.ErrNotFound) {
+			return echo.NewHTTPError(http.StatusNotFound, "no drivers found, we'll keep looking...").Wrap(err)
+		}
+		return echo.NewHTTPError(http.StatusInternalServerError, "get drivers failed").Wrap(err)
+	}
+
+	return c.JSON(http.StatusOK, Response{
+		Message: http.StatusText(http.StatusOK),
+		Data:    findDrivers,
 	})
 }

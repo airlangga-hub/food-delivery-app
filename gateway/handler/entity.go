@@ -26,3 +26,7 @@ type TopUpBalanceRequest struct {
 type CreateOrderRequest struct {
 	ItemID string `json:"item_id" validate:"required"`
 }
+
+type GetDriversParam struct {
+	OrderID string `query:"order_id" validate:"required"`
+}
