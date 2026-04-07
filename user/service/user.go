@@ -9,7 +9,7 @@ import (
 )
 
 type PaymentGatewayRepository interface {
-	CreatePaymentSession(ctx context.Context, userID uuid.UUID, userEmail string, amount int, items []model.PaymentGatewayItem) (model.PaymentGatewayResponse, error)
+	CreatePaymentSession(ctx context.Context, paymentType model.PaymentType, userID uuid.UUID, userEmail string, amount int, items []model.PaymentGatewayItem) (model.PaymentGatewayResponse, error)
 }
 
 type MongoRepository interface {
@@ -37,7 +37,7 @@ func (s *userService) TopUpBalance(ctx context.Context, userID uuid.UUID, userEm
 		},
 	}
 
-	paymentGatewayResp, err := s.paymentGatewayRepository.CreatePaymentSession(ctx, userID, userEmail, amount, items)
+	paymentGatewayResp, err := s.paymentGatewayRepository.CreatePaymentSession(ctx, model.PaymentTypeTopUp, userID, userEmail, amount, items)
 	if err != nil {
 		return model.PaymentGatewayResponse{}, fmt.Errorf("user.service.TopUpBalance: %w", err)
 	}
