@@ -51,7 +51,7 @@ func (s *userService) CreateOrder(ctx context.Context, userID uuid.UUID, userEma
 		return model.Order{}, fmt.Errorf("order.customer_service.CreateOrder: %w", err)
 	}
 	
-	// user client
+	// user client to save payment gateway response
 
 	oorder.PaymentLink = paymentGatewayResponse.PaymentLinkURL
 
