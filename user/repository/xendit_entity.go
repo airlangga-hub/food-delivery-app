@@ -60,6 +60,5 @@ type Item struct {
 	Category      string `json:"category" validate:"required"`
 	NetUnitAmount int    `json:"net_unit_amount" validate:"required"`
 	Quantity      int    `json:"quantity" validate:"required"`
-	Currency      string `json:"currency,omitempty"`
 	URL           string `json:"url,omitempty"`
 }

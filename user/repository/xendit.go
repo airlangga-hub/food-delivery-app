@@ -28,7 +28,21 @@ func NewXenditRepository(xenditPaymentSessionURL, xenditAPIkey string, validate 
 	}
 }
 
-func (r *xenditRepository) CreatePaymentSession(ctx context.Context, userID uuid.UUID, userEmail string, amount int) (model.PaymentGatewayResponse, error) {
+func (r *xenditRepository) CreatePaymentSession(ctx context.Context, userID uuid.UUID, userEmail string, amount int, items []model.PaymentGatewayItem) (model.PaymentGatewayResponse, error) {
+	iitems := make([]Item, len(items))
+	for i, item := range items {
+		iitems[i] = Item{
+			ReferenceID:   item.ReferenceID,
+			Name:          item.Name,
+			Description:   item.Description,
+			Type:          item.Type,
+			Category:      item.Category,
+			NetUnitAmount: item.NetUnitAmount,
+			Quantity:      item.Quantity,
+			URL:           item.URL,
+		}
+	}
+
 	payload := XenditPaymentSessionRequest{
 		ReferenceID: userID.String(),
 		SessionType: "PAY",
@@ -45,16 +59,7 @@ func (r *xenditRepository) CreatePaymentSession(ctx context.Context, userID uuid
 			},
 			Email: userEmail,
 		},
-		Items: []Item{
-			{
-				ReferenceID:   uuid.NewString(),
-				Type:          "DIGITAL_SERVICE",
-				Name:          "Top Up Customer Balance",
-				NetUnitAmount: amount,
-				Quantity:      1,
-				Category:      "Top Up",
-			},
-		},
+		Items: iitems,
 	}
 
 	if err := r.validate.Struct(payload); err != nil {
@@ -90,21 +95,6 @@ func (r *xenditRepository) CreatePaymentSession(ctx context.Context, userID uuid
 		return model.PaymentGatewayResponse{}, fmt.Errorf("user.repository.CreatePaymentSession (JSON decoding): %w", err)
 	}
 
-	paymentGatewayItems := make([]model.PaymentGatewayItem, len(xenditResp.Items))
-	for i, item := range xenditResp.Items {
-		paymentGatewayItems[i] = model.PaymentGatewayItem{
-			ReferenceID:   item.ReferenceID,
-			Name:          item.Name,
-			Description:   item.Description,
-			Type:          item.Type,
-			Category:      item.Category,
-			NetUnitAmount: item.NetUnitAmount,
-			Quantity:      item.Quantity,
-			Currency:      item.Currency,
-			URL:           item.URL,
-		}
-	}
-
 	return model.PaymentGatewayResponse{
 		PaymentSessionID: xenditResp.PaymentSessionID,
 		Created:          xenditResp.Created,
@@ -122,7 +112,7 @@ func (r *xenditRepository) CreatePaymentSession(ctx context.Context, userID uuid
 		CustomerID:       xenditResp.CustomerID,
 		CaptureMethod:    xenditResp.CaptureMethod,
 		Description:      xenditResp.Description,
-		Items:            paymentGatewayItems,
+		Items:            items,
 		SuccessReturnURL: xenditResp.SuccessReturnURL,
 		CancelReturnURL:  xenditResp.CancelReturnURL,
 		PaymentLinkURL:   xenditResp.PaymentLinkURL,

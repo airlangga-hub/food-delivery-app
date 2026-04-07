@@ -55,6 +55,5 @@ type PaymentGatewayItem struct {
 	Category      string `bson:"category"`
 	NetUnitAmount int    `bson:"net_unit_amount"`
 	Quantity      int    `bson:"quantity"`
-	Currency      string `bson:"currency"`
 	URL           string `bson:"url"`
 }
