@@ -18,19 +18,42 @@ type PaymentGatewayRepository interface {
 }
 
 type userService struct {
-	customerRepo CustomerRepository
+	customerRepo       CustomerRepository
+	paymentGatewayRepo PaymentGatewayRepository
 }
 
-func NewUserService(customerRepo CustomerRepository) *userService {
-	return &userService{customerRepo: customerRepo}
+func NewUserService(customerRepo CustomerRepository, paymentGatewayRepo PaymentGatewayRepository) *userService {
+	return &userService{customerRepo: customerRepo, paymentGatewayRepo: paymentGatewayRepo}
 }
 
-func (s *userService) CreateOrder(ctx context.Context, userID uuid.UUID, order model.Order) (model.Order, error) {
-	order, err := s.customerRepo.CreateOrder(ctx, userID, order)
+func (s *userService) CreateOrder(ctx context.Context, userID uuid.UUID, userEmail string, order model.Order) (model.Order, model.PaymentGatewayResponse, error) {
+	oorder, err := s.customerRepo.CreateOrder(ctx, userID, order)
 	if err != nil {
-		return model.Order{}, fmt.Errorf("order.customer_service.CreateOrder: %w", err)
+		return model.Order{}, model.PaymentGatewayResponse{}, fmt.Errorf("order.customer_service.CreateOrder: %w", err)
 	}
-	return order, nil
+
+	items := make([]model.PaymentGatewayItem, 0, 8)
+	for _, resto := range oorder.Restaurants {
+		for _, item := range resto.Items {
+			items = append(items, model.PaymentGatewayItem{
+				ReferenceID:   item.ID.String(),
+				Name:          item.Name,
+				Type:          "PHYSICAL_PRODUCT",
+				Category:      "Order",
+				NetUnitAmount: item.Price,
+				Quantity:      item.Quantity,
+			})
+		}
+	}
+
+	paymentGatewayResponse, err := s.paymentGatewayRepo.CreatePaymentSession(ctx, userID, userEmail, order.TotalFee, items)
+	if err != nil {
+		return model.Order{}, model.PaymentGatewayResponse{}, fmt.Errorf("order.customer_service.CreateOrder: %w", err)
+	}
+
+	oorder.PaymentLink = paymentGatewayResponse.PaymentLinkURL
+
+	return oorder, paymentGatewayResponse, nil
 }
 
 func (s *userService) GetDrivers(ctx context.Context, orderID uuid.UUID) ([]model.Driver, error) {
