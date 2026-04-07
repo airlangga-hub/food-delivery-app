@@ -44,10 +44,10 @@ type XenditCustomer struct {
 	Type             string           `json:"type" validate:"required"`
 	Email            string           `json:"email,omitempty"`
 	MobileNumber     string           `json:"mobile_number,omitempty"`
-	IndividualDetail IndividualDetail `json:"individual_detail" validate:"required"`
+	IndividualDetail XenditIndividualDetail `json:"individual_detail" validate:"required"`
 }
 
-type IndividualDetail struct {
+type XenditIndividualDetail struct {
 	GivenNames string `json:"given_names" validate:"required"`
 	Surname    string `json:"surname,omitempty"`
 }

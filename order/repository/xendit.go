@@ -53,7 +53,7 @@ func (r *xenditRepository) CreatePaymentSession(ctx context.Context, userID uuid
 		Customer: XenditCustomer{
 			ReferenceID: uuid.NewString(),
 			Type:        "INDIVIDUAL",
-			IndividualDetail: IndividualDetail{
+			IndividualDetail: XenditIndividualDetail{
 				GivenNames: userEmail,
 				Surname:    "email",
 			},
