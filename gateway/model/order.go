@@ -11,7 +11,7 @@ const (
 )
 
 type Order struct {
-	ID                  uuid.UUID    `json:"order_id"`
+	ID                  uuid.UUID    `json:"id"`
 	Restaurants         []Restaurant `json:"restaurants"`
 	DeliveryAddress     string       `json:"delivery_address"`
 	CustomerPhoneNumber string       `json:"customer_phone_number"`
@@ -20,28 +20,28 @@ type Order struct {
 }
 
 type Restaurant struct {
-	ID      uuid.UUID `json:"restaurant_id"`
+	ID      uuid.UUID `json:"id"`
 	Name    string    `json:"name"`
 	Address string    `json:"address"`
 	Items   []Item    `json:"items"`
 }
 
 type Item struct {
-	ID       uuid.UUID `json:"item_id"`
+	ID       uuid.UUID `json:"id"`
 	Name     string    `json:"item_name"`
 	Price    int       `json:"price"`
 	Quantity int       `json:"quantity"`
 }
 
 type Driver struct {
-	ID                  uuid.UUID `json:"driver_id"`
-	DriverAverageRating float64   `json:"driver_average_rating"`
-	DriverName          string    `json:"driver_name"`
-	DriverBike          string    `json:"driver_bike"`
-	DriverLicensePlate  string    `json:"driver_license_plate"`
+	ID            uuid.UUID `json:"id"`
+	AverageRating float64   `json:"average_rating"`
+	Name          string    `json:"name"`
+	Bike          string    `json:"bike"`
+	LicensePlate  string    `json:"license_plate"`
+	PhoneNumber   string    `json:"phone_number"`
 }
 
 type FindDriver struct {
-	OrderID          uuid.UUID `json:"order_id"`
-	ApplicantDrivers []Driver  `json:"applicant_driver"`
+	OrderApplicants []Driver `json:"order_applicants"`
 }

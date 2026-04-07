@@ -87,7 +87,7 @@ func (r *customerRepository) CreateOrder(ctx context.Context, userID uuid.UUID, 
 		totalFee += price * qty
 		updatedCount++
 	}
-	
+
 	if updatedCount != len(itemIDs) {
 		return model.Order{}, fmt.Errorf("order.customer_repo.CreateOrder: one or more item not found: %w", model.ErrNotFound)
 	}
@@ -226,4 +226,72 @@ func (r *customerRepository) CreateOrder(ctx context.Context, userID uuid.UUID, 
 	}
 
 	return resultOrder, tx.Commit()
+}
+
+func (r *customerRepository) GetDrivers(ctx context.Context, orderID uuid.UUID) ([]model.Driver, error) {
+	rows, err := r.db.QueryContext(
+		ctx,
+		`SELECT
+			dp.user_id,
+			COALESCE((
+			      SELECT
+					ROUND(AVG(r.rating)::numeric, 1)
+			      FROM
+					orders o
+			      JOIN 
+					ratings r 
+					ON r.order_id = o.id
+			      WHERE 
+					o.driver_id = dp.user_id
+			), 0.0) AS avg_rating
+			dp.first_name,
+			dp.last_name,
+			dp.bike,
+			dp.license_plate,
+			dp.phone_number,
+		FROM
+		    	order_applicants op
+		JOIN
+		    	driver_profiles dp
+			ON dp.user_id = op.driver_id
+		WHERE
+		    	op.order_id = $1;`,
+		orderID,
+	)
+	if err != nil {
+		return nil, fmt.Errorf("order.customer_repo.GetDrivers (r.db.QueryContext): %w", err)
+	}
+	defer rows.Close()
+	
+	drivers := make([]model.Driver, 0, 8)
+	
+	for rows.Next() {
+		var drv model.Driver
+		var firstName, lastName string
+		
+		if err := rows.Scan(
+			&drv.ID,
+			&drv.AverageRating,
+			&firstName,
+			&lastName,
+			&drv.Bike,
+			&drv.LicensePlate,
+			&drv.PhoneNumber,
+		); err != nil {
+			return nil, fmt.Errorf("order.customer_repo.GetDrivers (rows.Scan): %w", err)
+		}
+		
+		drv.Name = firstName + " " + lastName
+		
+		drivers = append(drivers, drv)
+	}
+	
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("order.customer_repo.GetDrivers (rows.Err): %w", err)
+	}
+	if len(drivers) == 0 {
+		return nil, fmt.Errorf("order.customer_repo.GetDrivers: no drivers found: %w", model.ErrNotFound)
+	}
+	
+	return drivers, nil
 }

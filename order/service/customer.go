@@ -10,6 +10,7 @@ import (
 
 type CustomerRepository interface {
 	CreateOrder(ctx context.Context, userID uuid.UUID, order model.Order) (model.Order, error)
+	GetDrivers(ctx context.Context, orderID uuid.UUID) ([]model.Driver, error)
 }
 
 type userService struct {
@@ -26,4 +27,12 @@ func (s *userService) CreateOrder(ctx context.Context, userID uuid.UUID, order m
 		return model.Order{}, fmt.Errorf("order.customer_service.CreateOrder: %w", err)
 	}
 	return order, nil
+}
+
+func (s *userService) GetDrivers(ctx context.Context, orderID uuid.UUID) ([]model.Driver, error) {
+	drivers, err := s.customerRepo.GetDrivers(ctx, orderID)
+	if err != nil {
+		return nil, fmt.Errorf("order.customer_service.GetDrivers: %w", err)
+	}
+	return drivers, nil
 }

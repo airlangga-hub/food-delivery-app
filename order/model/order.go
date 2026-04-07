@@ -36,14 +36,14 @@ type Item struct {
 }
 
 type Driver struct {
-	ID                  uuid.UUID
-	DriverAverageRating float64
-	DriverName          string
-	DriverBike          string
-	DriverLicensePlate  string
+	ID            uuid.UUID
+	AverageRating float64
+	Name          string
+	Bike          string
+	LicensePlate  string
+	PhoneNumber   string
 }
 
 type FindDriver struct {
-	OrderID          uuid.UUID
-	ApplicantDrivers []Driver
+	OrderApplicants []Driver
 }
