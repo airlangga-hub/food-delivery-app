@@ -14,7 +14,7 @@ import (
 	"github.com/airlangga-hub/food-delivery-app/gateway/helper"
 	"github.com/go-playground/validator/v10"
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/joho/godotenv"
+	_ "github.com/joho/godotenv/autoload"
 	echojwt "github.com/labstack/echo-jwt/v5"
 	"github.com/labstack/echo/v5"
 	"github.com/labstack/echo/v5/middleware"
@@ -25,8 +25,6 @@ import (
 func main() {
 	// logger
 	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
-
-	godotenv.Load()
 
 	port := os.Getenv("CONTAINER_PORT")
 	jwtSecret := os.Getenv("JWT_SECRET")
