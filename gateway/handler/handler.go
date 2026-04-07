@@ -181,7 +181,7 @@ func (h *Handler) CreateOrder(c *echo.Context) error {
 		}
 
 		items[i] = model.Item{
-			ItemID:   itemID,
+			ID:       itemID,
 			Quantity: item.Quantity,
 		}
 	}
