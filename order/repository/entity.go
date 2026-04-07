@@ -3,15 +3,8 @@ package repository
 import (
 	"time"
 
+	"github.com/airlangga-hub/food-delivery-app/order/model"
 	"github.com/google/uuid"
-)
-
-type OrderStatus string
-
-const (
-	OrderStatusSearchingForDriver OrderStatus = "pending"
-	OrderStatusDriverOTW          OrderStatus = "otw"
-	OrderStatusDone               OrderStatus = "done"
 )
 
 type Restaurant struct {
@@ -39,7 +32,7 @@ type OrderItem struct {
 
 type Order struct {
 	ID          uuid.UUID
-	OrderStatus OrderStatus
+	OrderStatus model.OrderStatus
 	DeliveryFee int
 	TotalFee    int
 	CreatedAt   time.Time
