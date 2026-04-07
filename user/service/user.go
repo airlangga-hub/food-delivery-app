@@ -44,7 +44,7 @@ func (s *userService) TopUpBalance(ctx context.Context, userID uuid.UUID, userEm
 
 	if err := s.mongoRepository.CreatePaymentRecord(ctx, model.PaymentRecord{
 		Email:                  userEmail,
-		EmailSentStatus:        model.EmailStatusPending,
+		EmailStatus:            model.EmailStatusPending,
 		PaymentType:            model.PaymentTypeTopUp,
 		PaymentGatewayResponse: paymentGatewayResp,
 	}); err != nil {
