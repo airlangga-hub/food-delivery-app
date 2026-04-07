@@ -4,25 +4,26 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/airlangga-hub/food-delivery-app/user/model"
 	"github.com/google/uuid"
 )
 
-type XenditRepository interface {
-	CreatePaymentSession(ctx context.Context, userID uuid.UUID, userEmail string, amount int) (string, error)
+type PaymentGatewayRepository interface {
+	CreatePaymentSession(ctx context.Context, userID uuid.UUID, userEmail string, amount int) (model.PaymentGatewayResponse, error)
 }
 
 type userService struct {
-	xenditRepo XenditRepository
+	paymentGatewayRepository PaymentGatewayRepository
 }
 
-func NewUserService(userRepo XenditRepository) *userService {
-	return &userService{xenditRepo: userRepo}
+func NewUserService(userRepo PaymentGatewayRepository) *userService {
+	return &userService{paymentGatewayRepository: userRepo}
 }
 
-func (s *userService) TopUpBalance(ctx context.Context, userID uuid.UUID, userEmail string, amount int) (string, error) {
-	sessionLink, err := s.xenditRepo.CreatePaymentSession(ctx, userID, userEmail, amount)
+func (s *userService) TopUpBalance(ctx context.Context, userID uuid.UUID, userEmail string, amount int) (model.PaymentGatewayResponse, error) {
+	sessionLink, err := s.paymentGatewayRepository.CreatePaymentSession(ctx, userID, userEmail, amount)
 	if err != nil {
-		return "", fmt.Errorf("user.service.TopUpBalance: %w", err)
+		return model.PaymentGatewayResponse{}, fmt.Errorf("user.service.TopUpBalance: %w", err)
 	}
 	return sessionLink, nil
 }
