@@ -27,34 +27,75 @@ func (r *customerRepository) CreateOrder(ctx context.Context, userID uuid.UUID, 
 
 	// map requested items to fetch current prices and calculate totalfee
 	var itemIDs []uuid.UUID
+	var itemQtys []int
 	qtyMap := make(map[uuid.UUID]int)
+
 	for _, resto := range order.Restaurants {
 		for _, item := range resto.Items {
 			itemIDs = append(itemIDs, item.ID)
+			itemQtys = append(itemQtys, item.Quantity)
 			qtyMap[item.ID] = item.Quantity
 		}
 	}
 
 	// fetch prices from db
-	rows, err := tx.QueryContext(ctx, `SELECT id, price FROM items WHERE id = ANY($1)`, pq.Array(itemIDs))
+	rows, err := tx.QueryContext(
+		ctx,
+		`UPDATE
+			items AS i
+		SET
+			stock = i.stock - v.qty
+		FROM
+			(
+				SELECT
+					unnest($1::uuid[]) AS id,
+					unnest($2::int[]) AS qty
+			) AS v
+		WHERE
+			i.id = v.id
+		RETURNING
+			i.id,
+			i.price,
+			i.stock`,
+		pq.Array(itemIDs),
+		pq.Array(itemQtys),
+	)
 	if err != nil {
 		return model.Order{}, fmt.Errorf("order.customer_repo.CreateOrder (tx.QueryContext): %w", err)
 	}
 	defer rows.Close()
 
 	totalFee := 0
+	updatedCount := 0
 	for rows.Next() {
 		var id uuid.UUID
-		var price int
-		if err := rows.Scan(&id, &price); err != nil {
+		var price, updatedStock int
+
+		if err := rows.Scan(&id, &price, &updatedStock); err != nil {
 			return model.Order{}, fmt.Errorf("order.customer_repo.CreateOrder (rows.Scan): %w", err)
 		}
+
+		if updatedStock < 0 {
+			return model.Order{}, fmt.Errorf("order.customer_repo.CreateOrder: insufficient stock for %v", id)
+		}
+
 		qty, ok := qtyMap[id]
 		if !ok {
-			return model.Order{}, fmt.Errorf("order.customer_repo.CreateOrder (qtyMap[id]) id not found in qtyMap: %w", model.ErrNotFound)
+			return model.Order{}, fmt.Errorf("order.customer_repo.CreateOrder: id %v not found in qtyMap: %w", id, model.ErrNotFound)
 		}
+
 		totalFee += price * qty
+		updatedCount++
 	}
+	
+	if updatedCount != len(itemIDs) {
+		return model.Order{}, fmt.Errorf("order.customer_repo.CreateOrder: one or more item not found: %w", model.ErrNotFound)
+	}
+
+	if err := rows.Err(); err != nil {
+		return model.Order{}, fmt.Errorf("order.customer_repo.CreateOrder (rows.Err): %w", err)
+	}
+
 	totalFee += order.DeliveryFee
 
 	// insert order
@@ -81,6 +122,11 @@ func (r *customerRepository) CreateOrder(ctx context.Context, userID uuid.UUID, 
 		if _, err = stmt.ExecContext(ctx, orderID, itemID, qty); err != nil {
 			return model.Order{}, fmt.Errorf("order.customer_repo.CreateOrder (stmt.ExecContext): %w", err)
 		}
+	}
+
+	// flush
+	if _, err := stmt.ExecContext(ctx); err != nil {
+		return model.Order{}, fmt.Errorf("order.customer_repo.CreateOrder (stmt.ExecContext flush): %w", err)
 	}
 
 	// fetch full populated data for return
