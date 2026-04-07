@@ -8,7 +8,7 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/airlangga-hub/food-delivery-app/user/model"
+	"github.com/airlangga-hub/food-delivery-app/order/model"
 	"github.com/go-playground/validator/v10"
 	"github.com/google/uuid"
 )
@@ -29,9 +29,9 @@ func NewXenditRepository(xenditPaymentSessionURL, xenditAPIkey string, validate 
 }
 
 func (r *xenditRepository) CreatePaymentSession(ctx context.Context, userID uuid.UUID, userEmail string, amount int, items []model.PaymentGatewayItem) (model.PaymentGatewayResponse, error) {
-	iitems := make([]Item, len(items))
+	iitems := make([]XenditItem, len(items))
 	for i, item := range items {
-		iitems[i] = Item{
+		iitems[i] = XenditItem{
 			ReferenceID:   item.ReferenceID,
 			Name:          item.Name,
 			Description:   item.Description,
@@ -50,7 +50,7 @@ func (r *xenditRepository) CreatePaymentSession(ctx context.Context, userID uuid
 		Amount:      amount,
 		Currency:    "IDR",
 		Country:     "ID",
-		Customer: Customer{
+		Customer: XenditCustomer{
 			ReferenceID: uuid.NewString(),
 			Type:        "INDIVIDUAL",
 			IndividualDetail: IndividualDetail{

@@ -7,8 +7,8 @@ type XenditPaymentSessionRequest struct {
 	Amount           int      `json:"amount" validate:"required"`
 	Currency         string   `json:"currency" validate:"required"`
 	Country          string   `json:"country" validate:"required"`
-	Customer         Customer `json:"customer" validate:"required"`
-	Items            []Item   `json:"items,omitempty"`
+	Customer         XenditCustomer `json:"customer" validate:"required"`
+	Items            []XenditItem   `json:"items,omitempty"`
 	CaptureMethod    string   `json:"capture_method,omitempty"`
 	Locale           string   `json:"locale,omitempty"`
 	Description      string   `json:"description,omitempty"`
@@ -33,13 +33,13 @@ type XenditPaymentSessionResponse struct {
 	CustomerID       string `json:"customer_id"`
 	CaptureMethod    string `json:"capture_method"`
 	Description      string `json:"description"`
-	Items            []Item `json:"items"`
+	Items            []XenditItem `json:"items"`
 	SuccessReturnURL string `json:"success_return_url"`
 	CancelReturnURL  string `json:"cancel_return_url"`
 	PaymentLinkURL   string `json:"payment_link_url"`
 }
 
-type Customer struct {
+type XenditCustomer struct {
 	ReferenceID      string           `json:"reference_id" validate:"required"`
 	Type             string           `json:"type" validate:"required"`
 	Email            string           `json:"email,omitempty"`
@@ -52,7 +52,7 @@ type IndividualDetail struct {
 	Surname    string `json:"surname,omitempty"`
 }
 
-type Item struct {
+type XenditItem struct {
 	ReferenceID   string `json:"reference_id" validate:"required"`
 	Name          string `json:"name" validate:"required"`
 	Description   string `json:"description,omitempty"`
