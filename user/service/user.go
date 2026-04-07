@@ -12,8 +12,13 @@ type PaymentGatewayRepository interface {
 	CreatePaymentSession(ctx context.Context, userID uuid.UUID, userEmail string, amount int) (model.PaymentGatewayResponse, error)
 }
 
+type MongoRepository interface {
+	CreatePaymentRecord(ctx context.Context, paymentRecord model.PaymentRecord) error
+}
+
 type userService struct {
 	paymentGatewayRepository PaymentGatewayRepository
+	mongoRepository          MongoRepository
 }
 
 func NewUserService(userRepo PaymentGatewayRepository) *userService {
@@ -21,9 +26,19 @@ func NewUserService(userRepo PaymentGatewayRepository) *userService {
 }
 
 func (s *userService) TopUpBalance(ctx context.Context, userID uuid.UUID, userEmail string, amount int) (model.PaymentGatewayResponse, error) {
-	sessionLink, err := s.paymentGatewayRepository.CreatePaymentSession(ctx, userID, userEmail, amount)
+	paymentGatewayResp, err := s.paymentGatewayRepository.CreatePaymentSession(ctx, userID, userEmail, amount)
 	if err != nil {
 		return model.PaymentGatewayResponse{}, fmt.Errorf("user.service.TopUpBalance: %w", err)
 	}
-	return sessionLink, nil
+
+	if err := s.mongoRepository.CreatePaymentRecord(ctx, model.PaymentRecord{
+		Email:                  userEmail,
+		EmailSentStatus:        model.EmailStatusPending,
+		PaymentType:            model.PaymentTypeTopUp,
+		PaymentGatewayResponse: paymentGatewayResp,
+	}); err != nil {
+		return model.PaymentGatewayResponse{}, fmt.Errorf("user.service.TopUpBalance: %w", err)
+	}
+
+	return paymentGatewayResp, nil
 }

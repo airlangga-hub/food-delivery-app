@@ -1,13 +1,5 @@
 package repository
 
-type EmailStatus string
-
-const (
-	EmailStatusPending EmailStatus = "PENDING"
-	EmailStatusSending EmailStatus = "SENDING"
-	EmailStatusSent    EmailStatus = "SENT"
-)
-
 type XenditPaymentSessionRequest struct {
 	ReferenceID      string   `json:"reference_id" validate:"required"`
 	SessionType      string   `json:"session_type" validate:"required"`
