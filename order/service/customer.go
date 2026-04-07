@@ -13,6 +13,10 @@ type CustomerRepository interface {
 	GetDrivers(ctx context.Context, orderID uuid.UUID) ([]model.Driver, error)
 }
 
+type PaymentGatewayRepository interface {
+	CreatePaymentSession(ctx context.Context, userID uuid.UUID, userEmail string, amount int, items []model.PaymentGatewayItem) (model.PaymentGatewayResponse, error)
+}
+
 type userService struct {
 	customerRepo CustomerRepository
 }
