@@ -26,10 +26,10 @@ func NewUserService(customerRepo CustomerRepository, paymentGatewayRepo PaymentG
 	return &userService{customerRepo: customerRepo, paymentGatewayRepo: paymentGatewayRepo}
 }
 
-func (s *userService) CreateOrder(ctx context.Context, userID uuid.UUID, userEmail string, order model.Order) (model.Order, model.PaymentGatewayResponse, error) {
+func (s *userService) CreateOrder(ctx context.Context, userID uuid.UUID, userEmail string, order model.Order) (model.Order, error) {
 	oorder, err := s.customerRepo.CreateOrder(ctx, userID, order)
 	if err != nil {
-		return model.Order{}, model.PaymentGatewayResponse{}, fmt.Errorf("order.customer_service.CreateOrder: %w", err)
+		return model.Order{}, fmt.Errorf("order.customer_service.CreateOrder: %w", err)
 	}
 
 	items := make([]model.PaymentGatewayItem, 0, 8)
@@ -48,12 +48,12 @@ func (s *userService) CreateOrder(ctx context.Context, userID uuid.UUID, userEma
 
 	paymentGatewayResponse, err := s.paymentGatewayRepo.CreatePaymentSession(ctx, model.PaymentTypeOrder, userID, userEmail, order.TotalFee, items)
 	if err != nil {
-		return model.Order{}, model.PaymentGatewayResponse{}, fmt.Errorf("order.customer_service.CreateOrder: %w", err)
+		return model.Order{}, fmt.Errorf("order.customer_service.CreateOrder: %w", err)
 	}
 
 	oorder.PaymentLink = paymentGatewayResponse.PaymentLinkURL
 
-	return oorder, paymentGatewayResponse, nil
+	return oorder, nil
 }
 
 func (s *userService) GetDrivers(ctx context.Context, orderID uuid.UUID) ([]model.Driver, error) {
