@@ -14,7 +14,7 @@ type CustomerRepository interface {
 }
 
 type PaymentGatewayRepository interface {
-	CreatePaymentSession(ctx context.Context, userID uuid.UUID, userEmail string, amount int, items []model.PaymentGatewayItem) (model.PaymentGatewayResponse, error)
+	CreatePaymentSession(ctx context.Context, paymentType model.PaymentType, userID uuid.UUID, userEmail string, amount int, items []model.PaymentGatewayItem) (model.PaymentGatewayResponse, error)
 }
 
 type userService struct {
@@ -46,7 +46,7 @@ func (s *userService) CreateOrder(ctx context.Context, userID uuid.UUID, userEma
 		}
 	}
 
-	paymentGatewayResponse, err := s.paymentGatewayRepo.CreatePaymentSession(ctx, userID, userEmail, order.TotalFee, items)
+	paymentGatewayResponse, err := s.paymentGatewayRepo.CreatePaymentSession(ctx, model.PaymentTypeOrder, userID, userEmail, order.TotalFee, items)
 	if err != nil {
 		return model.Order{}, model.PaymentGatewayResponse{}, fmt.Errorf("order.customer_service.CreateOrder: %w", err)
 	}
