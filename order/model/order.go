@@ -19,6 +19,7 @@ type Order struct {
 	Driver              Driver
 	DeliveryFee         int
 	TotalFee            int
+	PaymentLink         string
 }
 
 type Restaurant struct {
