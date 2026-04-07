@@ -1,15 +1,17 @@
 package service
 
 import (
-	"database/sql"
-	_ "github.com/lib/pq"
+	"context"
 )
 
+type UserRepository interface {
+	CreatePaymentSession(ctx context.Context, amount int) (string, error)
+}
+
 type userService struct {
-	db *sql.DB
+	userRepo UserRepository
 }
 
-func NewUserService(db *sql.DB) *userService {
-	return &userService{db: db}
+func NewUserService(userRepo UserRepository) *userService {
+	return &userService{userRepo: userRepo}
 }
-
