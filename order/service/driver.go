@@ -11,6 +11,7 @@ import (
 type DriverSQLRepository interface {
 	DriverGetPendingOrders(ctx context.Context) ([]model.Order, error)
 	DriverApplyForOrder(ctx context.Context, orderID uuid.UUID, driverID uuid.UUID) error
+	DriverCompleteOrder(ctx context.Context, orderID uuid.UUID, driverID uuid.UUID) error
 }
 
 type driverService struct {
@@ -32,6 +33,13 @@ func (s *driverService) DriverGetPendingOrders(ctx context.Context) ([]model.Ord
 func (s *driverService) DriverApplyForOrder(ctx context.Context, orderID uuid.UUID, driverID uuid.UUID) error {
 	if err := s.driverSqlRepo.DriverApplyForOrder(ctx, orderID, driverID); err != nil {
 		return fmt.Errorf("order.service.DriverApplyForOrder: %w", err)
+	}
+	return nil
+}
+
+func (s *driverService) DriverCompleteOrder(ctx context.Context, orderID uuid.UUID, driverID uuid.UUID) error {
+	if err := s.driverSqlRepo.DriverCompleteOrder(ctx, orderID, driverID); err != nil {
+		return fmt.Errorf("order.service.DriverCompleteOrder: %w", err)
 	}
 	return nil
 }
