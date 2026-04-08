@@ -424,28 +424,6 @@ func (r *sqlRepository) GetDrivers(ctx context.Context, orderID uuid.UUID) ([]mo
 	return drivers, nil
 }
 
-func (r *sqlRepository) UpdateLedger(ctx context.Context, tx *sql.Tx, userID uuid.UUID, reason model.LedgerReason, amount int) error {
-	finalAmount := amount
-
-	if reason == model.LedgerReasonCustomerOrder {
-		finalAmount = -amount
-	}
-
-	_, err := tx.ExecContext(
-		ctx,
-		`INSERT INTO
-			ledgers (user_id, amount, reason)
-		VALUES
-			($1, $2, $3)`,
-		userID, finalAmount, string(reason),
-	)
-	if err != nil {
-		return fmt.Errorf("user.repository.UpdateLedger: %w", err)
-	}
-
-	return nil
-}
-
 func (r *sqlRepository) ChooseDriver(ctx context.Context, orderID, driverID uuid.UUID) (model.Order, error) {
 	tx, err := r.db.BeginTx(ctx, nil)
 	if err != nil {
