@@ -648,3 +648,33 @@ func (r *sqlRepository) DriverGetPendingOrders(ctx context.Context) ([]model.Ord
 
 	return result, nil
 }
+
+func (r *sqlRepository) DriverApplyForOrder(ctx context.Context, orderID uuid.UUID, driverID uuid.UUID) error {
+	result, err := r.db.ExecContext(
+		ctx,
+		`INSERT INTO
+			order_applicants (order_id, driver_id)
+		SELECT $1, $2
+		FROM
+			orders
+		WHERE
+			id = $1 AND
+			order_status = $3
+		ON CONFLICT (order_id, driver_id) DO NOTHING`,
+		orderID, driverID, model.OrderStatusSearchingForDriver,
+	)
+	if err != nil {
+		return fmt.Errorf("order.repo.DriverApplyForOrder (db.ExecContext): %w", err)
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("order.repo.DriverApplyForOrder (RowsAffected): %w", err)
+	}
+
+	if rowsAffected == 0 {
+		return fmt.Errorf("order.repo.DriverApplyForOrder (no rows found): %w", model.ErrNotFound)
+	}
+
+	return nil
+}
