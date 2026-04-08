@@ -424,14 +424,14 @@ func (r *sqlRepository) GetDrivers(ctx context.Context, orderID uuid.UUID) ([]mo
 	return drivers, nil
 }
 
-func (r *sqlRepository) UpdateLedger(ctx context.Context, userID uuid.UUID, reason model.LedgerReason, amount int) error {
+func (r *sqlRepository) UpdateLedger(ctx context.Context, tx *sql.Tx, userID uuid.UUID, reason model.LedgerReason, amount int) error {
 	finalAmount := amount
 
 	if reason == model.LedgerReasonCustomerOrder {
 		finalAmount = -amount
 	}
 
-	_, err := r.db.ExecContext(
+	_, err := tx.ExecContext(
 		ctx,
 		`INSERT INTO
 			ledgers (user_id, amount, reason)
