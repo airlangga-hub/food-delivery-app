@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/airlangga-hub/food-delivery-app/user/model"
+	"github.com/airlangga-hub/food-delivery-app/user/repository"
 	"github.com/google/uuid"
 )
 
@@ -20,13 +21,20 @@ type UserSQLRepository interface {
 	UpdateLedger(ctx context.Context, userID uuid.UUID, reason model.LedgerReason, amount int) error
 }
 
+type UserService interface {
+	Register(ctx context.Context, input model.UserRegister)
+	Login(ctx context.Context, email string, password string) (string, error)
+	GetUserByInfo(ctx context.Context, email string) (model.UserInfo, error)
+}
+
 type userService struct {
+	userRepo                     repository.UserRepository
 	userPaymentGatewayRepository UserPaymentGatewayRepository
 	userMongoRepository          UserMongoRepository
 	userSqlRepository            UserSQLRepository
 }
 
-func NewUserService(userpaymentGatewayRepo UserPaymentGatewayRepository, userMongoRepo UserMongoRepository, userSqlRepo UserSQLRepository) *userService {
+func NewUserService(repo repository.UserRepository, userpaymentGatewayRepo UserPaymentGatewayRepository, userMongoRepo UserMongoRepository, userSqlRepo UserSQLRepository) *userService {
 	return &userService{userPaymentGatewayRepository: userpaymentGatewayRepo, userMongoRepository: userMongoRepo, userSqlRepository: userSqlRepo}
 }
 
