@@ -11,6 +11,7 @@ import (
 type CustomerSQLRepository interface {
 	CreateOrder(ctx context.Context, userID uuid.UUID, order model.OrderIn) (model.Order, error)
 	GetDrivers(ctx context.Context, orderID uuid.UUID) ([]model.Driver, error)
+	ChooseDriver(ctx context.Context, orderID, driverID uuid.UUID) (model.Order, error)
 }
 
 type CustomerPaymentGatewayRepository interface {
@@ -76,4 +77,12 @@ func (s *customerService) GetDrivers(ctx context.Context, orderID uuid.UUID) ([]
 		return nil, fmt.Errorf("order.customer_service.GetDrivers: %w", err)
 	}
 	return drivers, nil
+}
+
+func (s *customerService) ChooseDriver(ctx context.Context, orderID, driverID uuid.UUID) (model.Order, error) {
+	order, err := s.customerSqlRepo.ChooseDriver(ctx, orderID, driverID)
+	if err != nil {
+		return model.Order{}, fmt.Errorf("order.service.ChooseDriver (customerSqlRepo.ChooseDriver): %w", err)
+	}
+	return order, nil
 }
