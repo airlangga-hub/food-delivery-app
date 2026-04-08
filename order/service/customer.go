@@ -27,8 +27,8 @@ type customerService struct {
 	customerMongoRepo          CustomerMongoRepository
 }
 
-func NewCustomerService(customerRepo CustomerSQLRepository, paymentGatewayRepo CustomerPaymentGatewayRepository, mongoRepo CustomerMongoRepository) *customerService {
-	return &customerService{customerSqlRepo: customerRepo, customerPaymentGatewayRepo: paymentGatewayRepo, customerMongoRepo: mongoRepo}
+func NewCustomerService(customerSqlRepo CustomerSQLRepository, customerPaymentGatewayRepo CustomerPaymentGatewayRepository, customerMongoRepo CustomerMongoRepository) *customerService {
+	return &customerService{customerSqlRepo: customerSqlRepo, customerPaymentGatewayRepo: customerPaymentGatewayRepo, customerMongoRepo: customerMongoRepo}
 }
 
 func (s *customerService) CreateOrder(ctx context.Context, userID uuid.UUID, userEmail string, order model.OrderIn) (model.Order, error) {
