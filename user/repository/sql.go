@@ -39,10 +39,45 @@ func (r *sqlRepository) UpdateLedger(ctx context.Context, userID uuid.UUID, reas
 	return nil
 }
 
-func (r *sqlRepository) Register(ctx context.Context, u model.UserRegister) error {
-	query := `INSERT INTO users (first_name, last_name, email, password_hash, address) VALUES ($1, $2, $3, $4, $5)`
-	_, err := r.db.ExecContext(ctx, query, u.FirstName, u.LastName, u.Email, u.Password, u.Address)
-	return err
+func (r *sqlRepository) RegisterCustomer(ctx context.Context, input model.UserRegister) (model.UserInfo, error) {
+	_, err := r.db.ExecContext(
+		ctx,
+		`WITH new_user AS (
+			INSERT INTO
+				users (email, password_hash, role)
+			VALUES
+				($1, $2, $7)
+			RETURNING
+				id
+		)
+		INSERT INTO
+			customer_profiles (user_id, first_name, last_name, address, phone_number)
+		SELECT
+			id, $3, $4, $5, $6
+		FROM
+			new_user
+		RETURNING
+			user_id`,
+		input.Email,
+		input.Password,
+		input.FirstName,
+		input.LastName,
+		input.Address,
+		input.PhoneNumber,
+		model.UserRoleCustomer,
+	)
+
+	if err != nil {
+		return model.UserInfo{}, fmt.Errorf("user.repository.RegisterCustomer (ExecContext): %w", err)
+	}
+
+	return model.UserInfo{
+		FirstName:   input.FirstName,
+		LastName:    input.LastName,
+		Email:       input.Email,
+		Address:     input.Address,
+		PhoneNumber: input.PhoneNumber,
+	}, nil
 }
 
 func (r *sqlRepository) Login(ctx context.Context, email string) (model.UserInfo, string, error) {

@@ -8,21 +8,23 @@ const (
 )
 
 type UserRegister struct {
-	FirstName string `json:"first_name"`
-	LastName  string `json:"last_name"`
-	Email     string `json:"email"`
-	Password  string `json:"password"`
-	Address   string `json:"address"`
+	FirstName   string
+	LastName    string
+	Email       string
+	Password    string
+	Address     string
+	PhoneNumber string
 }
 
 type UserInfo struct {
-	FirstName string `json:"first_name"`
-	LastName  string `json:"last_name"`
-	Email     string `json:"email"`
-	Address   string `json:"address"`
-	Balance   int    `json:"balance"`
+	FirstName   string
+	LastName    string
+	Email       string
+	Address     string
+	PhoneNumber string
+	Balance     int
 }
 
 type PaymentLink struct {
-	PaymentLink string `json:"payment_link"`
+	PaymentLink string
 }
