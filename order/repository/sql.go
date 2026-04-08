@@ -505,3 +505,37 @@ func (r *sqlRepository) UpdateOrder(ctx context.Context, tx *sql.Tx, orderID uui
 
 	return nil
 }
+
+func (r *sqlRepository) GiveRating(ctx context.Context, orderID uuid.UUID, rating int) error {
+	result, err := r.db.ExecContext(
+		ctx,
+		`INSERT INTO
+			ratings (order_id, rating)
+		SELECT
+			$1,
+			$2
+		FROM
+			orders
+		WHERE
+			id = $1 AND
+			order_status = $3
+		ON CONFLICT (order_id) DO NOTHING`,
+		orderID,
+		rating,
+		model.OrderStatusDone,
+	)
+	if err != nil {
+		return fmt.Errorf("order.repository.GiveRating (ExecContext): %w", err)
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("order.repository.GiveRating (RowsAffected): %w", err)
+	}
+
+	if rowsAffected == 0 {
+		return fmt.Errorf("order.repository.GiveRating (no rows found): %w", model.ErrNotFound)
+	}
+
+	return nil
+}
