@@ -16,13 +16,18 @@ type MongoRepository interface {
 	CreatePaymentRecord(ctx context.Context, paymentRecord model.PaymentRecord) error
 }
 
+type SQLRepository interface {
+	UpdateLedger(ctx context.Context, userID uuid.UUID, reason model.LedgerReason, amount int) error
+}
+
 type userService struct {
 	paymentGatewayRepository PaymentGatewayRepository
 	mongoRepository          MongoRepository
+	sqlRepository            SQLRepository
 }
 
-func NewUserService(userRepo PaymentGatewayRepository) *userService {
-	return &userService{paymentGatewayRepository: userRepo}
+func NewUserService(userRepo PaymentGatewayRepository, mongoRepo MongoRepository, sqlRepo SQLRepository) *userService {
+	return &userService{paymentGatewayRepository: userRepo, mongoRepository: mongoRepo, sqlRepository: sqlRepo}
 }
 
 func (s *userService) TopUpBalance(ctx context.Context, userID uuid.UUID, userEmail string, amount int) (model.PaymentGatewayResponse, error) {
