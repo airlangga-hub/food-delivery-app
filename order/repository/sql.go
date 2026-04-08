@@ -126,7 +126,7 @@ func (r *sqlRepository) CreateOrder(ctx context.Context, userID uuid.UUID, order
 	if _, err := stmt.ExecContext(ctx); err != nil {
 		return model.Order{}, fmt.Errorf("order.customer_repo.CreateOrder (stmt.ExecContext flush): %w", err)
 	}
-	
+
 	resultOrder, err := r.GetOrderByOrderID(ctx, tx, orderID)
 	if err != nil {
 		return model.Order{}, fmt.Errorf("order.customer_repo.CreateOrder (GetOrderByOrderID): %w", err)
@@ -326,4 +326,40 @@ func (r *sqlRepository) UpdateLedger(ctx context.Context, userID uuid.UUID, reas
 	}
 
 	return nil
+}
+
+func (r *sqlRepository) ChooseDriver(ctx context.Context, orderID, driverID uuid.UUID) (model.Order, error)
+
+type UpdateOrderParams struct {
+	Status   *model.OrderStatus
+	DriverID *uuid.UUID
+}
+
+func (r *sqlRepository) UpdateOrder(ctx context.Context, orderID uuid.UUID, params UpdateOrderParams) error {
+	query := "UPDATE orders SET updated_at = NOW()"
+	args := []any{orderID}
+	argCount := 2
+
+	if params.Status != nil {
+		query += fmt.Sprintf(", order_status = $%d", argCount)
+		args = append(args, *params.Status)
+		argCount++
+	}
+
+	if params.DriverID != nil {
+		query += fmt.Sprintf(", driver_id = $%d", argCount)
+		args = append(args, *params.DriverID)
+	}
+
+	query += " WHERE id = $1"
+
+	tx, err := r.db.BeginTx(ctx, nil)
+	if err != nil {
+		return fmt.Errorf("order.repository.UpdateOrder (BeginTx): %w", err)
+	}
+	defer tx.Rollback()
+
+	_, err = tx.ExecContext(ctx, query, args...)
+
+	return tx.Commit()
 }
