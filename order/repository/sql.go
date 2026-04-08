@@ -126,9 +126,17 @@ func (r *sqlRepository) CreateOrder(ctx context.Context, userID uuid.UUID, order
 	if _, err := stmt.ExecContext(ctx); err != nil {
 		return model.Order{}, fmt.Errorf("order.customer_repo.CreateOrder (stmt.ExecContext flush): %w", err)
 	}
+	
+	resultOrder, err := r.GetOrderByOrderID(ctx, tx, orderID)
+	if err != nil {
+		return model.Order{}, fmt.Errorf("order.customer_repo.CreateOrder (GetOrderByOrderID): %w", err)
+	}
 
-	// fetch full populated data for return
-	rows, err = tx.QueryContext(
+	return resultOrder, tx.Commit()
+}
+
+func (r *sqlRepository) GetOrderByOrderID(ctx context.Context, tx *sql.Tx, orderID uuid.UUID) (model.Order, error) {
+	rows, err := tx.QueryContext(
 		ctx,
 		`SELECT
 			cp.address,
@@ -139,7 +147,10 @@ func (r *sqlRepository) CreateOrder(ctx context.Context, userID uuid.UUID, order
 			i.id,
 			i.name,
 			i.price,
-			oi.quantity
+			oi.quantity,
+			o.order_status,
+			o.delivery_fee,
+			o.total_fee
 		FROM
 			orders o
 		JOIN
@@ -163,18 +174,13 @@ func (r *sqlRepository) CreateOrder(ctx context.Context, userID uuid.UUID, order
 	}
 	defer rows.Close()
 
-	resultOrder := model.Order{
-		ID:          orderID,
-		OrderStatus: model.OrderStatusSearchingForDriver,
-		DeliveryFee: order.DeliveryFee,
-		TotalFee:    totalFee,
-	}
+	resultOrder := model.Order{ID: orderID}
 	restoMap := make(map[uuid.UUID]*model.Restaurant)
 
 	for rows.Next() {
-		var restoName, restoAddr, itemName, deliveryAddr, customerPhoneNumber string
+		var restoName, restoAddr, itemName, deliveryAddr, customerPhoneNumber, orderStatus string
 		var restoID, itemID uuid.UUID
-		var itemPrice, itemQty int
+		var itemPrice, itemQty, deliveryFee, totalFee int
 
 		err := rows.Scan(
 			&deliveryAddr,
@@ -186,6 +192,9 @@ func (r *sqlRepository) CreateOrder(ctx context.Context, userID uuid.UUID, order
 			&itemName,
 			&itemPrice,
 			&itemQty,
+			&orderStatus,
+			&deliveryFee,
+			&totalFee,
 		)
 		if err != nil {
 			return model.Order{}, fmt.Errorf("order.customer_repo.CreateOrder (fetch full rows.Scan): %w", err)
@@ -193,6 +202,9 @@ func (r *sqlRepository) CreateOrder(ctx context.Context, userID uuid.UUID, order
 
 		resultOrder.DeliveryAddress = deliveryAddr
 		resultOrder.CustomerPhoneNumber = customerPhoneNumber
+		resultOrder.OrderStatus = model.OrderStatus(orderStatus)
+		resultOrder.DeliveryFee = deliveryFee
+		resultOrder.TotalFee = totalFee
 
 		restaurant, ok := restoMap[restoID]
 		if !ok {
@@ -223,7 +235,7 @@ func (r *sqlRepository) CreateOrder(ctx context.Context, userID uuid.UUID, order
 		resultOrder.Restaurants = append(resultOrder.Restaurants, *resto)
 	}
 
-	return resultOrder, tx.Commit()
+	return resultOrder, nil
 }
 
 func (r *sqlRepository) GetDrivers(ctx context.Context, orderID uuid.UUID) ([]model.Driver, error) {
