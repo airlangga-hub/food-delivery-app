@@ -22,17 +22,17 @@ type MongoRepository interface {
 	CreatePaymentRecord(ctx context.Context, paymentRecord model.PaymentRecord) error
 }
 
-type userService struct {
-	sqlRepo       SQLRepository
+type customerService struct {
+	sqlRepo            SQLRepository
 	paymentGatewayRepo PaymentGatewayRepository
 	mongoRepo          MongoRepository
 }
 
-func NewUserService(customerRepo SQLRepository, paymentGatewayRepo PaymentGatewayRepository, mongoRepo MongoRepository) *userService {
-	return &userService{sqlRepo: customerRepo, paymentGatewayRepo: paymentGatewayRepo, mongoRepo: mongoRepo}
+func NewCustomerService(customerRepo SQLRepository, paymentGatewayRepo PaymentGatewayRepository, mongoRepo MongoRepository) *customerService {
+	return &customerService{sqlRepo: customerRepo, paymentGatewayRepo: paymentGatewayRepo, mongoRepo: mongoRepo}
 }
 
-func (s *userService) CreateOrder(ctx context.Context, userID uuid.UUID, userEmail string, order model.Order) (model.Order, error) {
+func (s *customerService) CreateOrder(ctx context.Context, userID uuid.UUID, userEmail string, order model.Order) (model.Order, error) {
 	oorder, err := s.sqlRepo.CreateOrder(ctx, userID, order)
 	if err != nil {
 		return model.Order{}, fmt.Errorf("order.customer_service.CreateOrder: %w", err)
@@ -71,7 +71,7 @@ func (s *userService) CreateOrder(ctx context.Context, userID uuid.UUID, userEma
 	return oorder, nil
 }
 
-func (s *userService) GetDrivers(ctx context.Context, orderID uuid.UUID) ([]model.Driver, error) {
+func (s *customerService) GetDrivers(ctx context.Context, orderID uuid.UUID) ([]model.Driver, error) {
 	drivers, err := s.sqlRepo.GetDrivers(ctx, orderID)
 	if err != nil {
 		return nil, fmt.Errorf("order.customer_service.GetDrivers: %w", err)
