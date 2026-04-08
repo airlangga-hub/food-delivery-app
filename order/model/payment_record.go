@@ -1,8 +1,9 @@
 package model
 
 type (
-	EmailStatus string
-	PaymentType string
+	EmailStatus  string
+	PaymentType  string
+	LedgerReason string
 )
 
 const (
@@ -12,6 +13,10 @@ const (
 
 	PaymentTypeTopUp PaymentType = "top_up"
 	PaymentTypeOrder PaymentType = "order"
+
+	LedgerReasonTopUp           LedgerReason = "customer_top_up"
+	LedgerReasonCustomerOrder   LedgerReason = "customer_order"
+	LedgerReasonDriverTakeOrder LedgerReason = "driver_take_order"
 )
 
 type PaymentRecord struct {

@@ -11,6 +11,7 @@ import (
 type SQLRepository interface {
 	CreateOrder(ctx context.Context, userID uuid.UUID, order model.Order) (model.Order, error)
 	GetDrivers(ctx context.Context, orderID uuid.UUID) ([]model.Driver, error)
+	UpdateLedger(ctx context.Context, userID uuid.UUID, reason model.LedgerReason, amount int) error
 }
 
 type PaymentGatewayRepository interface {
