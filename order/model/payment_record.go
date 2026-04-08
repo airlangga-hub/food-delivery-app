@@ -15,6 +15,7 @@ const (
 )
 
 type PaymentRecord struct {
+	ID                     string
 	Email                  string
 	EmailStatus            EmailStatus
 	PaymentType            PaymentType

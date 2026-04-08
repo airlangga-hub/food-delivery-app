@@ -59,7 +59,7 @@ func (s *userService) CreateOrder(ctx context.Context, userID uuid.UUID, userEma
 	if err := s.mongoRepo.CreatePaymentRecord(ctx, model.PaymentRecord{
 		Email:                  userEmail,
 		EmailStatus:            model.EmailStatusPending,
-		PaymentType:            model.PaymentTypeTopUp,
+		PaymentType:            model.PaymentTypeOrder,
 		PaymentGatewayResponse: paymentGatewayResponse,
 	}); err != nil {
 		return model.Order{}, fmt.Errorf("order.customer_service.CreateOrder: %w", err)
