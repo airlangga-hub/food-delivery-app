@@ -11,7 +11,6 @@ import (
 type SQLRepository interface {
 	CreateOrder(ctx context.Context, userID uuid.UUID, order model.OrderIn) (model.Order, error)
 	GetDrivers(ctx context.Context, orderID uuid.UUID) ([]model.Driver, error)
-	UpdateLedger(ctx context.Context, userID uuid.UUID, reason model.LedgerReason, amount int) error
 }
 
 type PaymentGatewayRepository interface {
@@ -77,20 +76,4 @@ func (s *customerService) GetDrivers(ctx context.Context, orderID uuid.UUID) ([]
 		return nil, fmt.Errorf("order.customer_service.GetDrivers: %w", err)
 	}
 	return drivers, nil
-}
-
-func (s *customerService) PaymentGatewayWebhook(ctx context.Context, userID uuid.UUID, paymentType model.PaymentType, amount int) error {
-	var reason model.LedgerReason
-	switch paymentType {
-	case model.PaymentTypeOrder:
-		reason = model.LedgerReasonCustomerOrder
-	case model.PaymentTypeTopUp:
-		reason = model.LedgerReasonTopUp
-	}
-	
-	if err := s.sqlRepo.UpdateLedger(ctx, userID, reason, amount); err != nil {
-		return fmt.Errorf("order.service.PaymentGatewayWebhook (UpdateLedger): %w", err)
-	}
-	
-	return nil
 }

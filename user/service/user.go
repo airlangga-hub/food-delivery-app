@@ -58,3 +58,21 @@ func (s *userService) TopUpBalance(ctx context.Context, userID uuid.UUID, userEm
 
 	return paymentGatewayResp, nil
 }
+
+func (s *userService) PaymentGatewayWebhook(ctx context.Context, userID uuid.UUID, paymentType model.PaymentType, amount int) error {
+	var reason model.LedgerReason
+	switch paymentType {
+	case model.PaymentTypeOrder:
+		reason = model.LedgerReasonCustomerOrder
+	case model.PaymentTypeTopUp:
+		reason = model.LedgerReasonTopUp
+	default:
+		return fmt.Errorf("order.service.PaymentGatewayWebhook (invalid payment type: %s): %w", string(paymentType), model.ErrNotFound)
+	}
+	
+	if err := s.sqlRepository.UpdateLedger(ctx, userID, reason, amount); err != nil {
+		return fmt.Errorf("order.service.PaymentGatewayWebhook (UpdateLedger): %w", err)
+	}
+	
+	return nil
+}
