@@ -8,7 +8,8 @@ import (
 )
 
 type UserRepository interface {
-	CreateUser(ctx context.Context, user model.UserRegister) error
+	Register(ctx context.Context, user model.UserRegister) error
+	Login(ctx context.Context, email string) (model.UserInfo, string, error)
 	FindUserByEmail(ctx context.Context, email string) (model.UserInfo, string, error)
 }
 
@@ -18,4 +19,8 @@ type userRepository struct {
 
 func NewUserRepository(db *sql.DB) UserRepository {
 	return &userRepository{db}
+}
+
+func (r *userRepository) Register(ctx context.Context, user model.UserRegister) error {
+
 }
