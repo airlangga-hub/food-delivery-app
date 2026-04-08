@@ -14,9 +14,9 @@ const (
 	PaymentTypeTopUp PaymentType = "top_up"
 	PaymentTypeOrder PaymentType = "order"
 
-	LedgerReasonTopUp           LedgerReason = "customer_top_up"
-	LedgerReasonCustomerOrder   LedgerReason = "customer_order"
-	LedgerReasonDriverTakeOrder LedgerReason = "driver_take_order"
+	LedgerReasonTopUp               LedgerReason = "customer_top_up"
+	LedgerReasonCustomerOrder       LedgerReason = "customer_order"
+	LedgerReasonDriverCompleteOrder LedgerReason = "driver_complete_order"
 )
 
 type PaymentRecord struct {

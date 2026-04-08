@@ -656,3 +656,43 @@ func (r *sqlRepository) DriverApplyForOrder(ctx context.Context, orderID uuid.UU
 
 	return nil
 }
+
+func (r *sqlRepository) DriverCompleteOrder(ctx context.Context, orderID uuid.UUID, driverID uuid.UUID) error {
+	res, err := r.db.ExecContext(
+		ctx, 
+		`WITH completed_order AS (
+			UPDATE 
+				orders 
+			SET 
+				order_status = $3,
+				updated_at = NOW()
+			WHERE 
+				id = $1 
+				AND driver_id = $2 
+				AND order_status = $4
+			RETURNING
+				total_fee
+		)
+		INSERT INTO 
+			ledgers (user_id, amount, reason)
+		SELECT 
+			$2, total_fee, $5
+		FROM 
+			completed_order`, 
+		orderID, driverID, model.OrderStatusDone, model.OrderStatusDriverOTW, model.LedgerReasonDriverCompleteOrder,
+	)
+	if err != nil {
+		return fmt.Errorf("order.repository.DriverCompleteOrder (ExecContext): %w", err)
+	}
+
+	rows, err := res.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("order.repository.DriverCompleteOrder (RowsAffected): %w", err)
+	}
+
+	if rows == 0 {
+		return fmt.Errorf("order.repository.DriverCompleteOrder (no rows found): %w", model.ErrNotFound)
+	}
+
+	return nil
+}
