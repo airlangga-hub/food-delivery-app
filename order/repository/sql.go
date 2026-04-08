@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 
+	"github.com/airlangga-hub/food-delivery-app/order/helper"
 	"github.com/airlangga-hub/food-delivery-app/order/model"
 	"github.com/google/uuid"
 	"github.com/lib/pq"
@@ -328,7 +329,26 @@ func (r *sqlRepository) UpdateLedger(ctx context.Context, userID uuid.UUID, reas
 	return nil
 }
 
-func (r *sqlRepository) ChooseDriver(ctx context.Context, orderID, driverID uuid.UUID) (model.Order, error)
+func (r *sqlRepository) ChooseDriver(ctx context.Context, orderID, driverID uuid.UUID) (model.Order, error) {
+	tx, err := r.db.BeginTx(ctx, nil)
+	if err != nil {
+		return model.Order{}, fmt.Errorf("order.respotiry.ChooseDriver (BeginTx): %w", err)
+	}
+
+	if err := r.UpdateOrder(ctx, tx, orderID, UpdateOrderParams{
+		Status:   helper.Ptr(model.OrderStatusDriverOTW),
+		DriverID: &driverID,
+	}); err != nil {
+		return model.Order{}, fmt.Errorf("order.respotiry.ChooseDriver (UpdateOrder): %w", err)
+	}
+	
+	order, err := r.GetOrderByOrderID(ctx, tx, orderID)
+	if err != nil {
+		return model.Order{}, fmt.Errorf("order.respotiry.ChooseDriver (GetOrderByOrderID): %w", err)
+	}
+	
+	return order, tx.Commit()
+}
 
 type UpdateOrderParams struct {
 	Status   *model.OrderStatus
