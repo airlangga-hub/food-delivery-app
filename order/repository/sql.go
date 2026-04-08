@@ -539,3 +539,112 @@ func (r *sqlRepository) GiveRating(ctx context.Context, orderID uuid.UUID, ratin
 
 	return nil
 }
+
+func (r *sqlRepository) DriverGetPendingOrders(ctx context.Context) ([]model.Order, error) {
+	rows, err := r.db.QueryContext(
+		ctx,
+		`SELECT
+			cp.address,
+			cp.phone_number,
+			r.id,
+			r.name,
+			r.address,
+			i.id,
+			i.name,
+			i.price,
+			oi.quantity,
+			o.order_status,
+			o.delivery_fee,
+			o.total_fee,
+			o.id
+		FROM
+			orders o
+		JOIN
+			customer_profiles cp ON o.customer_id = cp.user_id
+		JOIN
+			order_items oi ON o.id = oi.order_id
+		JOIN
+			items i ON oi.item_id = i.id
+		JOIN
+			restaurants r ON i.restaurant_id = r.id
+		WHERE
+			o.order_status = $1`,
+		model.OrderStatusSearchingForDriver,
+	)
+	if err != nil {
+		return nil, fmt.Errorf("order.repository.DriverGetPendingOrders (db.QueryContext): %w", err)
+	}
+	defer rows.Close()
+
+	ordersMap := make(map[uuid.UUID]*model.Order)
+	orderRestoMap := make(map[uuid.UUID]map[uuid.UUID]*model.Restaurant)
+
+	for rows.Next() {
+		var (
+			restoName, restoAddr, itemName, deliveryAddr, customerPhoneNumber, orderStatus string
+			restoID, itemID, orderID                                                       uuid.UUID
+			itemPrice, itemQty, deliveryFee, totalFee                                      int
+		)
+
+		err := rows.Scan(
+			&deliveryAddr,
+			&customerPhoneNumber,
+			&restoID,
+			&restoName,
+			&restoAddr,
+			&itemID,
+			&itemName,
+			&itemPrice,
+			&itemQty,
+			&orderStatus,
+			&deliveryFee,
+			&totalFee,
+			&orderID,
+		)
+		if err != nil {
+			return nil, fmt.Errorf("order.repo.DriverGetPendingOrders (rows.Scan): %w", err)
+		}
+
+		if _, ok := ordersMap[orderID]; !ok {
+			ordersMap[orderID] = &model.Order{
+				ID:                  orderID,
+				DeliveryAddress:     deliveryAddr,
+				CustomerPhoneNumber: customerPhoneNumber,
+				OrderStatus:         model.OrderStatus(orderStatus),
+				DeliveryFee:         deliveryFee,
+				TotalFee:            totalFee,
+				Restaurants:         []model.Restaurant{},
+			}
+			orderRestoMap[orderID] = make(map[uuid.UUID]*model.Restaurant)
+		}
+
+		restosInOrder := orderRestoMap[orderID]
+
+		if _, ok := restosInOrder[restoID]; !ok {
+			restosInOrder[restoID] = &model.Restaurant{
+				ID:      restoID,
+				Name:    restoName,
+				Address: restoAddr,
+				Items:   []model.Item{},
+			}
+		}
+
+		restosInOrder[restoID].Items = append(restosInOrder[restoID].Items, model.Item{
+			ID:       itemID,
+			Name:     itemName,
+			Price:    itemPrice,
+			Quantity: itemQty,
+		})
+	}
+
+	result := make([]model.Order, 0, len(ordersMap))
+
+	for orderID, o := range ordersMap {
+		for _, resto := range orderRestoMap[orderID] {
+			o.Restaurants = append(o.Restaurants, *resto)
+		}
+		result = append(result, *o)
+	}
+
+	return result, nil
+}
