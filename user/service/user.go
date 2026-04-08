@@ -8,26 +8,26 @@ import (
 	"github.com/google/uuid"
 )
 
-type PaymentGatewayRepository interface {
+type UserPaymentGatewayRepository interface {
 	CreatePaymentSession(ctx context.Context, paymentType model.PaymentType, userID uuid.UUID, userEmail string, amount int, items []model.PaymentGatewayItem) (model.PaymentGatewayResponse, error)
 }
 
-type MongoRepository interface {
+type UserMongoRepository interface {
 	CreatePaymentRecord(ctx context.Context, paymentRecord model.PaymentRecord) error
 }
 
-type SQLRepository interface {
+type UserSQLRepository interface {
 	UpdateLedger(ctx context.Context, userID uuid.UUID, reason model.LedgerReason, amount int) error
 }
 
 type userService struct {
-	paymentGatewayRepository PaymentGatewayRepository
-	mongoRepository          MongoRepository
-	sqlRepository            SQLRepository
+	userPaymentGatewayRepository UserPaymentGatewayRepository
+	userMongoRepository          UserMongoRepository
+	userSqlRepository            UserSQLRepository
 }
 
-func NewUserService(userRepo PaymentGatewayRepository, mongoRepo MongoRepository, sqlRepo SQLRepository) *userService {
-	return &userService{paymentGatewayRepository: userRepo, mongoRepository: mongoRepo, sqlRepository: sqlRepo}
+func NewUserService(userpaymentGatewayRepo UserPaymentGatewayRepository, userMongoRepo UserMongoRepository, userSqlRepo UserSQLRepository) *userService {
+	return &userService{userPaymentGatewayRepository: userpaymentGatewayRepo, userMongoRepository: userMongoRepo, userSqlRepository: userSqlRepo}
 }
 
 func (s *userService) TopUpBalance(ctx context.Context, userID uuid.UUID, userEmail string, amount int) (model.PaymentGatewayResponse, error) {
@@ -42,12 +42,12 @@ func (s *userService) TopUpBalance(ctx context.Context, userID uuid.UUID, userEm
 		},
 	}
 
-	paymentGatewayResp, err := s.paymentGatewayRepository.CreatePaymentSession(ctx, model.PaymentTypeTopUp, userID, userEmail, amount, items)
+	paymentGatewayResp, err := s.userPaymentGatewayRepository.CreatePaymentSession(ctx, model.PaymentTypeTopUp, userID, userEmail, amount, items)
 	if err != nil {
 		return model.PaymentGatewayResponse{}, fmt.Errorf("user.service.TopUpBalance: %w", err)
 	}
 
-	if err := s.mongoRepository.CreatePaymentRecord(ctx, model.PaymentRecord{
+	if err := s.userMongoRepository.CreatePaymentRecord(ctx, model.PaymentRecord{
 		Email:                  userEmail,
 		EmailStatus:            model.EmailStatusPending,
 		PaymentType:            model.PaymentTypeTopUp,
@@ -69,10 +69,10 @@ func (s *userService) PaymentGatewayWebhook(ctx context.Context, userID uuid.UUI
 	default:
 		return fmt.Errorf("order.service.PaymentGatewayWebhook (invalid payment type: %s): %w", string(paymentType), model.ErrNotFound)
 	}
-	
-	if err := s.sqlRepository.UpdateLedger(ctx, userID, reason, amount); err != nil {
+
+	if err := s.userSqlRepository.UpdateLedger(ctx, userID, reason, amount); err != nil {
 		return fmt.Errorf("order.service.PaymentGatewayWebhook (UpdateLedger): %w", err)
 	}
-	
+
 	return nil
 }
