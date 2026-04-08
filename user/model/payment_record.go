@@ -3,8 +3,9 @@ package model
 import "go.mongodb.org/mongo-driver/v2/bson"
 
 type (
-	EmailStatus string
-	PaymentType string
+	EmailStatus  string
+	PaymentType  string
+	LedgerReason string
 )
 
 const (
@@ -14,6 +15,10 @@ const (
 
 	PaymentTypeTopUp PaymentType = "top_up"
 	PaymentTypeOrder PaymentType = "order"
+
+	LedgerReasonTopUp           = "customer_top_up"
+	LedgerReasonCustomerOrder   = "customer_order"
+	LedgerReasonDriverTakeOrder = "driver_take_order"
 )
 
 type PaymentRecord struct {
