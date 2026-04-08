@@ -111,7 +111,7 @@ func main() {
 	// user
 	users := e.Group("/users")
 	// user public endpoints
-	users.POST("/register", h.Register)
+	users.POST("/register/customer", h.RegisterCustomer)
 	users.POST("/login", h.Login)
 	// user private endpoints
 	usersPrivate := users.Group("", echojwt.WithConfig(config))
