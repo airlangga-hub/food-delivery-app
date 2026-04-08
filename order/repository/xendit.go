@@ -44,18 +44,18 @@ func (r *xenditRepository) CreatePaymentSession(ctx context.Context, paymentType
 		}
 	}
 
-	var prefix string
+	var prefix model.PaymentGatewayRefIDPrefix
 	switch paymentType {
 	case model.PaymentTypeTopUp:
-		prefix = "TOPUP_"
+		prefix = model.PaymentGatewayRefIDPrefixTopUp
 	case model.PaymentTypeOrder:
-		prefix = "ORDER_"
+		prefix = model.PaymentGatewayRefIDPrefixOrder
 	default:
 		return model.PaymentGatewayResponse{}, errors.New("unsupported payment type")
 	}
 
 	payload := XenditPaymentSessionRequest{
-		ReferenceID: prefix + userID.String(),
+		ReferenceID: string(prefix) + userID.String(),
 		SessionType: "PAY",
 		Mode:        "PAYMENT_LINK",
 		Amount:      amount,

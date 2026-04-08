@@ -1,5 +1,12 @@
 package model
 
+type PaymentGatewayRefIDPrefix string
+
+const (
+	PaymentGatewayRefIDPrefixTopUp PaymentGatewayRefIDPrefix = "TOPUP_"
+	PaymentGatewayRefIDPrefixOrder PaymentGatewayRefIDPrefix = "ORDER_"
+)
+
 type PaymentGatewayResponse struct {
 	PaymentSessionID string               `bson:"payment_session_id"`
 	Created          string               `bson:"created"`
