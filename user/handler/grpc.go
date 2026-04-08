@@ -12,5 +12,5 @@ type UserService interface {
 	Login(ctx context.Context, email string, password string) (string, error)
 	GetUserInfo(ctx context.Context, email string) (model.UserInfo, error)
 	PaymentGatewayWebhook(ctx context.Context, userID uuid.UUID, paymentType model.PaymentType, amount int) error
-	TopUpBalance(ctx context.Context, userID uuid.UUID, userEmail string, amount int) (string, error)
+	TopUpBalance(ctx context.Context, userID uuid.UUID, userEmail string, amount int) (model.PaymentLink, error)
 }

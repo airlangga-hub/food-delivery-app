@@ -1,5 +1,12 @@
 package model
 
+type UserRole string
+
+const (
+	UserRoleCustomer UserRole = "customer"
+	UserRoleDriver   UserRole = "driver"
+)
+
 type UserRegister struct {
 	FirstName string `json:"first_name"`
 	LastName  string `json:"last_name"`
@@ -9,11 +16,11 @@ type UserRegister struct {
 }
 
 type UserInfo struct {
-	FirstName string  `json:"first_name"`
-	LastName  string  `json:"last_name"`
-	Email     string  `json:"email"`
-	Address   string  `json:"address"`
-	Balance   int     `json:"balance"`
+	FirstName string `json:"first_name"`
+	LastName  string `json:"last_name"`
+	Email     string `json:"email"`
+	Address   string `json:"address"`
+	Balance   int    `json:"balance"`
 }
 
 type PaymentLink struct {
