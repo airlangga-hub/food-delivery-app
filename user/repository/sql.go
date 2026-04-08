@@ -80,15 +80,15 @@ func (r *sqlRepository) RegisterCustomer(ctx context.Context, input model.UserRe
 	}, nil
 }
 
-func (r *sqlRepository) Login(ctx context.Context, email string) (model.UserInfo, string, error) {
-	var u model.UserInfo
+func (r *sqlRepository) Login(ctx context.Context, email string) (string, error) {
 	var password string
-	query := `SELECT first_name, last_name, email, password_hash, address, balance FROM users WHERE email = $1`
 
-	err := r.db.QueryRowContext(ctx, query, email).Scan(
-		&u.FirstName, &u.LastName, &u.Email, &u.Address, &u.Balance, &password,
-	)
-	return u, password, err
+	err := r.db.QueryRowContext(ctx, `SELECT password_hash FROM users WHERE email = $1`, email).Scan(&password)
+	if err != nil {
+		return "", fmt.Errorf("user.repository.Login (QueryRowContext): %w", err)
+	}
+
+	return password, nil
 }
 
 func (r *sqlRepository) GetUserInfo(ctx context.Context, email string) (model.UserInfo, error) {
