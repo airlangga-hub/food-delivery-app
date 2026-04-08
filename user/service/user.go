@@ -19,7 +19,7 @@ type UserMongoRepository interface {
 
 type UserSQLRepository interface {
 	UpdateLedger(ctx context.Context, userID uuid.UUID, reason model.LedgerReason, amount int) error
-	Register(ctx context.Context, user model.UserRegister) (model.UserInfo, error)
+	RegisterCustomer(ctx context.Context, user model.UserRegister) (model.UserInfo, error)
 	Login(ctx context.Context, email string) (model.UserInfo, string, error)
 	GetUserInfo(ctx context.Context, email string) (model.UserInfo, error)
 }
@@ -38,7 +38,7 @@ func NewUserService(userpaymentGatewayRepo UserPaymentGatewayRepository, userMon
 	}
 }
 
-func (s *userService) Register(ctx context.Context, input model.UserRegister) (model.UserInfo, error) {
+func (s *userService) RegisterCustomer(ctx context.Context, input model.UserRegister) (model.UserInfo, error) {
 	hashed, err := bcrypt.GenerateFromPassword([]byte(input.Password), bcrypt.DefaultCost)
 	if err != nil {
 		return model.UserInfo{}, fmt.Errorf("user.service.Register (GenerateFromPassword): %w", err)
@@ -46,7 +46,7 @@ func (s *userService) Register(ctx context.Context, input model.UserRegister) (m
 
 	input.Password = string(hashed)
 
-	userInfo, err := s.userSqlRepository.Register(ctx, input)
+	userInfo, err := s.userSqlRepository.RegisterCustomer(ctx, input)
 	if err != nil {
 		return model.UserInfo{}, fmt.Errorf("user.service.Register (Register): %w", err)
 	}

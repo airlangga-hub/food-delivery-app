@@ -13,7 +13,7 @@ import (
 )
 
 type UserService interface {
-	UserRegister(user model.UserRegister) (model.UserInfo, error)
+	RegisterCustomer(user model.UserRegister) (model.UserInfo, error)
 	UserLogin(email, password string) (string, error)
 	TopUpBalance(userID uuid.UUID, amount int) (model.PaymentLink, error)
 	GetUserInfo(userID uuid.UUID) (model.UserInfo, error)
@@ -40,7 +40,7 @@ func New(userSvc UserService, orderSvc OrderService, val *validator.Validate) *H
 	return &Handler{UserSvc: userSvc, OrderSvc: orderSvc, Validate: val}
 }
 
-func (h *Handler) Register(c *echo.Context) error {
+func (h *Handler) RegisterCustomer(c *echo.Context) error {
 	var payload RegisterRequest
 	if err := c.Bind(&payload); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, "invalid request body").Wrap(err)
@@ -58,7 +58,7 @@ func (h *Handler) Register(c *echo.Context) error {
 		Address:   payload.Address,
 	}
 
-	userInfo, err := h.UserSvc.UserRegister(user)
+	userInfo, err := h.UserSvc.RegisterCustomer(user)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "register failed").Wrap(err)
 	}

@@ -8,7 +8,7 @@ import (
 )
 
 type UserService interface {
-	Register(ctx context.Context, input model.UserRegister) (model.UserInfo, error)
+	RegisterCustomer(ctx context.Context, input model.UserRegister) (model.UserInfo, error)
 	Login(ctx context.Context, email string, password string) (string, error)
 	GetUserInfo(ctx context.Context, email string) (model.UserInfo, error)
 	PaymentGatewayWebhook(ctx context.Context, userID uuid.UUID, paymentType model.PaymentType, amount int) error
