@@ -10,15 +10,15 @@ import (
 	"github.com/lib/pq"
 )
 
-type customerRepository struct {
+type sqlRepository struct {
 	db *sql.DB
 }
 
-func New(db *sql.DB) *customerRepository {
-	return &customerRepository{db: db}
+func New(db *sql.DB) *sqlRepository {
+	return &sqlRepository{db: db}
 }
 
-func (r *customerRepository) CreateOrder(ctx context.Context, userID uuid.UUID, order model.Order) (model.Order, error) {
+func (r *sqlRepository) CreateOrder(ctx context.Context, userID uuid.UUID, order model.Order) (model.Order, error) {
 	tx, err := r.db.BeginTx(ctx, nil)
 	if err != nil {
 		return model.Order{}, fmt.Errorf("order.customer_repo.CreateOrder (r.db.BeginTx): %w", err)
@@ -228,7 +228,7 @@ func (r *customerRepository) CreateOrder(ctx context.Context, userID uuid.UUID, 
 	return resultOrder, tx.Commit()
 }
 
-func (r *customerRepository) GetDrivers(ctx context.Context, orderID uuid.UUID) ([]model.Driver, error) {
+func (r *sqlRepository) GetDrivers(ctx context.Context, orderID uuid.UUID) ([]model.Driver, error) {
 	rows, err := r.db.QueryContext(
 		ctx,
 		`SELECT
