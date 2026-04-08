@@ -401,7 +401,7 @@ func (h *Handler) DriverApplyToTakeOrder(c *echo.Context) error {
 	})
 }
 
-func (h *Handler) MarkOrderAsDone(c *echo.Context) error {
+func (h *Handler) DriverCompleteOrder(c *echo.Context) error {
 	token, ok := c.Get("user").(*jwt.Token)
 	if !ok {
 		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized user")
