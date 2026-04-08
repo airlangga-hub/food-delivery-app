@@ -28,6 +28,8 @@ type UserService interface {
 	Register(ctx context.Context, input model.UserRegister) error
 	Login(ctx context.Context, email string, password string) (string, error)
 	GetUserInfo(ctx context.Context, email string) (model.UserInfo, error)
+	PaymentGatewayWebhook(ctx context.Context, userID uuid.UUID, paymentType model.PaymentType, amount int) error
+	TopUpBalance(ctx context.Context, userID uuid.UUID, userEmail string, amount int) (string, error)
 }
 
 type userService struct {
@@ -66,7 +68,7 @@ func (s *userService) GetUserInfo(ctx context.Context, email string) (model.User
 	return s.userSqlRepository.GetUserInfo(ctx, email)
 }
 
-func (s *userService) TopUpBalance(ctx context.Context, userID uuid.UUID, userEmail string, amount int) (model.PaymentGatewayResponse, error) {
+func (s *userService) TopUpBalance(ctx context.Context, userID uuid.UUID, userEmail string, amount int) (string, error) {
 	items := []model.PaymentGatewayItem{
 		{
 			ReferenceID:   uuid.NewString(),
@@ -80,7 +82,7 @@ func (s *userService) TopUpBalance(ctx context.Context, userID uuid.UUID, userEm
 
 	paymentGatewayResp, err := s.userPaymentGatewayRepository.CreatePaymentSession(ctx, model.PaymentTypeTopUp, userID, userEmail, amount, items)
 	if err != nil {
-		return model.PaymentGatewayResponse{}, fmt.Errorf("user.service.TopUpBalance: %w", err)
+		return "", fmt.Errorf("user.service.TopUpBalance: %w", err)
 	}
 
 	if err := s.userMongoRepository.CreatePaymentRecord(ctx, model.PaymentRecord{
@@ -89,10 +91,10 @@ func (s *userService) TopUpBalance(ctx context.Context, userID uuid.UUID, userEm
 		PaymentType:            model.PaymentTypeTopUp,
 		PaymentGatewayResponse: paymentGatewayResp,
 	}); err != nil {
-		return model.PaymentGatewayResponse{}, fmt.Errorf("user.service.TopUpBalance: %w", err)
+		return "", fmt.Errorf("user.service.TopUpBalance: %w", err)
 	}
 
-	return paymentGatewayResp, nil
+	return paymentGatewayResp.PaymentLinkURL, nil
 }
 
 func (s *userService) PaymentGatewayWebhook(ctx context.Context, userID uuid.UUID, paymentType model.PaymentType, amount int) error {
