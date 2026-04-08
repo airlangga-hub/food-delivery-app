@@ -14,7 +14,7 @@ import (
 
 type UserService interface {
 	RegisterCustomer(user model.UserRegister) (model.UserInfo, error)
-	UserLogin(email, password string) (string, error)
+	Login(email, password string) (string, error)
 	TopUpBalance(userID uuid.UUID, amount int) (model.PaymentLink, error)
 	GetUserInfo(userID uuid.UUID) (model.UserInfo, error)
 }
@@ -79,7 +79,7 @@ func (h *Handler) Login(c *echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, "invalid request body").Wrap(err)
 	}
 
-	token, err := h.UserSvc.UserLogin(payload.Email, payload.Password)
+	token, err := h.UserSvc.Login(payload.Email, payload.Password)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusUnauthorized, "invalid email or password").Wrap(err)
 	}

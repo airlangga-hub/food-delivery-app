@@ -20,7 +20,7 @@ type UserMongoRepository interface {
 type UserSQLRepository interface {
 	UpdateLedger(ctx context.Context, userID uuid.UUID, reason model.LedgerReason, amount int) error
 	RegisterCustomer(ctx context.Context, user model.UserRegister) (model.UserInfo, error)
-	Login(ctx context.Context, email string) (model.UserInfo, string, error)
+	Login(ctx context.Context, email string) (string, error)
 	GetUserInfo(ctx context.Context, email string) (model.UserInfo, error)
 }
 
@@ -54,20 +54,18 @@ func (s *userService) RegisterCustomer(ctx context.Context, input model.UserRegi
 	return userInfo, nil
 }
 
-func (s *userService) Login(ctx context.Context, email string, password string) (string, error) {
-	_, hashedPassword, err := s.userSqlRepository.Login(ctx, email)
+func (s *userService) Login(ctx context.Context, email string, password string) error {
+	hashedPassword, err := s.userSqlRepository.Login(ctx, email)
 	if err != nil {
-		return "", err
+		return fmt.Errorf("user.service.Login (Login): %w", err)
 	}
 
-	// compare password input with hash from DB
 	err = bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
 	if err != nil {
-		return "", err
+		return fmt.Errorf("user.service.Login (CompareHashAndPassword): %w", err)
 	}
 
-	token := ""
-	return token, nil
+	return nil
 }
 
 func (s *userService) GetUserInfo(ctx context.Context, email string) (model.UserInfo, error) {

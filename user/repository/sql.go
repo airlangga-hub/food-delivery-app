@@ -81,14 +81,14 @@ func (r *sqlRepository) RegisterCustomer(ctx context.Context, input model.UserRe
 }
 
 func (r *sqlRepository) Login(ctx context.Context, email string) (string, error) {
-	var password string
+	var passwordHash string
 
-	err := r.db.QueryRowContext(ctx, `SELECT password_hash FROM users WHERE email = $1`, email).Scan(&password)
+	err := r.db.QueryRowContext(ctx, `SELECT password_hash FROM users WHERE email = $1`, email).Scan(&passwordHash)
 	if err != nil {
 		return "", fmt.Errorf("user.repository.Login (QueryRowContext): %w", err)
 	}
 
-	return password, nil
+	return passwordHash, nil
 }
 
 func (r *sqlRepository) GetUserInfo(ctx context.Context, email string) (model.UserInfo, error) {
