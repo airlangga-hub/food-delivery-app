@@ -18,7 +18,7 @@ func New(db *sql.DB) *sqlRepository {
 	return &sqlRepository{db: db}
 }
 
-func (r *sqlRepository) CreateOrder(ctx context.Context, userID uuid.UUID, order model.Order) (model.Order, error) {
+func (r *sqlRepository) CreateOrder(ctx context.Context, userID uuid.UUID, order model.OrderIn) (model.Order, error) {
 	tx, err := r.db.BeginTx(ctx, nil)
 	if err != nil {
 		return model.Order{}, fmt.Errorf("order.customer_repo.CreateOrder (r.db.BeginTx): %w", err)
@@ -30,12 +30,10 @@ func (r *sqlRepository) CreateOrder(ctx context.Context, userID uuid.UUID, order
 	var itemQtys []int
 	qtyMap := make(map[uuid.UUID]int)
 
-	for _, resto := range order.Restaurants {
-		for _, item := range resto.Items {
-			itemIDs = append(itemIDs, item.ID)
-			itemQtys = append(itemQtys, item.Quantity)
-			qtyMap[item.ID] = item.Quantity
-		}
+	for _, item := range order.ItemsIn {
+		itemIDs = append(itemIDs, item.ID)
+		itemQtys = append(itemQtys, item.Quantity)
+		qtyMap[item.ID] = item.Quantity
 	}
 
 	// fetch prices from db
@@ -105,7 +103,7 @@ func (r *sqlRepository) CreateOrder(ctx context.Context, userID uuid.UUID, order
 		`INSERT INTO orders (customer_id, order_status, delivery_fee, total_fee)
 		VALUES ($1, $2, $3, $4)
 		RETURNING id`,
-		userID, order.OrderStatus, order.DeliveryFee, totalFee,
+		userID, model.OrderStatusSearchingForDriver, order.DeliveryFee, totalFee,
 	).Scan(&orderID)
 	if err != nil {
 		return model.Order{}, fmt.Errorf("order.customer_repo.CreateOrder (tx.QueryRowContext.Scan): %w", err)
@@ -167,7 +165,7 @@ func (r *sqlRepository) CreateOrder(ctx context.Context, userID uuid.UUID, order
 
 	resultOrder := model.Order{
 		ID:          orderID,
-		OrderStatus: order.OrderStatus,
+		OrderStatus: model.OrderStatusSearchingForDriver,
 		DeliveryFee: order.DeliveryFee,
 		TotalFee:    totalFee,
 	}

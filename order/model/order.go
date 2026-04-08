@@ -10,6 +10,16 @@ const (
 	OrderStatusDone               OrderStatus = "done"
 )
 
+type OrderIn struct {
+	DeliveryFee int
+	ItemsIn     []ItemsIn
+}
+
+type ItemsIn struct {
+	ID       uuid.UUID
+	Quantity int
+}
+
 type Order struct {
 	ID                  uuid.UUID
 	Restaurants         []Restaurant

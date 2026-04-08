@@ -9,7 +9,7 @@ import (
 )
 
 type SQLRepository interface {
-	CreateOrder(ctx context.Context, userID uuid.UUID, order model.Order) (model.Order, error)
+	CreateOrder(ctx context.Context, userID uuid.UUID, order model.OrderIn) (model.Order, error)
 	GetDrivers(ctx context.Context, orderID uuid.UUID) ([]model.Driver, error)
 	UpdateLedger(ctx context.Context, userID uuid.UUID, reason model.LedgerReason, amount int) error
 }
@@ -32,7 +32,7 @@ func NewCustomerService(customerRepo SQLRepository, paymentGatewayRepo PaymentGa
 	return &customerService{sqlRepo: customerRepo, paymentGatewayRepo: paymentGatewayRepo, mongoRepo: mongoRepo}
 }
 
-func (s *customerService) CreateOrder(ctx context.Context, userID uuid.UUID, userEmail string, order model.Order) (model.Order, error) {
+func (s *customerService) CreateOrder(ctx context.Context, userID uuid.UUID, userEmail string, order model.OrderIn) (model.Order, error) {
 	oorder, err := s.sqlRepo.CreateOrder(ctx, userID, order)
 	if err != nil {
 		return model.Order{}, fmt.Errorf("order.customer_service.CreateOrder: %w", err)
@@ -52,7 +52,7 @@ func (s *customerService) CreateOrder(ctx context.Context, userID uuid.UUID, use
 		}
 	}
 
-	paymentGatewayResponse, err := s.paymentGatewayRepo.CreatePaymentSession(ctx, model.PaymentTypeOrder, userID, userEmail, order.TotalFee, items)
+	paymentGatewayResponse, err := s.paymentGatewayRepo.CreatePaymentSession(ctx, model.PaymentTypeOrder, userID, userEmail, oorder.TotalFee, items)
 	if err != nil {
 		return model.Order{}, fmt.Errorf("order.customer_service.CreateOrder: %w", err)
 	}
