@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -28,7 +29,7 @@ func NewXenditRepository(xenditPaymentSessionURL, xenditAPIkey string, validate 
 	}
 }
 
-func (r *xenditRepository) CreatePaymentSession(ctx context.Context, userID uuid.UUID, userEmail string, amount int, items []model.PaymentGatewayItem) (model.PaymentGatewayResponse, error) {
+func (r *xenditRepository) CreatePaymentSession(ctx context.Context, paymentType model.PaymentType, userID uuid.UUID, userEmail string, amount int, items []model.PaymentGatewayItem) (model.PaymentGatewayResponse, error) {
 	iitems := make([]XenditItem, len(items))
 	for i, item := range items {
 		iitems[i] = XenditItem{
@@ -43,8 +44,18 @@ func (r *xenditRepository) CreatePaymentSession(ctx context.Context, userID uuid
 		}
 	}
 
+	var prefix model.PaymentGatewayRefIDPrefix
+	switch paymentType {
+	case model.PaymentTypeTopUp:
+		prefix = model.PaymentGatewayRefIDPrefixTopUp
+	case model.PaymentTypeOrder:
+		prefix = model.PaymentGatewayRefIDPrefixOrder
+	default:
+		return model.PaymentGatewayResponse{}, errors.New("unsupported payment type")
+	}
+
 	payload := XenditPaymentSessionRequest{
-		ReferenceID: userID.String(),
+		ReferenceID: string(prefix) + userID.String(),
 		SessionType: "PAY",
 		Mode:        "PAYMENT_LINK",
 		Amount:      amount,

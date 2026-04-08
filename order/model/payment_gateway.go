@@ -1,12 +1,10 @@
 package model
 
-type (
-	PaymentType string
-)
+type PaymentGatewayRefIDPrefix string
 
 const (
-	PaymentTypeTopUp PaymentType = "top_up"
-	PaymentTypeOrder PaymentType = "order"
+	PaymentGatewayRefIDPrefixTopUp PaymentGatewayRefIDPrefix = "TOPUP_"
+	PaymentGatewayRefIDPrefixOrder PaymentGatewayRefIDPrefix = "ORDER_"
 )
 
 type PaymentGatewayResponse struct {
