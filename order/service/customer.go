@@ -11,6 +11,7 @@ import (
 type CustomerSQLRepository interface {
 	CreateOrder(ctx context.Context, userID uuid.UUID, order model.OrderIn) (model.Order, error)
 	GetDrivers(ctx context.Context, orderID uuid.UUID) ([]model.Driver, error)
+	ChooseDriver(ctx context.Context, orderID, driverID uuid.UUID) (model.Order, error)
 }
 
 type CustomerPaymentGatewayRepository interface {
@@ -27,8 +28,8 @@ type customerService struct {
 	customerMongoRepo          CustomerMongoRepository
 }
 
-func NewCustomerService(customerRepo CustomerSQLRepository, paymentGatewayRepo CustomerPaymentGatewayRepository, mongoRepo CustomerMongoRepository) *customerService {
-	return &customerService{customerSqlRepo: customerRepo, customerPaymentGatewayRepo: paymentGatewayRepo, customerMongoRepo: mongoRepo}
+func NewCustomerService(customerSqlRepo CustomerSQLRepository, customerPaymentGatewayRepo CustomerPaymentGatewayRepository, customerMongoRepo CustomerMongoRepository) *customerService {
+	return &customerService{customerSqlRepo: customerSqlRepo, customerPaymentGatewayRepo: customerPaymentGatewayRepo, customerMongoRepo: customerMongoRepo}
 }
 
 func (s *customerService) CreateOrder(ctx context.Context, userID uuid.UUID, userEmail string, order model.OrderIn) (model.Order, error) {
@@ -76,4 +77,12 @@ func (s *customerService) GetDrivers(ctx context.Context, orderID uuid.UUID) ([]
 		return nil, fmt.Errorf("order.customer_service.GetDrivers: %w", err)
 	}
 	return drivers, nil
+}
+
+func (s *customerService) ChooseDriver(ctx context.Context, orderID, driverID uuid.UUID) (model.Order, error) {
+	order, err := s.customerSqlRepo.ChooseDriver(ctx, orderID, driverID)
+	if err != nil {
+		return model.Order{}, fmt.Errorf("order.service.ChooseDriver (customerSqlRepo.ChooseDriver): %w", err)
+	}
+	return order, nil
 }
