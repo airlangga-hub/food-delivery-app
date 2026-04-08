@@ -335,7 +335,7 @@ type UpdateOrderParams struct {
 	DriverID *uuid.UUID
 }
 
-func (r *sqlRepository) UpdateOrder(ctx context.Context, orderID uuid.UUID, params UpdateOrderParams) error {
+func (r *sqlRepository) UpdateOrder(ctx context.Context, tx *sql.Tx, orderID uuid.UUID, params UpdateOrderParams) error {
 	query := "UPDATE orders SET updated_at = NOW()"
 	args := []any{orderID}
 	argCount := 2
@@ -353,13 +353,18 @@ func (r *sqlRepository) UpdateOrder(ctx context.Context, orderID uuid.UUID, para
 
 	query += " WHERE id = $1"
 
-	tx, err := r.db.BeginTx(ctx, nil)
+	res, err := tx.ExecContext(ctx, query, args...)
 	if err != nil {
-		return fmt.Errorf("order.repository.UpdateOrder (BeginTx): %w", err)
+		return fmt.Errorf("order.repository.UpdateOrder (ExecContext): %w", err)
 	}
-	defer tx.Rollback()
 
-	_, err = tx.ExecContext(ctx, query, args...)
+	rows, err := res.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("order.repository.UpdateOrder (RowsAffected): %w", err)
+	}
+	if rows == 0 {
+		return fmt.Errorf("order.repository.UpdateOrder (no order found): %w", model.ErrNotFound)
+	}
 
-	return tx.Commit()
+	return nil
 }
