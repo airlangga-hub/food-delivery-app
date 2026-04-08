@@ -78,3 +78,19 @@ func (s *customerService) GetDrivers(ctx context.Context, orderID uuid.UUID) ([]
 	}
 	return drivers, nil
 }
+
+func (s *customerService) PaymentGatewayWebhook(ctx context.Context, userID uuid.UUID, paymentType model.PaymentType, amount int) error {
+	var reason model.LedgerReason
+	switch paymentType {
+	case model.PaymentTypeOrder:
+		reason = model.LedgerReasonCustomerOrder
+	case model.PaymentTypeTopUp:
+		reason = model.LedgerReasonTopUp
+	}
+	
+	if err := s.sqlRepo.UpdateLedger(ctx, userID, reason, amount); err != nil {
+		return fmt.Errorf("order.service.PaymentGatewayWebhook (UpdateLedger): %w", err)
+	}
+	
+	return nil
+}
