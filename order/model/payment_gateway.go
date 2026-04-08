@@ -1,14 +1,5 @@
 package model
 
-type (
-	PaymentType string
-)
-
-const (
-	PaymentTypeTopUp PaymentType = "top_up"
-	PaymentTypeOrder PaymentType = "order"
-)
-
 type PaymentGatewayResponse struct {
 	PaymentSessionID string               `bson:"payment_session_id"`
 	Created          string               `bson:"created"`

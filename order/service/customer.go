@@ -17,13 +17,18 @@ type PaymentGatewayRepository interface {
 	CreatePaymentSession(ctx context.Context, paymentType model.PaymentType, userID uuid.UUID, userEmail string, amount int, items []model.PaymentGatewayItem) (model.PaymentGatewayResponse, error)
 }
 
+type MongoRepository interface {
+	CreatePaymentRecord(ctx context.Context, paymentRecord model.PaymentRecord) error
+}
+
 type userService struct {
 	customerRepo       CustomerRepository
 	paymentGatewayRepo PaymentGatewayRepository
+	mongoRepo          MongoRepository
 }
 
-func NewUserService(customerRepo CustomerRepository, paymentGatewayRepo PaymentGatewayRepository) *userService {
-	return &userService{customerRepo: customerRepo, paymentGatewayRepo: paymentGatewayRepo}
+func NewUserService(customerRepo CustomerRepository, paymentGatewayRepo PaymentGatewayRepository, mongoRepo MongoRepository) *userService {
+	return &userService{customerRepo: customerRepo, paymentGatewayRepo: paymentGatewayRepo, mongoRepo: mongoRepo}
 }
 
 func (s *userService) CreateOrder(ctx context.Context, userID uuid.UUID, userEmail string, order model.Order) (model.Order, error) {
@@ -50,8 +55,15 @@ func (s *userService) CreateOrder(ctx context.Context, userID uuid.UUID, userEma
 	if err != nil {
 		return model.Order{}, fmt.Errorf("order.customer_service.CreateOrder: %w", err)
 	}
-	
-	// user client to save payment gateway response
+
+	if err := s.mongoRepo.CreatePaymentRecord(ctx, model.PaymentRecord{
+		Email:                  userEmail,
+		EmailStatus:            model.EmailStatusPending,
+		PaymentType:            model.PaymentTypeTopUp,
+		PaymentGatewayResponse: paymentGatewayResponse,
+	}); err != nil {
+		return model.Order{}, fmt.Errorf("order.customer_service.CreateOrder: %w", err)
+	}
 
 	oorder.PaymentLink = paymentGatewayResponse.PaymentLinkURL
 
