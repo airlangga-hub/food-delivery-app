@@ -10,7 +10,7 @@ import (
 type UserRepository interface {
 	Register(ctx context.Context, user model.UserRegister) error
 	Login(ctx context.Context, email string) (model.UserInfo, string, error)
-	GetUserByInfo(ctx context.Context, email string) (model.UserInfo, string, error)
+	GetUserByInfo(ctx context.Context, email string) (model.UserInfo, error)
 }
 
 type userRepository struct {
@@ -36,4 +36,11 @@ func (r *userRepository) Login(ctx context.Context, email string) (model.UserInf
 		&u.FirstName, &u.LastName, &u.Email, &u.Address, &u.Balance, &password,
 	)
 	return u, password, err
+}
+
+func (r *userRepository) GetUserByInfo(ctx context.Context, email string) (model.UserInfo, error) {
+	var u model.UserInfo
+	query := `SELECT first_name, last_name, email, address, balance FROM users WHERE = $1`
+	err := r.db.QueryRowContext(ctx, query, email).Scan(&u.FirstName, &u.LastName, &u.Email, &u.Address, &u.Balance)
+	return u, err
 }
