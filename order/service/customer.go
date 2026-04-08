@@ -8,31 +8,31 @@ import (
 	"github.com/google/uuid"
 )
 
-type SQLRepository interface {
+type CustomerSQLRepository interface {
 	CreateOrder(ctx context.Context, userID uuid.UUID, order model.OrderIn) (model.Order, error)
 	GetDrivers(ctx context.Context, orderID uuid.UUID) ([]model.Driver, error)
 }
 
-type PaymentGatewayRepository interface {
+type CustomerPaymentGatewayRepository interface {
 	CreatePaymentSession(ctx context.Context, paymentType model.PaymentType, userID uuid.UUID, userEmail string, amount int, items []model.PaymentGatewayItem) (model.PaymentGatewayResponse, error)
 }
 
-type MongoRepository interface {
+type CustomerMongoRepository interface {
 	CreatePaymentRecord(ctx context.Context, paymentRecord model.PaymentRecord) error
 }
 
 type customerService struct {
-	sqlRepo            SQLRepository
-	paymentGatewayRepo PaymentGatewayRepository
-	mongoRepo          MongoRepository
+	customerSqlRepo            CustomerSQLRepository
+	customerPaymentGatewayRepo CustomerPaymentGatewayRepository
+	customerMongoRepo          CustomerMongoRepository
 }
 
-func NewCustomerService(customerRepo SQLRepository, paymentGatewayRepo PaymentGatewayRepository, mongoRepo MongoRepository) *customerService {
-	return &customerService{sqlRepo: customerRepo, paymentGatewayRepo: paymentGatewayRepo, mongoRepo: mongoRepo}
+func NewCustomerService(customerRepo CustomerSQLRepository, paymentGatewayRepo CustomerPaymentGatewayRepository, mongoRepo CustomerMongoRepository) *customerService {
+	return &customerService{customerSqlRepo: customerRepo, customerPaymentGatewayRepo: paymentGatewayRepo, customerMongoRepo: mongoRepo}
 }
 
 func (s *customerService) CreateOrder(ctx context.Context, userID uuid.UUID, userEmail string, order model.OrderIn) (model.Order, error) {
-	oorder, err := s.sqlRepo.CreateOrder(ctx, userID, order)
+	oorder, err := s.customerSqlRepo.CreateOrder(ctx, userID, order)
 	if err != nil {
 		return model.Order{}, fmt.Errorf("order.customer_service.CreateOrder (sqlRepo.CreateOrder): %w", err)
 	}
@@ -51,12 +51,12 @@ func (s *customerService) CreateOrder(ctx context.Context, userID uuid.UUID, use
 		}
 	}
 
-	paymentGatewayResponse, err := s.paymentGatewayRepo.CreatePaymentSession(ctx, model.PaymentTypeOrder, userID, userEmail, oorder.TotalFee, items)
+	paymentGatewayResponse, err := s.customerPaymentGatewayRepo.CreatePaymentSession(ctx, model.PaymentTypeOrder, userID, userEmail, oorder.TotalFee, items)
 	if err != nil {
 		return model.Order{}, fmt.Errorf("order.customer_service.CreateOrder (CreatePaymentSession): %w", err)
 	}
 
-	if err := s.mongoRepo.CreatePaymentRecord(ctx, model.PaymentRecord{
+	if err := s.customerMongoRepo.CreatePaymentRecord(ctx, model.PaymentRecord{
 		Email:                  userEmail,
 		EmailStatus:            model.EmailStatusPending,
 		PaymentType:            model.PaymentTypeOrder,
@@ -71,7 +71,7 @@ func (s *customerService) CreateOrder(ctx context.Context, userID uuid.UUID, use
 }
 
 func (s *customerService) GetDrivers(ctx context.Context, orderID uuid.UUID) ([]model.Driver, error) {
-	drivers, err := s.sqlRepo.GetDrivers(ctx, orderID)
+	drivers, err := s.customerSqlRepo.GetDrivers(ctx, orderID)
 	if err != nil {
 		return nil, fmt.Errorf("order.customer_service.GetDrivers: %w", err)
 	}
