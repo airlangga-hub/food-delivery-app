@@ -238,10 +238,10 @@ func (r *sqlRepository) GetDrivers(ctx context.Context, orderID uuid.UUID) ([]mo
 					ROUND(AVG(r.rating)::numeric, 1)
 			      FROM
 					orders o
-			      JOIN 
-					ratings r 
+			      JOIN
+					ratings r
 					ON r.order_id = o.id
-			      WHERE 
+			      WHERE
 					o.driver_id = dp.user_id
 			), 0.0) AS avg_rating
 			dp.first_name,
@@ -262,13 +262,13 @@ func (r *sqlRepository) GetDrivers(ctx context.Context, orderID uuid.UUID) ([]mo
 		return nil, fmt.Errorf("order.customer_repo.GetDrivers (r.db.QueryContext): %w", err)
 	}
 	defer rows.Close()
-	
+
 	drivers := make([]model.Driver, 0, 8)
-	
+
 	for rows.Next() {
 		var drv model.Driver
 		var firstName, lastName string
-		
+
 		if err := rows.Scan(
 			&drv.ID,
 			&drv.AverageRating,
@@ -280,18 +280,40 @@ func (r *sqlRepository) GetDrivers(ctx context.Context, orderID uuid.UUID) ([]mo
 		); err != nil {
 			return nil, fmt.Errorf("order.customer_repo.GetDrivers (rows.Scan): %w", err)
 		}
-		
+
 		drv.Name = firstName + " " + lastName
-		
+
 		drivers = append(drivers, drv)
 	}
-	
+
 	if err := rows.Err(); err != nil {
 		return nil, fmt.Errorf("order.customer_repo.GetDrivers (rows.Err): %w", err)
 	}
 	if len(drivers) == 0 {
 		return nil, fmt.Errorf("order.customer_repo.GetDrivers: no drivers found: %w", model.ErrNotFound)
 	}
-	
+
 	return drivers, nil
+}
+
+func (r *sqlRepository) UpdateLedger(ctx context.Context, userID uuid.UUID, reason model.LedgerReason, amount int) error {
+	finalAmount := amount
+
+	if reason == model.LedgerReasonCustomerOrder {
+		finalAmount = -amount
+	}
+
+	_, err := r.db.ExecContext(
+		ctx,
+		`INSERT INTO
+			ledgers (user_id, amount, reason)
+		VALUES
+			($1, $2, $3)`,
+		userID, finalAmount, string(reason),
+	)
+	if err != nil {
+		return fmt.Errorf("user.repository.UpdateLedger: %w", err)
+	}
+
+	return nil
 }
