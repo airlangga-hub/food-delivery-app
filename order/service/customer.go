@@ -34,7 +34,7 @@ func NewCustomerService(customerRepo SQLRepository, paymentGatewayRepo PaymentGa
 func (s *customerService) CreateOrder(ctx context.Context, userID uuid.UUID, userEmail string, order model.OrderIn) (model.Order, error) {
 	oorder, err := s.sqlRepo.CreateOrder(ctx, userID, order)
 	if err != nil {
-		return model.Order{}, fmt.Errorf("order.customer_service.CreateOrder: %w", err)
+		return model.Order{}, fmt.Errorf("order.customer_service.CreateOrder (sqlRepo.CreateOrder): %w", err)
 	}
 
 	items := make([]model.PaymentGatewayItem, 0, 8)
@@ -53,7 +53,7 @@ func (s *customerService) CreateOrder(ctx context.Context, userID uuid.UUID, use
 
 	paymentGatewayResponse, err := s.paymentGatewayRepo.CreatePaymentSession(ctx, model.PaymentTypeOrder, userID, userEmail, oorder.TotalFee, items)
 	if err != nil {
-		return model.Order{}, fmt.Errorf("order.customer_service.CreateOrder: %w", err)
+		return model.Order{}, fmt.Errorf("order.customer_service.CreateOrder (CreatePaymentSession): %w", err)
 	}
 
 	if err := s.mongoRepo.CreatePaymentRecord(ctx, model.PaymentRecord{
@@ -62,7 +62,7 @@ func (s *customerService) CreateOrder(ctx context.Context, userID uuid.UUID, use
 		PaymentType:            model.PaymentTypeOrder,
 		PaymentGatewayResponse: paymentGatewayResponse,
 	}); err != nil {
-		return model.Order{}, fmt.Errorf("order.customer_service.CreateOrder: %w", err)
+		return model.Order{}, fmt.Errorf("order.customer_service.CreateOrder (CreatePaymentRecord): %w", err)
 	}
 
 	oorder.PaymentLink = paymentGatewayResponse.PaymentLinkURL
