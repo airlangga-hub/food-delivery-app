@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	"github.com/airlangga-hub/food-delivery-app/user/model"
-	"github.com/airlangga-hub/food-delivery-app/user/repository"
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -20,33 +19,35 @@ type UserMongoRepository interface {
 
 type UserSQLRepository interface {
 	UpdateLedger(ctx context.Context, userID uuid.UUID, reason model.LedgerReason, amount int) error
+	Register(ctx context.Context, user model.UserRegister) error
+	Login(ctx context.Context, email string) (model.UserInfo, string, error)
+	GetUserInfo(ctx context.Context, email string) (model.UserInfo, error)
 }
 
 type UserService interface {
 	Register(ctx context.Context, input model.UserRegister) error
 	Login(ctx context.Context, email string, password string) (string, error)
-	GetUserByInfo(ctx context.Context, email string) (model.UserInfo, error)
+	GetUserInfo(ctx context.Context, email string) (model.UserInfo, error)
 }
 
 type userService struct {
-	repo                         repository.UserRepository
 	userPaymentGatewayRepository UserPaymentGatewayRepository
 	userMongoRepository          UserMongoRepository
 	userSqlRepository            UserSQLRepository
 }
 
-func NewUserService(repo repository.UserRepository, userpaymentGatewayRepo UserPaymentGatewayRepository, userMongoRepo UserMongoRepository, userSqlRepo UserSQLRepository) *userService {
-	return &userService{repo, userPaymentGatewayRepository: userpaymentGatewayRepo, userMongoRepository: userMongoRepo, userSqlRepository: userSqlRepo}
+func NewUserService(userpaymentGatewayRepo UserPaymentGatewayRepository, userMongoRepo UserMongoRepository, userSqlRepo UserSQLRepository) *userService {
+	return &userService{userPaymentGatewayRepository: userpaymentGatewayRepo, userMongoRepository: userMongoRepo, userSqlRepository: userSqlRepo}
 }
 
 func (s *userService) Register(ctx context.Context, input model.UserRegister) error {
 	hashed, _ := bcrypt.GenerateFromPassword([]byte(input.Password), bcrypt.DefaultCost)
 	input.Password = string(hashed)
-	return s.repo.Register(ctx, input)
+	return s.userSqlRepository.Register(ctx, input)
 }
 
 func (s *userService) Login(ctx context.Context, email string, password string) (string, error) {
-	_, hashedPassword, err := s.repo.Login(ctx, email)
+	_, hashedPassword, err := s.userSqlRepository.Login(ctx, email)
 	if err != nil {
 		return "", err
 	}
@@ -62,7 +63,7 @@ func (s *userService) Login(ctx context.Context, email string, password string) 
 }
 
 func (s *userService) GetUserByInfo(ctx context.Context, email string) (model.UserInfo, error) {
-	return s.repo.GetUserByInfo(ctx, email)
+	return s.userSqlRepository.GetUserInfo(ctx, email)
 }
 
 func (s *userService) TopUpBalance(ctx context.Context, userID uuid.UUID, userEmail string, amount int) (model.PaymentGatewayResponse, error) {
@@ -96,6 +97,7 @@ func (s *userService) TopUpBalance(ctx context.Context, userID uuid.UUID, userEm
 
 func (s *userService) PaymentGatewayWebhook(ctx context.Context, userID uuid.UUID, paymentType model.PaymentType, amount int) error {
 	var reason model.LedgerReason
+
 	switch paymentType {
 	case model.PaymentTypeOrder:
 		reason = model.LedgerReasonCustomerOrder
