@@ -55,9 +55,7 @@ func (r *sqlRepository) RegisterCustomer(ctx context.Context, input model.UserRe
 		SELECT
 			id, $3, $4, $5, $6
 		FROM
-			new_user
-		RETURNING
-			user_id`,
+			new_user`,
 		input.Email,
 		input.Password,
 		input.FirstName,
