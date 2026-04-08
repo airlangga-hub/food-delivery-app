@@ -93,7 +93,39 @@ func (r *sqlRepository) Login(ctx context.Context, email string) (string, error)
 
 func (r *sqlRepository) GetUserInfo(ctx context.Context, email string) (model.UserInfo, error) {
 	var u model.UserInfo
-	query := `SELECT first_name, last_name, email, address, balance FROM users WHERE email = $1`
-	err := r.db.QueryRowContext(ctx, query, email).Scan(&u.FirstName, &u.LastName, &u.Email, &u.Address, &u.Balance)
-	return u, err
+
+	err := r.db.QueryRowContext(
+		ctx,
+		`SELECT
+			cp.first_name,
+			cp.last_name,
+			u.email,
+			cp.address,
+			cp.phone_number,
+			COALESCE((
+				SELECT SUM(amount)
+				FROM ledgers
+				WHERE user_id = u.id
+			), 0) AS balance
+		FROM
+			users u
+		JOIN
+			customer_profiles cp ON u.id = cp.user_id
+		WHERE
+			u.email = $1`,
+		email,
+	).Scan(
+		&u.FirstName,
+		&u.LastName,
+		&u.Email,
+		&u.Address,
+		&u.PhoneNumber,
+		&u.Balance,
+	)
+
+	if err != nil {
+		return model.UserInfo{}, fmt.Errorf("user.repository.GetUserInfo (Scan): %w", err)
+	}
+
+	return u, nil
 }

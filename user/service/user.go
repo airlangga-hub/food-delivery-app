@@ -69,7 +69,11 @@ func (s *userService) Login(ctx context.Context, email string, password string) 
 }
 
 func (s *userService) GetUserInfo(ctx context.Context, email string) (model.UserInfo, error) {
-	return s.userSqlRepository.GetUserInfo(ctx, email)
+	userInfo, err := s.userSqlRepository.GetUserInfo(ctx, email)
+	if err != nil {
+		return model.UserInfo{}, fmt.Errorf("user.service.GetUserInfo: %w", err)
+	}
+	return userInfo, nil
 }
 
 func (s *userService) TopUpBalance(ctx context.Context, userID uuid.UUID, userEmail string, amount int) (model.PaymentLink, error) {
