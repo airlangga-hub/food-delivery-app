@@ -62,7 +62,7 @@ func (s *userService) Login(ctx context.Context, email string, password string) 
 	return token, nil
 }
 
-func (s *userService) GetUserByInfo(ctx context.Context, email string) (model.UserInfo, error) {
+func (s *userService) GetUserInfo(ctx context.Context, email string) (model.UserInfo, error) {
 	return s.userSqlRepository.GetUserInfo(ctx, email)
 }
 
