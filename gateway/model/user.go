@@ -1,19 +1,20 @@
 package model
 
 type UserRegister struct {
-	FirstName string `json:"first_name"`
-	LastName  string `json:"last_name"`
-	Email     string `json:"email"`
-	Password  string `json:"password"`
-	Address   string `json:"address"`
+	FirstName   string `json:"first_name"`
+	LastName    string `json:"last_name"`
+	Email       string `json:"email"`
+	Password    string `json:"password"`
+	Address     string `json:"address"`
+	PhoneNumber string `json:"phone_number"`
 }
 
 type UserInfo struct {
-	FirstName string  `json:"first_name"`
-	LastName  string  `json:"last_name"`
-	Email     string  `json:"email"`
-	Address   string  `json:"address"`
-	Balance   int     `json:"balance"`
+	FirstName string `json:"first_name"`
+	LastName  string `json:"last_name"`
+	Email     string `json:"email"`
+	Address   string `json:"address"`
+	Balance   int    `json:"balance"`
 }
 
 type PaymentLink struct {
