@@ -2,12 +2,11 @@ package repository
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/airlangga-hub/food-delivery-app/user/model"
 	orderpb "github.com/airlangga-hub/food-delivery-app/user/order_pb"
 	"github.com/google/uuid"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 )
 
 type paymentGatewayRepository struct {
@@ -43,7 +42,7 @@ func (r *paymentGatewayRepository) CreatePaymentSession(ctx context.Context, pay
 	})
 
 	if err != nil {
-		return model.PaymentGatewayResponse{}, status.Errorf(codes.Internal, "user.repository.CreatePaymentSession: %v", err)
+		return model.PaymentGatewayResponse{}, fmt.Errorf("user.repository.CreatePaymentSession: %w", err)
 	}
 
 	pgItem := make([]model.PaymentGatewayItem, len(resp.Items))
