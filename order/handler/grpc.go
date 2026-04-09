@@ -250,7 +250,7 @@ func (h *Handler) DriverGetPendingOrders(ctx context.Context, req *emptypb.Empty
 			TotalFee:            int64(order.TotalFee),
 		}
 	}
-	
+
 	return &pb.DriverGetPendingOrdersResponse{Orders: resultOrders}, nil
 }
 
@@ -264,14 +264,14 @@ func (h *Handler) DriverApplyForOrder(ctx context.Context, req *pb.DriverApplyFo
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "order.handler.DriverApplyForOrder (Parse DriverId): %v", err)
 	}
-	
+
 	if err := h.driverSvc.DriverApplyForOrder(ctx, orderID, driverID); err != nil {
 		if errors.Is(err, model.ErrNotFound) {
 			return nil, status.Errorf(codes.NotFound, "order.handler.DriverApplyForOrder (no rows found): %v", err)
 		}
 		return nil, status.Errorf(codes.Internal, "order.handler.DriverApplyForOrder: %v", err)
 	}
-	
+
 	return nil, nil
 }
 
@@ -284,16 +284,79 @@ func (h *Handler) DriverCompleteOrder(ctx context.Context, req *pb.DriverComplet
 	driverID, err := uuid.Parse(req.DriverId)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "order.handler.DriverCompleteOrder (Parse DriverId): %v", err)
-	}	
-	
+	}
+
 	if err := h.driverSvc.DriverCompleteOrder(ctx, orderID, driverID); err != nil {
 		if errors.Is(err, model.ErrNotFound) {
 			return nil, status.Errorf(codes.NotFound, "order.handler.DriverCompleteOrder (no rows found): %v", err)
 		}
 		return nil, status.Errorf(codes.Internal, "order.handler.DriverCompleteOrder: %v", err)
 	}
-	
+
 	return nil, nil
 }
 
-func (h *Handler) CreatePaymentSession(ctx context.Context, req *pb.CreatePaymentSessionRequest) (*pb.CreatePaymentSessionResponse, error)
+func (h *Handler) CreatePaymentSession(ctx context.Context, req *pb.CreatePaymentSessionRequest) (*pb.CreatePaymentSessionResponse, error) {
+	items := make([]model.PaymentGatewayItem, len(req.Items))
+
+	for i, itm := range req.Items {
+		items[i] = model.PaymentGatewayItem{
+			ReferenceID:   itm.ReferenceId,
+			Name:          itm.Name,
+			Description:   itm.Description,
+			Type:          itm.Type,
+			Category:      itm.Category,
+			NetUnitAmount: int(itm.NetUnitAmount),
+			Quantity:      int(itm.Quantity),
+			URL:           itm.Url,
+		}
+	}
+
+	userID, err := uuid.Parse(req.UserId)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "order.handler.CreatePaymentSession (Parse UserId): %v", err)
+	}
+
+	pgResp, err := h.customerSvc.CreatePaymentSession(ctx, model.PaymentType(req.PaymentType), userID, req.UserEmail, int(req.Amount), items)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "order.handler.CreatePaymentSession: %v", err)
+	}
+
+	pgItems := make([]*pb.PaymentGatewayItem, len(pgResp.Items))
+
+	for i, pgItm := range pgResp.Items {
+		pgItems[i] = &pb.PaymentGatewayItem{
+			ReferenceId:   pgItm.ReferenceID,
+			Name:          pgItm.Name,
+			Description:   pgItm.Description,
+			Type:          pgItm.Type,
+			Category:      pgItm.Category,
+			NetUnitAmount: int64(pgItm.NetUnitAmount),
+			Quantity:      int64(pgItm.Quantity),
+			Url:           pgItm.URL,
+		}
+	}
+
+	return &pb.CreatePaymentSessionResponse{
+		PaymentSessionId: pgResp.PaymentSessionID,
+		Created:          pgResp.Created,
+		Updated:          pgResp.Updated,
+		Status:           pgResp.Status,
+		ReferenceId:      pgResp.ReferenceID,
+		Currency:         pgResp.Currency,
+		Amount:           pgResp.Amount,
+		Country:          pgResp.Country,
+		ExpiresAt:        pgResp.ExpiresAt,
+		SessionType:      pgResp.SessionType,
+		Mode:             pgResp.Mode,
+		Locale:           pgResp.Locale,
+		BusinessId:       pgResp.BusinessID,
+		CustomerId:       pgResp.CustomerID,
+		CaptureMethod:    pgResp.CaptureMethod,
+		Description:      pgResp.Description,
+		Items:            pgItems,
+		SuccessReturnUrl: pgResp.SuccessReturnURL,
+		CancelReturnUrl:  pgResp.CancelReturnURL,
+		PaymentLinkUrl:   pgResp.PaymentLinkURL,
+	}, nil
+}
