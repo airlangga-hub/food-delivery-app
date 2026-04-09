@@ -51,7 +51,7 @@ func main() {
 		Password: grpcPassword,
 	}
 
-	// order grpc client conn
+	// user grpc client conn
 	userCC, err := grpc.NewClient(userAddress, grpc.WithTransportCredentials(insecure.NewCredentials()), grpc.WithPerRPCCredentials(auth))
 	if err != nil {
 		logger.Error("order gRPC client conn error", slog.Any("error", err))
@@ -79,9 +79,11 @@ func main() {
 	// dependency injection
 	userClient := userpb.NewUserServiceClient(userCC)
 	validate := validator.New(validator.WithRequiredStructEnabled())
-	SQLRepo := repository.NewSQLRepository(sqlDB)
+	sqlRepo := repository.NewSQLRepository(sqlDB)
+	mongoRepo := repository.NewMongoRepository(userClient)
 	xenditRepo := repository.NewXenditRepository(xenditPaymentSessionURL, xenditAPIkey, validate)
-	svc := service.NewUserService(userPaymentGatewayRepo, userMongoRepo, SQLRepo, logger)
+	customerSvc := service.NewCustomerService(sqlRepo, xenditRepo, mongoRepo)
+	driverSvc := service.NewDriverService(sqlRepo)
 
 	// grpc basic auth
 	basicAuthMap := make(map[string]string)
@@ -99,7 +101,7 @@ func main() {
 	)
 
 	// Register the service implementation
-	pb.RegisterUserServiceServer(grpcServer, handler.NewHandler(svc))
+	pb.RegisterOrderServiceServer(grpcServer, handler.NewHandler(customerSvc, driverSvc))
 
 	logger.Info("gRPC Server running on port " + port)
 

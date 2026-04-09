@@ -33,7 +33,7 @@ func NewCustomerService(customerSqlRepo CustomerSQLRepository, customerPaymentGa
 	return &customerService{customerSqlRepo: customerSqlRepo, customerPaymentGatewayRepo: customerPaymentGatewayRepo, customerMongoRepo: customerMongoRepo}
 }
 
-func (s *customerService) CreateOrder(ctx context.Context, userID uuid.UUID, userEmail string, order model.OrderIn) (model.Order, error) {
+func(s *customerService) CreateOrder(ctx context.Context, userID uuid.UUID, userEmail string, order model.OrderIn) (model.Order, error) {
 	oorder, err := s.customerSqlRepo.CreateOrder(ctx, userID, order)
 	if err != nil {
 		return model.Order{}, fmt.Errorf("order.customer_service.CreateOrder (sqlRepo.CreateOrder): %w", err)
@@ -72,7 +72,7 @@ func (s *customerService) CreateOrder(ctx context.Context, userID uuid.UUID, use
 	return oorder, nil
 }
 
-func (s *customerService) GetDrivers(ctx context.Context, orderID uuid.UUID) ([]model.Driver, error) {
+func(s *customerService) GetDrivers(ctx context.Context, orderID uuid.UUID) ([]model.Driver, error) {
 	drivers, err := s.customerSqlRepo.GetDrivers(ctx, orderID)
 	if err != nil {
 		return nil, fmt.Errorf("order.customer_service.GetDrivers: %w", err)
@@ -80,7 +80,7 @@ func (s *customerService) GetDrivers(ctx context.Context, orderID uuid.UUID) ([]
 	return drivers, nil
 }
 
-func (s *customerService) ChooseDriver(ctx context.Context, orderID, driverID uuid.UUID) (model.Order, error) {
+func(s *customerService) ChooseDriver(ctx context.Context, orderID, driverID uuid.UUID) (model.Order, error) {
 	order, err := s.customerSqlRepo.ChooseDriver(ctx, orderID, driverID)
 	if err != nil {
 		return model.Order{}, fmt.Errorf("order.service.ChooseDriver (customerSqlRepo.ChooseDriver): %w", err)
@@ -88,7 +88,7 @@ func (s *customerService) ChooseDriver(ctx context.Context, orderID, driverID uu
 	return order, nil
 }
 
-func (s *customerService) GiveRating(ctx context.Context, orderID uuid.UUID, rating int) error {
+func(s *customerService) GiveRating(ctx context.Context, orderID uuid.UUID, rating int) error {
 	if err := s.customerSqlRepo.GiveRating(ctx, orderID, rating); err != nil {
 		return fmt.Errorf("order.service.GiveRating: %w", err)
 	}
