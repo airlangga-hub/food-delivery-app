@@ -2,13 +2,7 @@ package model
 
 import "github.com/google/uuid"
 
-type OrderStatus string
 
-const (
-	OrderStatusSearchingForDriver OrderStatus = "pending"
-	OrderStatusDriverOTW          OrderStatus = "otw"
-	OrderStatusDone               OrderStatus = "done"
-)
 
 type Order struct {
 	ID                  uuid.UUID    `json:"id"`
