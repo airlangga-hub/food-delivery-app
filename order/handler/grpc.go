@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+	"errors"
 
 	"github.com/airlangga-hub/food-delivery-app/order/model"
 	"github.com/airlangga-hub/food-delivery-app/order/pb"
@@ -183,7 +184,21 @@ func (h *Handler) ChooseDriver(ctx context.Context, req *pb.ChooseDriverRequest)
 	}, nil
 }
 
-func (h *Handler) GiveRating(ctx context.Context, req *pb.GiveRatingRequest) (*pb.GiveRatingResponse, error)
+func (h *Handler) GiveRating(ctx context.Context, req *pb.GiveRatingRequest) (*pb.GiveRatingResponse, error) {
+	orderID, err := uuid.Parse(req.OrderId)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "order.handler.GiveRating (Parse OrderId): %v", err)
+	}
+	
+	if err := h.customerSvc.GiveRating(ctx, orderID, int(req.Rating)); err != nil {
+		if errors.Is(err, model.ErrNotFound) {
+			return nil, status.Errorf(codes.NotFound, "order.handler.GiveRating (orderID not found): %v", err)
+		}
+		return nil, status.Errorf(codes.Internal, "order.handler.GiveRating: %w", err)
+	}
+	
+	return nil, nil
+}
 
 func (h *Handler) DriverGetPendingOrders(ctx context.Context, req *emptypb.Empty) (*pb.DriverGetPendingOrdersResponse, error)
 
