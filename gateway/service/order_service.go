@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"fmt"
+	"log/slog"
 
 	"github.com/airlangga-hub/food-delivery-app/gateway/model"
 	orderpb "github.com/airlangga-hub/food-delivery-app/gateway/order_pb"
@@ -12,10 +13,11 @@ import (
 
 type orderService struct {
 	orderClient orderpb.OrderServiceClient
+	logger      *slog.Logger
 }
 
-func NewOrderService(orderClient orderpb.OrderServiceClient) *orderService {
-	return &orderService{orderClient: orderClient}
+func NewOrderService(orderClient orderpb.OrderServiceClient, logger *slog.Logger) *orderService {
+	return &orderService{orderClient: orderClient, logger: logger}
 }
 
 func (s *orderService) CreateOrder(ctx context.Context, userID string, userEmail string, deliveryFee int, items []model.Item) (model.Order, error) {
@@ -40,7 +42,7 @@ func (s *orderService) CreateOrder(ctx context.Context, userID string, userEmail
 	if err != nil {
 		st, ok := status.FromError(err)
 		if !ok {
-			return model.Order{}, fmt.Errorf("gateway.service.CreateOrder (FromError): not gRPC error: %w", err)
+			slog.Info("gateway.service.CreateOrder (FromError): not gRPC error: %w", slog.Any("error", err))
 		}
 
 		if st.Code() == codes.NotFound {
@@ -81,7 +83,37 @@ func (s *orderService) CreateOrder(ctx context.Context, userID string, userEmail
 	}, nil
 }
 
-func (s *orderService) GetDrivers(ctx context.Context, orderID string) (model.FindDriver, error)
+func (s *orderService) GetDrivers(ctx context.Context, orderID string) (model.FindDriver, error) {
+	resp, err := s.orderClient.GetDrivers(ctx, &orderpb.GetDriversRequest{OrderId: orderID})
+
+	if err != nil {
+		st, ok := status.FromError(err)
+		if !ok {
+			slog.Info("gateway.service.GetDrivers (FromError): not gRPC error: %w", slog.Any("error", err))
+		}
+
+		if st.Code() == codes.NotFound {
+			return model.FindDriver{}, fmt.Errorf("gateway.service.GetDrivers (no rows found): %w: %w", model.ErrNotFound, err)
+		}
+
+		return model.FindDriver{}, fmt.Errorf("gateway.service.GetDrivers: %w", err)
+	}
+
+	drivers := make([]model.Driver, len(resp.Drivers))
+
+	for i, drv := range resp.Drivers {
+		drivers[i] = model.Driver{
+			ID:            drv.Id,
+			AverageRating: drv.AverageRating,
+			Name:          drv.Name,
+			Bike:          drv.Bike,
+			LicensePlate:  drv.LicensePlate,
+			PhoneNumber:   drv.PhoneNumber,
+		}
+	}
+
+	return model.FindDriver{OrderApplicants: drivers}, nil
+}
 
 func (s *orderService) ChooseDriver(ctx context.Context, orderID, driverID string) (model.Order, error)
 
