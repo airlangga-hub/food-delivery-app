@@ -239,7 +239,24 @@ func (s *orderService) CustomerGetOrders(ctx context.Context, userID string) ([]
 	return resultOrders, nil
 }
 
-func (s *orderService) GiveRating(ctx context.Context, orderID string) error
+func (s *orderService) GiveRating(ctx context.Context, orderID string, rating int) error {
+	_, err := s.orderClient.GiveRating(ctx, &orderpb.GiveRatingRequest{OrderId: orderID, Rating: int64(rating)})
+	
+	if err != nil {
+		st, ok := status.FromError(err)
+		if !ok {
+			slog.Info("gateway.service.GetOrders (FromError): not gRPC error: %w", slog.Any("error", err))
+		}
+
+		if st.Code() == codes.NotFound {
+			return fmt.Errorf("gateway.service.GetOrders (no rows found): %w: %w", model.ErrNotFound, err)
+		}
+
+		return fmt.Errorf("gateway.service.GetOrders: %w", err)
+	}
+	
+	return nil
+}
 
 func (s *orderService) DriverGetPendingOrders(ctx context.Context) ([]model.Order, error)
 

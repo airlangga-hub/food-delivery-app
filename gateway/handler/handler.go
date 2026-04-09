@@ -25,7 +25,7 @@ type OrderService interface {
 	GetDrivers(ctx context.Context, orderID string) (model.FindDriver, error)
 	ChooseDriver(ctx context.Context, orderID, driverID string) (model.Order, error)
 	CustomerGetOrders(ctx context.Context, userID string) ([]model.Order, error)
-	GiveRating(ctx context.Context, orderID string) error
+	GiveRating(ctx context.Context, orderID string, rating int) error
 	DriverGetPendingOrders(ctx context.Context) ([]model.Order, error)
 	DriverApplyToTakeOrder(ctx context.Context, driverID, orderID string) error
 	MarkOrderAsDone(ctx context.Context, orderID, driverID string) error
@@ -352,7 +352,7 @@ func (h *Handler) GiveRating(c *echo.Context) error {
 	ctx, cancel := context.WithTimeout(c.Request().Context(), time.Second*20)
 	defer cancel()
 
-	if err := h.OrderSvc.GiveRating(ctx, orderID); err != nil {
+	if err := h.OrderSvc.GiveRating(ctx, orderID, payload.Rating); err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "give rating failed").Wrap(err)
 	}
 
