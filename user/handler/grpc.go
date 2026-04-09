@@ -55,7 +55,7 @@ func (h *Handler) RegisterCustomer(ctx context.Context, req *pb.RegisterCustomer
 func (h *Handler) Login(ctx context.Context, req *pb.LoginRequest) (*pb.LoginResponse, error) {
 	if err := h.Svc.Login(ctx, req.Email, req.Password); err != nil {
 		if errors.Is(err, model.ErrNotFound) {
-			return nil, status.Errorf(codes.NotFound, "user.handler.Login (user not found): %v: %v", model.ErrNotFound, err)
+			return nil, status.Errorf(codes.NotFound, "user.handler.Login (user not found): %v", err)
 		}
 		return nil, status.Errorf(codes.Internal, "user.handler.Login: %v", err)
 	}
@@ -66,7 +66,7 @@ func (h *Handler) GetUserInfo(ctx context.Context, req *pb.GetUserInfoRequest) (
 	userinfo, err := h.Svc.GetUserInfo(ctx, req.Email)
 	if err != nil {
 		if errors.Is(err, model.ErrNotFound) {
-			return nil, status.Errorf(codes.Internal, "user.handler.GetUserInfo (user not found): %v: %v", model.ErrNotFound, err)
+			return nil, status.Errorf(codes.NotFound, "user.handler.GetUserInfo (user not found): %v", err)
 		}
 		return nil, status.Errorf(codes.Internal, "user.handler.GetUserInfo: %v", err)
 	}
@@ -80,6 +80,17 @@ func (h *Handler) GetUserInfo(ctx context.Context, req *pb.GetUserInfoRequest) (
 	}, nil
 }
 
-func (h *Handler) PaymentGatewayWebhook(ctx context.Context, req *pb.PaymentGatewayWebhookRequest) (*pb.PaymentGatewayWebhookResponse, error)
+func (h *Handler) PaymentGatewayWebhook(ctx context.Context, req *pb.PaymentGatewayWebhookRequest) (*pb.PaymentGatewayWebhookResponse, error) {
+	userID, err := uuid.Parse(req.UserId)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "user.handler.PaymentGatewayWebhook (Parse): %v", err)
+	}
+	
+	if err := h.Svc.PaymentGatewayWebhook(ctx, userID, model.PaymentType(req.PaymentType), int(req.Amount)); err != nil {
+		return nil, status.Errorf(codes.Internal, "user.handler.PaymentGatewayWebhook: %v", err)
+	}
+	
+	return nil, nil
+}
 
 func (h *Handler) TopUpBalance(ctx context.Context, req *pb.TopUpBalanceRequest) (*pb.TopUpBalanceResponse, error)
