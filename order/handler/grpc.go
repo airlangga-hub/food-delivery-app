@@ -108,7 +108,7 @@ func (h *Handler) GetDrivers(ctx context.Context, req *pb.GetDriversRequest) (*p
 	drivers, err := h.customerSvc.GetDrivers(ctx, orderID)
 	if err != nil {
 		if errors.Is(err, model.ErrNotFound) {
-			return nil, status.Errorf(codes.Internal, "order.handler.GetDrivers (no rows found): %v", err)
+			return nil, status.Errorf(codes.NotFound, "order.handler.GetDrivers (no rows found): %v", err)
 		}
 		return nil, status.Errorf(codes.Internal, "order.handler.GetDrivers: %v", err)
 	}
@@ -195,18 +195,64 @@ func (h *Handler) GiveRating(ctx context.Context, req *pb.GiveRatingRequest) (*p
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "order.handler.GiveRating (Parse OrderId): %v", err)
 	}
-	
+
 	if err := h.customerSvc.GiveRating(ctx, orderID, int(req.Rating)); err != nil {
 		if errors.Is(err, model.ErrNotFound) {
 			return nil, status.Errorf(codes.NotFound, "order.handler.GiveRating (orderID not found): %v", err)
 		}
 		return nil, status.Errorf(codes.Internal, "order.handler.GiveRating: %v", err)
 	}
-	
+
 	return nil, nil
 }
 
-func (h *Handler) DriverGetPendingOrders(ctx context.Context, req *emptypb.Empty) (*pb.DriverGetPendingOrdersResponse, error)
+func (h *Handler) DriverGetPendingOrders(ctx context.Context, req *emptypb.Empty) (*pb.DriverGetPendingOrdersResponse, error) {
+	orders, err := h.driverSvc.DriverGetPendingOrders(ctx)
+	if err != nil {
+		if errors.Is(err, model.ErrNotFound) {
+			return nil, status.Errorf(codes.NotFound, "order.handler.DriverGetPendingOrders (no rows found): %v", err)
+		}
+		return nil, status.Errorf(codes.Internal, "order.handler.DriverGetPendingOrders: %v", err)
+	}
+
+	resultOrders := make([]*pb.Order, len(orders))
+
+	for i, order := range orders {
+		restos := make([]*pb.Restaurant, len(order.Restaurants))
+
+		for j, resto := range order.Restaurants {
+			restoItems := make([]*pb.Item, len(resto.Items))
+
+			for k, restoItem := range resto.Items {
+				restoItems[k] = &pb.Item{
+					Id:       restoItem.ID.String(),
+					Name:     restoItem.Name,
+					Price:    int64(restoItem.Price),
+					Quantity: int64(restoItem.Quantity),
+				}
+			}
+
+			restos[j] = &pb.Restaurant{
+				Id:      resto.ID.String(),
+				Name:    resto.Name,
+				Address: resto.Address,
+				Items:   restoItems,
+			}
+		}
+
+		resultOrders[i] = &pb.Order{
+			Id:                  order.ID.String(),
+			Restaurants:         restos,
+			DeliveryAddress:     order.DeliveryAddress,
+			CustomerPhoneNumber: order.CustomerPhoneNumber,
+			OrderStatus:         string(order.OrderStatus),
+			DeliveryFee:         int64(order.DeliveryFee),
+			TotalFee:            int64(order.TotalFee),
+		}
+	}
+	
+	return &pb.DriverGetPendingOrdersResponse{Orders: resultOrders}, nil
+}
 
 func (h *Handler) DriverApplyForOrder(ctx context.Context, req *pb.DriverApplyForOrderRequest) (*pb.DriverApplyForOrderResponse, error)
 
