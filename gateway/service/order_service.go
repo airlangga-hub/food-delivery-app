@@ -6,7 +6,8 @@ import (
 
 	"github.com/airlangga-hub/food-delivery-app/gateway/model"
 	orderpb "github.com/airlangga-hub/food-delivery-app/gateway/order_pb"
-	pb "github.com/airlangga-hub/food-delivery-app/gateway/order_pb"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 type orderService struct {
@@ -18,10 +19,10 @@ func NewOrderService(orderClient orderpb.OrderServiceClient) *orderService {
 }
 
 func (s *orderService) CreateOrder(ctx context.Context, userID string, userEmail string, deliveryFee int, items []model.Item) (model.Order, error) {
-	itemsIn := make([]*pb.ItemsIn, len(items))
+	itemsIn := make([]*orderpb.ItemsIn, len(items))
 
 	for i, itm := range items {
-		itemsIn[i] = &pb.ItemsIn{
+		itemsIn[i] = &orderpb.ItemsIn{
 			Id:       itm.ID,
 			Quantity: int64(itm.Quantity),
 		}
@@ -37,6 +38,15 @@ func (s *orderService) CreateOrder(ctx context.Context, userID string, userEmail
 	})
 
 	if err != nil {
+		st, ok := status.FromError(err)
+		if !ok {
+			return model.Order{}, fmt.Errorf("gateway.service.CreateOrder (FromError): not gRPC error: %w", err)
+		}
+
+		if st.Code() == codes.NotFound {
+			return model.Order{}, fmt.Errorf("gateway.service.CreateOrder (no rows found): %w: %w", model.ErrNotFound, err)
+		}
+
 		return model.Order{}, fmt.Errorf("gateway.service.CreateOrder: %w", err)
 	}
 
