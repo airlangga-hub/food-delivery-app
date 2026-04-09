@@ -199,6 +199,9 @@ func (h *Handler) CreateOrder(c *echo.Context) error {
 
 	order, err := h.OrderSvc.CreateOrder(ctx, claims.UserID, claims.Subject, payload.DeliveryFee, items)
 	if err != nil {
+		if errors.Is(err, model.ErrNotFound) {
+			return echo.NewHTTPError(http.StatusNotFound, "nothing found").Wrap(err)
+		}
 		return echo.NewHTTPError(http.StatusInternalServerError, "create order failed").Wrap(err)
 	}
 
@@ -279,6 +282,9 @@ func (h *Handler) ChooseDriver(c *echo.Context) error {
 
 	order, err := h.OrderSvc.ChooseDriver(ctx, orderID, payload.DriverID)
 	if err != nil {
+		if errors.Is(err, model.ErrNotFound) {
+			return echo.NewHTTPError(http.StatusNotFound, "nothing found").Wrap(err)
+		}
 		return echo.NewHTTPError(http.StatusInternalServerError, "choose driver failed").Wrap(err)
 	}
 
@@ -309,7 +315,7 @@ func (h *Handler) CustomerGetOrders(c *echo.Context) error {
 	orders, err := h.OrderSvc.CustomerGetOrders(ctx, claims.UserID)
 	if err != nil {
 		if errors.Is(err, model.ErrNotFound) {
-			return echo.NewHTTPError(http.StatusNotFound, "you haven't made any orders yet").Wrap(err)
+			return echo.NewHTTPError(http.StatusNotFound, "no orders found").Wrap(err)
 		}
 		return echo.NewHTTPError(http.StatusInternalServerError, "get orders failed").Wrap(err)
 	}
@@ -353,6 +359,9 @@ func (h *Handler) GiveRating(c *echo.Context) error {
 	defer cancel()
 
 	if err := h.OrderSvc.GiveRating(ctx, orderID, payload.Rating); err != nil {
+		if errors.Is(err, model.ErrNotFound) {
+			return echo.NewHTTPError(http.StatusNotFound, "nothing found").Wrap(err)
+		}
 		return echo.NewHTTPError(http.StatusInternalServerError, "give rating failed").Wrap(err)
 	}
 
@@ -417,6 +426,9 @@ func (h *Handler) DriverApplyToTakeOrder(c *echo.Context) error {
 	defer cancel()
 
 	if err := h.OrderSvc.DriverApplyToTakeOrder(ctx, claims.UserID, orderID); err != nil {
+		if errors.Is(err, model.ErrNotFound) {
+			return echo.NewHTTPError(http.StatusNotFound, "nothing found").Wrap(err)
+		}
 		return echo.NewHTTPError(http.StatusInternalServerError, "apply to take order failed").Wrap(err)
 	}
 
@@ -449,6 +461,9 @@ func (h *Handler) DriverCompleteOrder(c *echo.Context) error {
 	defer cancel()
 
 	if err := h.OrderSvc.DriverCompleteOrder(ctx, orderID, claims.UserID); err != nil {
+		if errors.Is(err, model.ErrNotFound) {
+			return echo.NewHTTPError(http.StatusNotFound, "nothing found").Wrap(err)
+		}
 		return echo.NewHTTPError(http.StatusInternalServerError, "mark order as done failed").Wrap(err)
 	}
 
