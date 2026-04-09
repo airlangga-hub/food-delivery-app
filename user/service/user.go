@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log/slog"
 
+	"github.com/airlangga-hub/food-delivery-app/user/helper"
 	"github.com/airlangga-hub/food-delivery-app/user/model"
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
@@ -26,7 +27,7 @@ type UserMongoRepository interface {
 type UserSQLRepository interface {
 	UpdateLedger(ctx context.Context, userID uuid.UUID, reason model.LedgerReason, amount int) error
 	RegisterCustomer(ctx context.Context, user model.UserRegister) (model.UserInfo, error)
-	Login(ctx context.Context, email string) (string, error)
+	Login(ctx context.Context, email string) (model.UserLogin, error)
 	GetUserInfo(ctx context.Context, email string) (model.UserInfo, error)
 }
 
@@ -35,14 +36,16 @@ type userService struct {
 	userMongoRepository          UserMongoRepository
 	userSqlRepository            UserSQLRepository
 	logger                       *slog.Logger
+	jwtKey                       string
 }
 
-func NewUserService(userpaymentGatewayRepo UserPaymentGatewayRepository, userMongoRepo UserMongoRepository, userSqlRepo UserSQLRepository, logger *slog.Logger) *userService {
+func NewUserService(userpaymentGatewayRepo UserPaymentGatewayRepository, userMongoRepo UserMongoRepository, userSqlRepo UserSQLRepository, logger *slog.Logger, jwtKey string) *userService {
 	return &userService{
 		userPaymentGatewayRepository: userpaymentGatewayRepo,
 		userMongoRepository:          userMongoRepo,
 		userSqlRepository:            userSqlRepo,
 		logger:                       logger,
+		jwtKey:                       jwtKey,
 	}
 }
 
@@ -62,18 +65,23 @@ func (s *userService) RegisterCustomer(ctx context.Context, input model.UserRegi
 	return userInfo, nil
 }
 
-func (s *userService) Login(ctx context.Context, email string, password string) error {
-	hashedPassword, err := s.userSqlRepository.Login(ctx, email)
+func (s *userService) Login(ctx context.Context, email string, password string) (string, error) {
+	userLogin, err := s.userSqlRepository.Login(ctx, email)
 	if err != nil {
-		return fmt.Errorf("user.service.Login (Login): %w", err)
+		return "", fmt.Errorf("user.service.Login (Login): %w", err)
 	}
 
-	err = bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
+	err = bcrypt.CompareHashAndPassword([]byte(userLogin.PasswordHash), []byte(password))
 	if err != nil {
-		return fmt.Errorf("user.service.Login (CompareHashAndPassword): %w", err)
+		return "", fmt.Errorf("user.service.Login (CompareHashAndPassword): %w", err)
 	}
 
-	return nil
+	token, err := helper.MakeJWT(userLogin.UserID.String(), userLogin.Email, helper.Role(userLogin.Role), []byte(s.jwtKey))
+	if err != nil {
+		return "", fmt.Errorf("user.service.Login (MakeJWT): %w", err)
+	}
+
+	return token, nil
 }
 
 func (s *userService) GetUserInfo(ctx context.Context, email string) (model.UserInfo, error) {
@@ -144,7 +152,7 @@ func (s *userService) ProcessUnsentEmail(ctx context.Context) error {
 	}
 
 	for _, rec := range records {
-		
+
 		recordID := rec.ID.Hex()
 
 		if err := s.userMongoRepository.MarkEmailAsSending(ctx, recordID); err != nil {
@@ -170,7 +178,7 @@ func (s *userService) ProcessUnsentEmail(ctx context.Context) error {
 	return nil
 }
 
-func(s *userService) CreatePaymentRecord(ctx context.Context, paymentRecord model.PaymentRecord) error {
+func (s *userService) CreatePaymentRecord(ctx context.Context, paymentRecord model.PaymentRecord) error {
 	if err := s.userMongoRepository.CreatePaymentRecord(ctx, paymentRecord); err != nil {
 		return fmt.Errorf("user.service.CreatePaymentRecord: %w", err)
 	}

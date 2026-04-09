@@ -1,11 +1,6 @@
 package model
 
-type UserRole string
-
-const (
-	UserRoleCustomer UserRole = "customer"
-	UserRoleDriver   UserRole = "driver"
-)
+import "github.com/google/uuid"
 
 type UserRegister struct {
 	FirstName   string
@@ -14,6 +9,13 @@ type UserRegister struct {
 	Password    string
 	Address     string
 	PhoneNumber string
+}
+
+type UserLogin struct {
+	UserID       uuid.UUID
+	PasswordHash string
+	Email        string
+	Role         string
 }
 
 type UserInfo struct {

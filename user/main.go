@@ -45,8 +45,9 @@ func main() {
 	grpcPassword := os.Getenv("GRPC_PASSWORD")
 	orderAddress := os.Getenv("ORDER_ADDRESS")
 	supabaseURI := os.Getenv("SUPABASE_URI")
+	jwtKey := os.Getenv("JWT_SECRET")
 
-	if supabaseURI == "" || grpcUsername == "" || grpcPassword == "" || mongoURI == "" || port == "" || dbMongoName == "" || mailjetSender == "" || mailjetURL == "" || mailjetUsername == "" || mailjetPassword == "" || orderAddress == "" {
+	if jwtKey == "" || supabaseURI == "" || grpcUsername == "" || grpcPassword == "" || mongoURI == "" || port == "" || dbMongoName == "" || mailjetSender == "" || mailjetURL == "" || mailjetUsername == "" || mailjetPassword == "" || orderAddress == "" {
 		logger.Error("env variable missing.")
 		return
 	}
@@ -100,7 +101,7 @@ func main() {
 	userPaymentGatewayRepo := repository.NewPaymentGatewayRepository(orderClient)
 	userMongoRepo := repository.NewMongoRepository(client.Database(dbMongoName), validate, mailjetSender, mailjetURL, mailjetUsername, mailjetPassword)
 	userSQLRepo := repository.NewSQLRepository(sqlDB)
-	svc := service.NewUserService(userPaymentGatewayRepo, userMongoRepo, userSQLRepo, logger)
+	svc := service.NewUserService(userPaymentGatewayRepo, userMongoRepo, userSQLRepo, logger, jwtKey)
 
 	// cron
 	c := cron.New(cron.WithSeconds())

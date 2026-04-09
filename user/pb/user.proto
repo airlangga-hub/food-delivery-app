@@ -42,7 +42,9 @@ message RegisterCustomerResponse {
   int64 balance = 6;
 }
 
-message LoginResponse {} // empty response
+message LoginResponse {
+      string token = 1;
+}
 
 message GetUserInfoResponse {
   string first_name = 1;
@@ -71,7 +73,7 @@ message CreateCreatePaymentRecordResponse {}
 
 service UserService {
   rpc RegisterCustomer(RegisterCustomerRequest) returns (RegisterCustomerResponse);
-  rpc Login(LoginRequest) returns (LoginResponse); // empty response
+  rpc Login(LoginRequest) returns (LoginResponse);
   rpc GetUserInfo(GetUserInfoRequest) returns (GetUserInfoResponse);
   rpc TopUpBalance(TopUpBalanceRequest) returns (TopUpBalanceResponse);
   rpc PaymentGatewayWebhook(PaymentGatewayWebhookRequest) returns (PaymentGatewayWebhookResponse); //empty response

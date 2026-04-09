@@ -407,6 +407,7 @@ func (x *RegisterCustomerResponse) GetBalance() int64 {
 
 type LoginResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
+	Token         string                 `protobuf:"bytes,1,opt,name=token,proto3" json:"token,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -439,6 +440,13 @@ func (x *LoginResponse) ProtoReflect() protoreflect.Message {
 // Deprecated: Use LoginResponse.ProtoReflect.Descriptor instead.
 func (*LoginResponse) Descriptor() ([]byte, []int) {
 	return file_user_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *LoginResponse) GetToken() string {
+	if x != nil {
+		return x.Token
+	}
+	return ""
 }
 
 type GetUserInfoResponse struct {
@@ -1048,8 +1056,9 @@ const file_user_proto_rawDesc = "" +
 	"\x05email\x18\x03 \x01(\tR\x05email\x12\x18\n" +
 	"\aaddress\x18\x04 \x01(\tR\aaddress\x12!\n" +
 	"\fphone_number\x18\x05 \x01(\tR\vphoneNumber\x12\x18\n" +
-	"\abalance\x18\x06 \x01(\x03R\abalance\"\x0f\n" +
-	"\rLoginResponse\"\xbe\x01\n" +
+	"\abalance\x18\x06 \x01(\x03R\abalance\"%\n" +
+	"\rLoginResponse\x12\x14\n" +
+	"\x05token\x18\x01 \x01(\tR\x05token\"\xbe\x01\n" +
 	"\x13GetUserInfoResponse\x12\x1d\n" +
 	"\n" +
 	"first_name\x18\x01 \x01(\tR\tfirstName\x12\x1b\n" +
