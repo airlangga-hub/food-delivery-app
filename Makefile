@@ -1,0 +1,25 @@
+gen-user:
+	cd user/pb && \
+		protoc \
+			--go_out=. --go_opt=paths=source_relative \
+			--go-grpc_out=. --go-grpc_opt=paths=source_relative \
+			user.proto
+			
+gen-order:
+	cd order/pb && \
+		protoc \
+			--go_out=. --go_opt=paths=source_relative \
+			--go-grpc_out=. --go-grpc_opt=paths=source_relative \
+			order.proto
+
+build-order:
+	docker build -t airlangga491/final-project-order:latest ./order/
+	
+push-order:
+	docker push airlangga491/final-project-order:latest
+
+build-user:
+	docker build -t airlangga491/final-project-user:latest ./user/
+
+push-user:
+	docker push airlangga491/final-project-user:latest
