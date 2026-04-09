@@ -72,16 +72,16 @@ func (s *orderService) CreateOrder(ctx context.Context, userID uuid.UUID, userEm
 	}, nil
 }
 
-func (s *orderService) GetDrivers(orderID uuid.UUID) (model.FindDriver, error)
+func (s *orderService) GetDrivers(ctx context.Context, orderID uuid.UUID) (model.FindDriver, error)
 
-func (s *orderService) ChooseDriver(orderID, driverID uuid.UUID) (model.Order, error)
+func (s *orderService) ChooseDriver(ctx context.Context, orderID, driverID uuid.UUID) (model.Order, error)
 
-func (s *orderService) GetOrders(userID uuid.UUID) ([]model.Order, error)
+func (s *orderService) GetOrders(ctx context.Context, userID uuid.UUID) ([]model.Order, error)
 
-func (s *orderService) GiveRating(orderID uuid.UUID) error
+func (s *orderService) GiveRating(ctx context.Context, orderID uuid.UUID) error
 
-func (s *orderService) DriverGetPendingOrders() ([]model.Order, error)
+func (s *orderService) DriverGetPendingOrders(ctx context.Context, ) ([]model.Order, error)
 
-func (s *orderService) DriverApplyToTakeOrder(driverID, orderID uuid.UUID) error
+func (s *orderService) DriverApplyToTakeOrder(ctx context.Context, driverID, orderID uuid.UUID) error
 
-func (s *orderService) MarkOrderAsDone(orderID, driverID uuid.UUID) error
+func (s *orderService) MarkOrderAsDone(ctx context.Context, orderID, driverID uuid.UUID) error
