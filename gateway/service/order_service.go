@@ -115,7 +115,60 @@ func (s *orderService) GetDrivers(ctx context.Context, orderID string) (model.Fi
 	return model.FindDriver{OrderApplicants: drivers}, nil
 }
 
-func (s *orderService) ChooseDriver(ctx context.Context, orderID, driverID string) (model.Order, error)
+func (s *orderService) ChooseDriver(ctx context.Context, orderID, driverID string) (model.Order, error) {
+	resp, err := s.orderClient.ChooseDriver(ctx, &orderpb.ChooseDriverRequest{OrderId: orderID, DriverId: driverID})
+
+	if err != nil {
+		st, ok := status.FromError(err)
+		if !ok {
+			slog.Info("gateway.service.GetDrivers (FromError): not gRPC error: %w", slog.Any("error", err))
+		}
+
+		if st.Code() == codes.NotFound {
+			return model.Order{}, fmt.Errorf("gateway.service.GetDrivers (no rows found): %w: %w", model.ErrNotFound, err)
+		}
+
+		return model.Order{}, fmt.Errorf("gateway.service.GetDrivers: %w", err)
+	}
+
+	restos := make([]model.Restaurant, len(resp.Restaurants))
+
+	for i, resto := range resp.Restaurants {
+		restoItems := make([]model.Item, len(resto.Items))
+
+		for j, itm := range resto.Items {
+			restoItems[j] = model.Item{
+				ID:       itm.Id,
+				Name:     itm.Name,
+				Price:    int(itm.Price),
+				Quantity: int(itm.Quantity),
+			}
+		}
+
+		restos[i] = model.Restaurant{
+			ID:      resto.Id,
+			Name:    resto.Name,
+			Address: resto.Address,
+			Items:   restoItems,
+		}
+	}
+
+	return model.Order{
+		ID:                  resp.Id,
+		Restaurants:         restos,
+		DeliveryAddress:     resp.DeliveryAddress,
+		CustomerPhoneNumber: resp.CustomerPhoneNumber,
+		OrderStatus:         model.OrderStatus(resp.OrderStatus),
+		Driver: &model.Driver{
+			ID:            resp.Driver.Id,
+			AverageRating: resp.Driver.AverageRating,
+			Name:          resp.Driver.Name,
+			Bike:          resp.Driver.Bike,
+			LicensePlate:  resp.Driver.LicensePlate,
+			PhoneNumber:   resp.Driver.PhoneNumber,
+		},
+	}, nil
+}
 
 func (s *orderService) GetOrders(ctx context.Context, userID string) ([]model.Order, error)
 
