@@ -93,4 +93,18 @@ func (h *Handler) PaymentGatewayWebhook(ctx context.Context, req *pb.PaymentGate
 	return nil, nil
 }
 
-func (h *Handler) TopUpBalance(ctx context.Context, req *pb.TopUpBalanceRequest) (*pb.TopUpBalanceResponse, error)
+func (h *Handler) TopUpBalance(ctx context.Context, req *pb.TopUpBalanceRequest) (*pb.TopUpBalanceResponse, error) {
+	userID, err := uuid.Parse(req.UserId)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "user.handler.TopUpBalance (Parse): %v", err)
+	}
+	
+	paymentLink, err := h.Svc.TopUpBalance(ctx, userID, req.UserEmail, int(req.Amount))
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "user.handler.TopUpBalance: %v", err)
+	}
+	
+	return &pb.TopUpBalanceResponse{
+		PaymentLink: paymentLink.PaymentLink,
+	}, nil
+}
