@@ -28,7 +28,7 @@ type OrderService interface {
 	GiveRating(ctx context.Context, orderID string, rating int) error
 	DriverGetPendingOrders(ctx context.Context) ([]model.Order, error)
 	DriverApplyToTakeOrder(ctx context.Context, driverID, orderID string) error
-	MarkOrderAsDone(ctx context.Context, orderID, driverID string) error
+	DriverCompleteOrder(ctx context.Context, orderID, driverID string) error
 }
 
 type Handler struct {
@@ -448,7 +448,7 @@ func (h *Handler) DriverCompleteOrder(c *echo.Context) error {
 	ctx, cancel := context.WithTimeout(c.Request().Context(), time.Second*20)
 	defer cancel()
 
-	if err := h.OrderSvc.MarkOrderAsDone(ctx, orderID, claims.UserID); err != nil {
+	if err := h.OrderSvc.DriverCompleteOrder(ctx, orderID, claims.UserID); err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "mark order as done failed").Wrap(err)
 	}
 
