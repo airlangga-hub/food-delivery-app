@@ -12,6 +12,12 @@ gen-order:
 			--go-grpc_out=. --go-grpc_opt=paths=source_relative \
 			order.proto
 
+build-gateway:
+	docker build -t airlangga491/final-project-gateway:latest ./gateway/
+	
+push-gateway:
+	docker push airlangga491/final-project-gateway:latest
+			
 build-order:
 	docker build -t airlangga491/final-project-order:latest ./order/
 	
