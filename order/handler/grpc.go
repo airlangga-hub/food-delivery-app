@@ -121,11 +121,67 @@ func (h *Handler) GetDrivers(ctx context.Context, req *pb.GetDriversRequest) (*p
 			PhoneNumber:   driver.PhoneNumber,
 		}
 	}
-	
+
 	return &pb.GetDriversResponse{Drivers: resultDrivers}, nil
 }
 
-func (h *Handler) ChooseDriver(ctx context.Context, req *pb.ChooseDriverRequest) (*pb.ChooseDriverResponse, error)
+func (h *Handler) ChooseDriver(ctx context.Context, req *pb.ChooseDriverRequest) (*pb.ChooseDriverResponse, error) {
+	orderID, err := uuid.Parse(req.OrderId)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "order.handler.ChooseDriver (Parse OrderId): %v", err)
+	}
+
+	driverID, err := uuid.Parse(req.DriverId)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "order.handler.ChooseDriver (Parse DriverId): %v", err)
+	}
+
+	order, err := h.customerSvc.ChooseDriver(ctx, orderID, driverID)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "order.handler.ChooseDriver (Parse DriverId): %v", err)
+	}
+
+	restos := make([]*pb.Restaurant, len(order.Restaurants))
+
+	for i, resto := range order.Restaurants {
+		restoItems := make([]*pb.Item, len(resto.Items))
+
+		for j, itm := range resto.Items {
+			restoItems[j] = &pb.Item{
+				Id:       itm.ID.String(),
+				Name:     itm.Name,
+				Price:    int64(itm.Price),
+				Quantity: int64(itm.Quantity),
+			}
+		}
+
+		restos[i] = &pb.Restaurant{
+			Id:      resto.ID.String(),
+			Name:    resto.Name,
+			Address: resto.Address,
+			Items:   restoItems,
+		}
+	}
+
+	return &pb.ChooseDriverResponse{
+		Id:                  order.ID.String(),
+		Restaurants:         restos,
+		DeliveryAddress:     order.DeliveryAddress,
+		CustomerPhoneNumber: order.CustomerPhoneNumber,
+		OrderStatus:         string(order.OrderStatus),
+		Driver: &pb.Driver{
+			Id:            order.Driver.ID.String(),
+			AverageRating: order.Driver.AverageRating,
+			Name:          order.Driver.Name,
+			Bike:          order.Driver.Bike,
+			LicensePlate:  order.Driver.LicensePlate,
+			PhoneNumber:   order.Driver.PhoneNumber,
+		},
+		DeliveryFee: int64(order.DeliveryFee),
+		TotalFee:    int64(order.TotalFee),
+		PaymentLink: order.PaymentLink,
+	}, nil
+}
 
 func (h *Handler) GiveRating(ctx context.Context, req *pb.GiveRatingRequest) (*pb.GiveRatingResponse, error)
 
