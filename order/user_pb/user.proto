@@ -59,10 +59,55 @@ message TopUpBalanceResponse {
 
 message PaymentGatewayWebhookResponse {} // empty response
 
+message CreateCreatePaymentRecordRequest {
+  string id = 1;
+  string email = 2;
+  string email_status = 3;
+  string payment_type = 4;
+  PaymentGatewayResponse payment_gateway_response = 5;
+}
+
+message CreateCreatePaymentRecordResponse {}
+
 service UserService {
   rpc RegisterCustomer(RegisterCustomerRequest) returns (RegisterCustomerResponse);
   rpc Login(LoginRequest) returns (LoginResponse); // empty response
   rpc GetUserInfo(GetUserInfoRequest) returns (GetUserInfoResponse);
   rpc TopUpBalance(TopUpBalanceRequest) returns (TopUpBalanceResponse);
   rpc PaymentGatewayWebhook(PaymentGatewayWebhookRequest) returns (PaymentGatewayWebhookResponse); //empty response
+  rpc CreateCreatePaymentRecord(CreateCreatePaymentRecordRequest) returns (CreateCreatePaymentRecordResponse);
+}
+
+message PaymentGatewayResponse {
+  string payment_session_id = 1;
+  string created = 2;
+  string updated = 3;
+  string status = 4;
+  string reference_id = 5;
+  string currency = 6;
+  int64 amount = 7;
+  string country = 8;
+  string expires_at = 9;
+  string session_type = 10;
+  string mode = 11;
+  string locale = 12;
+  string business_id = 13;
+  string customer_id = 14;
+  string capture_method = 15;
+  string description = 16;
+  repeated PaymentGatewayItem items = 17;
+  string success_return_url = 18;
+  string cancel_return_url = 19;
+  string payment_link_url = 20;
+}
+
+message PaymentGatewayItem {
+  string reference_id = 1;
+  string name = 2;
+  string description = 3;
+  string type = 4;
+  string category = 5;
+  int64 net_unit_amount = 6;
+  int64 quantity = 7;
+  string url = 8;
 }

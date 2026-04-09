@@ -169,3 +169,10 @@ func (s *userService) ProcessUnsentEmail(ctx context.Context) error {
 	}
 	return nil
 }
+
+func(s *userService) CreatePaymentRecord(ctx context.Context, paymentRecord model.PaymentRecord) error {
+	if err := s.userMongoRepository.CreatePaymentRecord(ctx, paymentRecord); err != nil {
+		return fmt.Errorf("user.service.CreatePaymentRecord: %w", err)
+	}
+	return nil
+}

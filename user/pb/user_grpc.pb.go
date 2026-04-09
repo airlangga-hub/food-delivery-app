@@ -19,11 +19,12 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	UserService_RegisterCustomer_FullMethodName      = "/pb.UserService/RegisterCustomer"
-	UserService_Login_FullMethodName                 = "/pb.UserService/Login"
-	UserService_GetUserInfo_FullMethodName           = "/pb.UserService/GetUserInfo"
-	UserService_TopUpBalance_FullMethodName          = "/pb.UserService/TopUpBalance"
-	UserService_PaymentGatewayWebhook_FullMethodName = "/pb.UserService/PaymentGatewayWebhook"
+	UserService_RegisterCustomer_FullMethodName          = "/pb.UserService/RegisterCustomer"
+	UserService_Login_FullMethodName                     = "/pb.UserService/Login"
+	UserService_GetUserInfo_FullMethodName               = "/pb.UserService/GetUserInfo"
+	UserService_TopUpBalance_FullMethodName              = "/pb.UserService/TopUpBalance"
+	UserService_PaymentGatewayWebhook_FullMethodName     = "/pb.UserService/PaymentGatewayWebhook"
+	UserService_CreateCreatePaymentRecord_FullMethodName = "/pb.UserService/CreateCreatePaymentRecord"
 )
 
 // UserServiceClient is the client API for UserService service.
@@ -35,6 +36,7 @@ type UserServiceClient interface {
 	GetUserInfo(ctx context.Context, in *GetUserInfoRequest, opts ...grpc.CallOption) (*GetUserInfoResponse, error)
 	TopUpBalance(ctx context.Context, in *TopUpBalanceRequest, opts ...grpc.CallOption) (*TopUpBalanceResponse, error)
 	PaymentGatewayWebhook(ctx context.Context, in *PaymentGatewayWebhookRequest, opts ...grpc.CallOption) (*PaymentGatewayWebhookResponse, error)
+	CreateCreatePaymentRecord(ctx context.Context, in *CreateCreatePaymentRecordRequest, opts ...grpc.CallOption) (*CreateCreatePaymentRecordResponse, error)
 }
 
 type userServiceClient struct {
@@ -95,6 +97,16 @@ func (c *userServiceClient) PaymentGatewayWebhook(ctx context.Context, in *Payme
 	return out, nil
 }
 
+func (c *userServiceClient) CreateCreatePaymentRecord(ctx context.Context, in *CreateCreatePaymentRecordRequest, opts ...grpc.CallOption) (*CreateCreatePaymentRecordResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CreateCreatePaymentRecordResponse)
+	err := c.cc.Invoke(ctx, UserService_CreateCreatePaymentRecord_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // UserServiceServer is the server API for UserService service.
 // All implementations must embed UnimplementedUserServiceServer
 // for forward compatibility.
@@ -104,6 +116,7 @@ type UserServiceServer interface {
 	GetUserInfo(context.Context, *GetUserInfoRequest) (*GetUserInfoResponse, error)
 	TopUpBalance(context.Context, *TopUpBalanceRequest) (*TopUpBalanceResponse, error)
 	PaymentGatewayWebhook(context.Context, *PaymentGatewayWebhookRequest) (*PaymentGatewayWebhookResponse, error)
+	CreateCreatePaymentRecord(context.Context, *CreateCreatePaymentRecordRequest) (*CreateCreatePaymentRecordResponse, error)
 	mustEmbedUnimplementedUserServiceServer()
 }
 
@@ -128,6 +141,9 @@ func (UnimplementedUserServiceServer) TopUpBalance(context.Context, *TopUpBalanc
 }
 func (UnimplementedUserServiceServer) PaymentGatewayWebhook(context.Context, *PaymentGatewayWebhookRequest) (*PaymentGatewayWebhookResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method PaymentGatewayWebhook not implemented")
+}
+func (UnimplementedUserServiceServer) CreateCreatePaymentRecord(context.Context, *CreateCreatePaymentRecordRequest) (*CreateCreatePaymentRecordResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method CreateCreatePaymentRecord not implemented")
 }
 func (UnimplementedUserServiceServer) mustEmbedUnimplementedUserServiceServer() {}
 func (UnimplementedUserServiceServer) testEmbeddedByValue()                     {}
@@ -240,6 +256,24 @@ func _UserService_PaymentGatewayWebhook_Handler(srv interface{}, ctx context.Con
 	return interceptor(ctx, in, info, handler)
 }
 
+func _UserService_CreateCreatePaymentRecord_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateCreatePaymentRecordRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).CreateCreatePaymentRecord(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserService_CreateCreatePaymentRecord_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).CreateCreatePaymentRecord(ctx, req.(*CreateCreatePaymentRecordRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // UserService_ServiceDesc is the grpc.ServiceDesc for UserService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -266,6 +300,10 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "PaymentGatewayWebhook",
 			Handler:    _UserService_PaymentGatewayWebhook_Handler,
+		},
+		{
+			MethodName: "CreateCreatePaymentRecord",
+			Handler:    _UserService_CreateCreatePaymentRecord_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
