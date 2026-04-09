@@ -140,34 +140,22 @@ func (r *sqlRepository) GetOrderByOrderID(ctx context.Context, tx *sql.Tx, order
 	rows, err := tx.QueryContext(
 		ctx,
 		`SELECT
-			cp.address,
-			cp.phone_number,
-			r.id,
-			r.name,
-			r.address,
-			i.id,
-			i.name,
-			i.price,
-			oi.quantity,
-			o.order_status,
-			o.delivery_fee,
-			o.total_fee
-		FROM
-			orders o
-		JOIN
-			customer_profiles cp
-			ON o.customer_id = cp.user_id
-		JOIN
-			order_items oi
-			ON o.id = oi.order_id
-		JOIN
-			items i
-			ON oi.item_id = i.id
-		JOIN
-			restaurants r
-			ON i.restaurant_id = r.id
-		WHERE
-			o.id = $1`,
+		    cp.address, cp.phone_number,
+		    r.id, r.name, r.address,
+		    i.id, i.name, i.price, oi.quantity,
+		    o.order_status, o.delivery_fee, o.total_fee,
+		    dp.user_id, dp.first_name, dp.last_name, dp.bike, dp.license_plate, dp.phone_number,
+		    (SELECT COALESCE(AVG(rating), 0)
+		     FROM ratings
+		     JOIN orders ON ratings.order_id = orders.id
+		     WHERE orders.driver_id = o.driver_id) as avg_rating
+		FROM orders o
+		JOIN customer_profiles cp ON o.customer_id = cp.user_id
+		JOIN order_items oi ON o.id = oi.order_id
+		JOIN items i ON oi.item_id = i.id
+		JOIN restaurants r ON i.restaurant_id = r.id
+		LEFT JOIN driver_profiles dp ON o.driver_id = dp.user_id
+		WHERE o.id = $1`,
 		orderID,
 	)
 	if err != nil {
@@ -182,23 +170,33 @@ func (r *sqlRepository) GetOrderByOrderID(ctx context.Context, tx *sql.Tx, order
 		var restoName, restoAddr, itemName, deliveryAddr, customerPhoneNumber, orderStatus string
 		var restoID, itemID uuid.UUID
 		var itemPrice, itemQty, deliveryFee, totalFee int
+		var (
+			driverID                                                       uuid.NullUUID
+			driverFName, driverLName, driverBike, driverPlate, driverPhone sql.NullString
+			driverAvgRating                                                sql.NullFloat64
+		)
 
 		err := rows.Scan(
-			&deliveryAddr,
-			&customerPhoneNumber,
-			&restoID,
-			&restoName,
-			&restoAddr,
-			&itemID,
-			&itemName,
-			&itemPrice,
-			&itemQty,
-			&orderStatus,
-			&deliveryFee,
-			&totalFee,
+			&deliveryAddr, &customerPhoneNumber,
+			&restoID, &restoName, &restoAddr,
+			&itemID, &itemName, &itemPrice, &itemQty,
+			&orderStatus, &deliveryFee, &totalFee,
+			&driverID, &driverFName, &driverLName, &driverBike, &driverPlate, &driverPhone,
+			&driverAvgRating,
 		)
 		if err != nil {
 			return model.Order{}, fmt.Errorf("order.customer_repo.CreateOrder (fetch full rows.Scan): %w", err)
+		}
+
+		if driverID.Valid {
+			resultOrder.Driver = model.Driver{
+				ID:            driverID.UUID,
+				AverageRating: driverAvgRating.Float64,
+				Name:          fmt.Sprintf("%s %s", driverFName.String, driverLName.String),
+				Bike:          driverBike.String,
+				LicensePlate:  driverPlate.String,
+				PhoneNumber:   driverPhone.String,
+			}
 		}
 
 		resultOrder.DeliveryAddress = deliveryAddr
@@ -659,26 +657,26 @@ func (r *sqlRepository) DriverApplyForOrder(ctx context.Context, orderID uuid.UU
 
 func (r *sqlRepository) DriverCompleteOrder(ctx context.Context, orderID uuid.UUID, driverID uuid.UUID) error {
 	res, err := r.db.ExecContext(
-		ctx, 
+		ctx,
 		`WITH completed_order AS (
-			UPDATE 
-				orders 
-			SET 
+			UPDATE
+				orders
+			SET
 				order_status = $3,
 				updated_at = NOW()
-			WHERE 
-				id = $1 
-				AND driver_id = $2 
+			WHERE
+				id = $1
+				AND driver_id = $2
 				AND order_status = $4
 			RETURNING
 				total_fee
 		)
-		INSERT INTO 
+		INSERT INTO
 			ledgers (user_id, amount, reason)
-		SELECT 
+		SELECT
 			$2, total_fee, $5
-		FROM 
-			completed_order`, 
+		FROM
+			completed_order`,
 		orderID, driverID, model.OrderStatusDone, model.OrderStatusDriverOTW, model.LedgerReasonDriverCompleteOrder,
 	)
 	if err != nil {
