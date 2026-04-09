@@ -7,7 +7,6 @@ import (
 	"github.com/airlangga-hub/food-delivery-app/gateway/model"
 	orderpb "github.com/airlangga-hub/food-delivery-app/gateway/order_pb"
 	pb "github.com/airlangga-hub/food-delivery-app/gateway/order_pb"
-	"github.com/google/uuid"
 )
 
 type orderService struct {
@@ -18,7 +17,7 @@ func NewOrderService(orderClient orderpb.OrderServiceClient) *orderService {
 	return &orderService{orderClient: orderClient}
 }
 
-func (s *orderService) CreateOrder(ctx context.Context, userID uuid.UUID, userEmail string, deliveryFee int, items []model.Item) (model.Order, error) {
+func (s *orderService) CreateOrder(ctx context.Context, userID string, userEmail string, deliveryFee int, items []model.Item) (model.Order, error) {
 	itemsIn := make([]*pb.ItemsIn, len(items))
 
 	for i, itm := range items {
@@ -29,7 +28,7 @@ func (s *orderService) CreateOrder(ctx context.Context, userID uuid.UUID, userEm
 	}
 
 	resp, err := s.orderClient.CreateOrder(ctx, &orderpb.CreateOrderRequest{
-		UserId:    userID.String(),
+		UserId:    userID,
 		UserEmail: userEmail,
 		Order: &orderpb.OrderIn{
 			DeliveryFee: int64(deliveryFee),
@@ -72,16 +71,16 @@ func (s *orderService) CreateOrder(ctx context.Context, userID uuid.UUID, userEm
 	}, nil
 }
 
-func (s *orderService) GetDrivers(ctx context.Context, orderID uuid.UUID) (model.FindDriver, error)
+func (s *orderService) GetDrivers(ctx context.Context, orderID string) (model.FindDriver, error)
 
-func (s *orderService) ChooseDriver(ctx context.Context, orderID, driverID uuid.UUID) (model.Order, error)
+func (s *orderService) ChooseDriver(ctx context.Context, orderID, driverID string) (model.Order, error)
 
-func (s *orderService) GetOrders(ctx context.Context, userID uuid.UUID) ([]model.Order, error)
+func (s *orderService) GetOrders(ctx context.Context, userID string) ([]model.Order, error)
 
-func (s *orderService) GiveRating(ctx context.Context, orderID uuid.UUID) error
+func (s *orderService) GiveRating(ctx context.Context, orderID string) error
 
-func (s *orderService) DriverGetPendingOrders(ctx context.Context, ) ([]model.Order, error)
+func (s *orderService) DriverGetPendingOrders(ctx context.Context) ([]model.Order, error)
 
-func (s *orderService) DriverApplyToTakeOrder(ctx context.Context, driverID, orderID uuid.UUID) error
+func (s *orderService) DriverApplyToTakeOrder(ctx context.Context, driverID, orderID string) error
 
-func (s *orderService) MarkOrderAsDone(ctx context.Context, orderID, driverID uuid.UUID) error
+func (s *orderService) MarkOrderAsDone(ctx context.Context, orderID, driverID string) error

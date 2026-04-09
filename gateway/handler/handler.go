@@ -10,26 +10,25 @@ import (
 	"github.com/airlangga-hub/food-delivery-app/gateway/model"
 	"github.com/go-playground/validator/v10"
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/google/uuid"
 	"github.com/labstack/echo/v5"
 )
 
 type UserService interface {
 	RegisterCustomer(ctx context.Context, user model.UserRegister) (model.UserInfo, error)
 	Login(ctx context.Context, email, password string) (string, error)
-	TopUpBalance(ctx context.Context, userID uuid.UUID, amount int) (model.PaymentLink, error)
-	GetUserInfo(ctx context.Context, userID uuid.UUID) (model.UserInfo, error)
+	TopUpBalance(ctx context.Context, userID string, amount int) (model.PaymentLink, error)
+	GetUserInfo(ctx context.Context, userID string) (model.UserInfo, error)
 }
 
 type OrderService interface {
-	CreateOrder(ctx context.Context, userID uuid.UUID, userEmail string, deliveryFee int, items []model.Item) (model.Order, error)
-	GetDrivers(ctx context.Context, orderID uuid.UUID) (model.FindDriver, error)
-	ChooseDriver(ctx context.Context, orderID, driverID uuid.UUID) (model.Order, error)
-	GetOrders(ctx context.Context, userID uuid.UUID) ([]model.Order, error)
-	GiveRating(ctx context.Context, orderID uuid.UUID) error
+	CreateOrder(ctx context.Context, userID string, userEmail string, deliveryFee int, items []model.Item) (model.Order, error)
+	GetDrivers(ctx context.Context, orderID string) (model.FindDriver, error)
+	ChooseDriver(ctx context.Context, orderID, driverID string) (model.Order, error)
+	GetOrders(ctx context.Context, userID string) ([]model.Order, error)
+	GiveRating(ctx context.Context, orderID string) error
 	DriverGetPendingOrders(ctx context.Context) ([]model.Order, error)
-	DriverApplyToTakeOrder(ctx context.Context, driverID, orderID uuid.UUID) error
-	MarkOrderAsDone(ctx context.Context, orderID, driverID uuid.UUID) error
+	DriverApplyToTakeOrder(ctx context.Context, driverID, orderID string) error
+	MarkOrderAsDone(ctx context.Context, orderID, driverID string) error
 }
 
 type Handler struct {
@@ -224,9 +223,9 @@ func (h *Handler) GetDrivers(c *echo.Context) error {
 		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized user")
 	}
 
-	orderID, err := uuid.Parse(c.Param("order_id"))
-	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, "invalid order id format").Wrap(err)
+	orderID := c.Param("order_id")
+	if orderID == "" {
+		return echo.NewHTTPError(http.StatusBadRequest, "order id must not be empty")
 	}
 
 	ctx, cancel := context.WithTimeout(c.Request().Context(), time.Second*20)
@@ -270,20 +269,15 @@ func (h *Handler) ChooseDriver(c *echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, "invalid request body").Wrap(err)
 	}
 
-	orderID, err := uuid.Parse(c.Param("order_id"))
-	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, "invalid order id format").Wrap(err)
-	}
-
-	driverID, err := uuid.Parse(payload.DriverID)
-	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, "invalid driver id format").Wrap(err)
+	orderID := c.Param("order_id")
+	if orderID == "" {
+		return echo.NewHTTPError(http.StatusBadRequest, "order id must not be empty")
 	}
 
 	ctx, cancel := context.WithTimeout(c.Request().Context(), time.Second*20)
 	defer cancel()
 
-	order, err := h.OrderSvc.ChooseDriver(ctx, orderID, driverID)
+	order, err := h.OrderSvc.ChooseDriver(ctx, orderID, payload.DriverID)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "choose driver failed").Wrap(err)
 	}
@@ -350,9 +344,9 @@ func (h *Handler) GiveRating(c *echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, "invalid query params").Wrap(err)
 	}
 
-	orderID, err := uuid.Parse(c.Param("order_id"))
-	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, "invalid order id format").Wrap(err)
+	orderID := c.Param("order_id")
+	if orderID == "" {
+		return echo.NewHTTPError(http.StatusBadRequest, "order id must not be empty")
 	}
 
 	ctx, cancel := context.WithTimeout(c.Request().Context(), time.Second*20)
@@ -414,9 +408,9 @@ func (h *Handler) DriverApplyToTakeOrder(c *echo.Context) error {
 		return echo.NewHTTPError(http.StatusUnauthorized, "you're not a driver")
 	}
 
-	orderID, err := uuid.Parse(c.Param("order_id"))
-	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, "invalid order id format").Wrap(err)
+	orderID := c.Param("order_id")
+	if orderID == "" {
+		return echo.NewHTTPError(http.StatusBadRequest, "order id must not be empty")
 	}
 
 	ctx, cancel := context.WithTimeout(c.Request().Context(), time.Second*20)
@@ -446,9 +440,9 @@ func (h *Handler) DriverCompleteOrder(c *echo.Context) error {
 		return echo.NewHTTPError(http.StatusUnauthorized, "you're not a driver")
 	}
 
-	orderID, err := uuid.Parse(c.Param("order_id"))
-	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, "invalid order id format").Wrap(err)
+	orderID := c.Param("order_id")
+	if orderID == "" {
+		return echo.NewHTTPError(http.StatusBadRequest, "order id must not be empty")
 	}
 
 	ctx, cancel := context.WithTimeout(c.Request().Context(), time.Second*20)
