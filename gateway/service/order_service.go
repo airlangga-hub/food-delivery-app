@@ -314,6 +314,23 @@ func (s *orderService) DriverGetPendingOrders(ctx context.Context) ([]model.Orde
 	return resultOrders, nil
 }
 
-func (s *orderService) DriverApplyToTakeOrder(ctx context.Context, driverID, orderID string) error
+func (s *orderService) DriverApplyToTakeOrder(ctx context.Context, driverID, orderID string) error {
+	_, err := s.orderClient.DriverApplyForOrder(ctx, &orderpb.DriverApplyForOrderRequest{OrderId: orderID, DriverId: driverID})
+	
+	if err != nil {
+		st, ok := status.FromError(err)
+		if !ok {
+			slog.Info("gateway.service.DriverApplyToTakeOrder (FromError): not gRPC error: %w", slog.Any("error", err))
+		}
+
+		if st.Code() == codes.NotFound {
+			return fmt.Errorf("gateway.service.DriverApplyToTakeOrder (no rows found): %w: %w", model.ErrNotFound, err)
+		}
+
+		return fmt.Errorf("gateway.service.DriverApplyToTakeOrder: %w", err)
+	}
+	
+	return nil
+}
 
 func (s *orderService) MarkOrderAsDone(ctx context.Context, orderID, driverID string) error
