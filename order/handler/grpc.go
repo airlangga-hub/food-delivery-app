@@ -107,6 +107,9 @@ func (h *Handler) GetDrivers(ctx context.Context, req *pb.GetDriversRequest) (*p
 
 	drivers, err := h.customerSvc.GetDrivers(ctx, orderID)
 	if err != nil {
+		if errors.Is(err, model.ErrNotFound) {
+			return nil, status.Errorf(codes.Internal, "order.handler.GetDrivers (no rows found): %v", err)
+		}
 		return nil, status.Errorf(codes.Internal, "order.handler.GetDrivers: %v", err)
 	}
 
@@ -139,6 +142,9 @@ func (h *Handler) ChooseDriver(ctx context.Context, req *pb.ChooseDriverRequest)
 
 	order, err := h.customerSvc.ChooseDriver(ctx, orderID, driverID)
 	if err != nil {
+		if errors.Is(err, model.ErrNotFound) {
+			return nil, status.Errorf(codes.NotFound, "order.handler.ChooseDriver (no rows found): %v", err)
+		}
 		return nil, status.Errorf(codes.Internal, "order.handler.ChooseDriver (Parse DriverId): %v", err)
 	}
 
@@ -194,7 +200,7 @@ func (h *Handler) GiveRating(ctx context.Context, req *pb.GiveRatingRequest) (*p
 		if errors.Is(err, model.ErrNotFound) {
 			return nil, status.Errorf(codes.NotFound, "order.handler.GiveRating (orderID not found): %v", err)
 		}
-		return nil, status.Errorf(codes.Internal, "order.handler.GiveRating: %w", err)
+		return nil, status.Errorf(codes.Internal, "order.handler.GiveRating: %v", err)
 	}
 	
 	return nil, nil
