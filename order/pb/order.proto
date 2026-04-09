@@ -8,6 +8,7 @@ option go_package = "github.com/airlangga-hub/food-delivery-app/order/pb";
 message CreateOrderRequest {
   string user_id = 1;
   string user_email = 2;
+  OrderIn order = 3;
   message OrderIn {
     int64 delivery_fee = 1;
     repeated ItemsIn items_in = 2;

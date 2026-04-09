@@ -23,9 +23,10 @@ const (
 )
 
 type CreateOrderRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	UserId        string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
-	UserEmail     string                 `protobuf:"bytes,2,opt,name=user_email,json=userEmail,proto3" json:"user_email,omitempty"`
+	state         protoimpl.MessageState      `protogen:"open.v1"`
+	UserId        string                      `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	UserEmail     string                      `protobuf:"bytes,2,opt,name=user_email,json=userEmail,proto3" json:"user_email,omitempty"`
+	Order         *CreateOrderRequest_OrderIn `protobuf:"bytes,3,opt,name=order,proto3" json:"order,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -72,6 +73,13 @@ func (x *CreateOrderRequest) GetUserEmail() string {
 		return x.UserEmail
 	}
 	return ""
+}
+
+func (x *CreateOrderRequest) GetOrder() *CreateOrderRequest_OrderIn {
+	if x != nil {
+		return x.Order
+	}
+	return nil
 }
 
 type GetDriversRequest struct {
@@ -1886,11 +1894,12 @@ var File_order_proto protoreflect.FileDescriptor
 
 const file_order_proto_rawDesc = "" +
 	"\n" +
-	"\vorder.proto\x12\x02pb\x1a\x1bgoogle/protobuf/empty.proto\"\xf5\x01\n" +
+	"\vorder.proto\x12\x02pb\x1a\x1bgoogle/protobuf/empty.proto\"\xab\x02\n" +
 	"\x12CreateOrderRequest\x12\x17\n" +
 	"\auser_id\x18\x01 \x01(\tR\x06userId\x12\x1d\n" +
 	"\n" +
-	"user_email\x18\x02 \x01(\tR\tuserEmail\x1a\xa6\x01\n" +
+	"user_email\x18\x02 \x01(\tR\tuserEmail\x124\n" +
+	"\x05order\x18\x03 \x01(\v2\x1e.pb.CreateOrderRequest.OrderInR\x05order\x1a\xa6\x01\n" +
 	"\aOrderIn\x12!\n" +
 	"\fdelivery_fee\x18\x01 \x01(\x03R\vdeliveryFee\x12A\n" +
 	"\bitems_in\x18\x02 \x03(\v2&.pb.CreateOrderRequest.OrderIn.ItemsInR\aitemsIn\x1a5\n" +
@@ -2090,39 +2099,40 @@ var file_order_proto_goTypes = []any{
 	(*emptypb.Empty)(nil),                                   // 27: google.protobuf.Empty
 }
 var file_order_proto_depIdxs = []int32{
-	18, // 0: pb.CreateOrderResponse.restaurants:type_name -> pb.CreateOrderResponse.Restaurant
-	20, // 1: pb.GetDriversResponse.drivers:type_name -> pb.GetDriversResponse.Driver
-	21, // 2: pb.ChooseDriverResponse.restaurants:type_name -> pb.ChooseDriverResponse.Restaurant
-	23, // 3: pb.ChooseDriverResponse.driver:type_name -> pb.ChooseDriverResponse.Driver
-	24, // 4: pb.DriverGetPendingOrdersResponse.orders:type_name -> pb.DriverGetPendingOrdersResponse.Order
-	13, // 5: pb.CreatePaymentSessionRequest.items:type_name -> pb.PaymentGatewayItem
-	13, // 6: pb.CreatePaymentSessionResponse.items:type_name -> pb.PaymentGatewayItem
-	17, // 7: pb.CreateOrderRequest.OrderIn.items_in:type_name -> pb.CreateOrderRequest.OrderIn.ItemsIn
-	19, // 8: pb.CreateOrderResponse.Restaurant.items:type_name -> pb.CreateOrderResponse.Item
-	22, // 9: pb.ChooseDriverResponse.Restaurant.items:type_name -> pb.ChooseDriverResponse.Item
-	25, // 10: pb.DriverGetPendingOrdersResponse.Order.restaurants:type_name -> pb.DriverGetPendingOrdersResponse.Order.Restaurant
-	26, // 11: pb.DriverGetPendingOrdersResponse.Order.Restaurant.items:type_name -> pb.DriverGetPendingOrdersResponse.Order.Item
-	0,  // 12: pb.OrderService.CreateOrder:input_type -> pb.CreateOrderRequest
-	1,  // 13: pb.OrderService.GetDrivers:input_type -> pb.GetDriversRequest
-	2,  // 14: pb.OrderService.ChooseDriver:input_type -> pb.ChooseDriverRequest
-	3,  // 15: pb.OrderService.GiveRating:input_type -> pb.GiveRatingRequest
-	27, // 16: pb.OrderService.DriverGetPendingOrders:input_type -> google.protobuf.Empty
-	4,  // 17: pb.OrderService.DriverApplyForOrder:input_type -> pb.DriverApplyForOrderRequest
-	5,  // 18: pb.OrderService.DriverCompleteOrder:input_type -> pb.DriverCompleteOrderRequest
-	14, // 19: pb.OrderService.CreatePaymentSession:input_type -> pb.CreatePaymentSessionRequest
-	6,  // 20: pb.OrderService.CreateOrder:output_type -> pb.CreateOrderResponse
-	7,  // 21: pb.OrderService.GetDrivers:output_type -> pb.GetDriversResponse
-	8,  // 22: pb.OrderService.ChooseDriver:output_type -> pb.ChooseDriverResponse
-	9,  // 23: pb.OrderService.GiveRating:output_type -> pb.GiveRatingResponse
-	10, // 24: pb.OrderService.DriverGetPendingOrders:output_type -> pb.DriverGetPendingOrdersResponse
-	11, // 25: pb.OrderService.DriverApplyForOrder:output_type -> pb.DriverApplyForOrderResponse
-	12, // 26: pb.OrderService.DriverCompleteOrder:output_type -> pb.DriverCompleteOrderResponse
-	15, // 27: pb.OrderService.CreatePaymentSession:output_type -> pb.CreatePaymentSessionResponse
-	20, // [20:28] is the sub-list for method output_type
-	12, // [12:20] is the sub-list for method input_type
-	12, // [12:12] is the sub-list for extension type_name
-	12, // [12:12] is the sub-list for extension extendee
-	0,  // [0:12] is the sub-list for field type_name
+	16, // 0: pb.CreateOrderRequest.order:type_name -> pb.CreateOrderRequest.OrderIn
+	18, // 1: pb.CreateOrderResponse.restaurants:type_name -> pb.CreateOrderResponse.Restaurant
+	20, // 2: pb.GetDriversResponse.drivers:type_name -> pb.GetDriversResponse.Driver
+	21, // 3: pb.ChooseDriverResponse.restaurants:type_name -> pb.ChooseDriverResponse.Restaurant
+	23, // 4: pb.ChooseDriverResponse.driver:type_name -> pb.ChooseDriverResponse.Driver
+	24, // 5: pb.DriverGetPendingOrdersResponse.orders:type_name -> pb.DriverGetPendingOrdersResponse.Order
+	13, // 6: pb.CreatePaymentSessionRequest.items:type_name -> pb.PaymentGatewayItem
+	13, // 7: pb.CreatePaymentSessionResponse.items:type_name -> pb.PaymentGatewayItem
+	17, // 8: pb.CreateOrderRequest.OrderIn.items_in:type_name -> pb.CreateOrderRequest.OrderIn.ItemsIn
+	19, // 9: pb.CreateOrderResponse.Restaurant.items:type_name -> pb.CreateOrderResponse.Item
+	22, // 10: pb.ChooseDriverResponse.Restaurant.items:type_name -> pb.ChooseDriverResponse.Item
+	25, // 11: pb.DriverGetPendingOrdersResponse.Order.restaurants:type_name -> pb.DriverGetPendingOrdersResponse.Order.Restaurant
+	26, // 12: pb.DriverGetPendingOrdersResponse.Order.Restaurant.items:type_name -> pb.DriverGetPendingOrdersResponse.Order.Item
+	0,  // 13: pb.OrderService.CreateOrder:input_type -> pb.CreateOrderRequest
+	1,  // 14: pb.OrderService.GetDrivers:input_type -> pb.GetDriversRequest
+	2,  // 15: pb.OrderService.ChooseDriver:input_type -> pb.ChooseDriverRequest
+	3,  // 16: pb.OrderService.GiveRating:input_type -> pb.GiveRatingRequest
+	27, // 17: pb.OrderService.DriverGetPendingOrders:input_type -> google.protobuf.Empty
+	4,  // 18: pb.OrderService.DriverApplyForOrder:input_type -> pb.DriverApplyForOrderRequest
+	5,  // 19: pb.OrderService.DriverCompleteOrder:input_type -> pb.DriverCompleteOrderRequest
+	14, // 20: pb.OrderService.CreatePaymentSession:input_type -> pb.CreatePaymentSessionRequest
+	6,  // 21: pb.OrderService.CreateOrder:output_type -> pb.CreateOrderResponse
+	7,  // 22: pb.OrderService.GetDrivers:output_type -> pb.GetDriversResponse
+	8,  // 23: pb.OrderService.ChooseDriver:output_type -> pb.ChooseDriverResponse
+	9,  // 24: pb.OrderService.GiveRating:output_type -> pb.GiveRatingResponse
+	10, // 25: pb.OrderService.DriverGetPendingOrders:output_type -> pb.DriverGetPendingOrdersResponse
+	11, // 26: pb.OrderService.DriverApplyForOrder:output_type -> pb.DriverApplyForOrderResponse
+	12, // 27: pb.OrderService.DriverCompleteOrder:output_type -> pb.DriverCompleteOrderResponse
+	15, // 28: pb.OrderService.CreatePaymentSession:output_type -> pb.CreatePaymentSessionResponse
+	21, // [21:29] is the sub-list for method output_type
+	13, // [13:21] is the sub-list for method input_type
+	13, // [13:13] is the sub-list for extension type_name
+	13, // [13:13] is the sub-list for extension extendee
+	0,  // [0:13] is the sub-list for field type_name
 }
 
 func init() { file_order_proto_init() }
