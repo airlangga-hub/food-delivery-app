@@ -18,6 +18,11 @@ type UserService interface {
 
 type Handler struct {
 	pb.UnimplementedUserServiceServer
+	Svc UserService
+}
+
+func NewHandler(svc UserService) *Handler {
+	return &Handler{Svc: svc}
 }
 
 func (h *Handler) RegisterCustomer(context.Context, *pb.RegisterCustomerRequest) (*pb.RegisterCustomerResponse, error)

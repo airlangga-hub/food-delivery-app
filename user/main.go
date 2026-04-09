@@ -2,24 +2,31 @@ package main
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"log/slog"
 	"net"
 	"os"
 	"os/signal"
+	"syscall"
+	"time"
+
+	_ "github.com/lib/pq"
+
+	"github.com/airlangga-hub/food-delivery-app/user/auth"
 	"github.com/airlangga-hub/food-delivery-app/user/handler"
 	"github.com/airlangga-hub/food-delivery-app/user/middleware"
+	orderpb "github.com/airlangga-hub/food-delivery-app/user/order_pb"
 	"github.com/airlangga-hub/food-delivery-app/user/pb"
 	"github.com/airlangga-hub/food-delivery-app/user/repository"
 	"github.com/airlangga-hub/food-delivery-app/user/service"
 	"github.com/airlangga-hub/food-delivery-app/user/util/database"
-	"syscall"
-	"time"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/joho/godotenv"
 	"github.com/robfig/cron/v3"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 func main() {
@@ -29,16 +36,17 @@ func main() {
 
 	mongoURI := os.Getenv("MONGO_URI")
 	port := os.Getenv("CONTAINER_PORT")
-	xenditAPIkey := os.Getenv("XENDIT_API_KEY")
-	xenditPaymentSessionURL := os.Getenv("XENDIT_PAYMENT_SESSION_URL")
 	dbMongoName := os.Getenv("DB_MONGO_NAME")
 	mailjetSender := os.Getenv("MAILJET_SENDER")
 	mailjetURL := os.Getenv("MAILJET_URL")
 	mailjetUsername := os.Getenv("MAILJET_BASIC_AUTH_USERNAME")
 	mailjetPassword := os.Getenv("MAILJET_BASIC_AUTH_PASSWORD")
-	grpcUser := os.Getenv("GRPC_USER")
+	grpcUsername := os.Getenv("GRPC_USERNAME")
 	grpcPassword := os.Getenv("GRPC_PASSWORD")
-	if grpcUser == "" || grpcPassword == "" || mongoURI == "" || port == "" || dbMongoName == "" || xenditAPIkey == "" || xenditPaymentSessionURL == "" || mailjetSender == "" || mailjetURL == "" || mailjetUsername == "" || mailjetPassword == "" {
+	orderAddress := os.Getenv("ORDER_ADDRESS")
+	supabaseURI := os.Getenv("SUPABASE_URI")
+
+	if supabaseURI == "" || grpcUsername == "" || grpcPassword == "" || mongoURI == "" || port == "" || dbMongoName == "" || mailjetSender == "" || mailjetURL == "" || mailjetUsername == "" || mailjetPassword == "" || orderAddress == "" {
 		logger.Error("env variable missing.")
 		return
 	}
@@ -55,14 +63,44 @@ func main() {
 		}
 	}()
 
-	// dependency injection
-	validate := validator.New(validator.WithRequiredStructEnabled())
-	repo := repository.NewMongoRepository(client.Database(dbMongoName), mailjetSender, mailjetURL, mailjetUsername, mailjetPassword, validate)
+	// grpc basic auth
+	auth := auth.BasicAuth{
+		Username: grpcUsername,
+		Password: grpcPassword,
+	}
+
+	// order grpc client conn
+	orderCC, err := grpc.NewClient(orderAddress, grpc.WithTransportCredentials(insecure.NewCredentials()), grpc.WithPerRPCCredentials(auth))
 	if err != nil {
-		logger.Error("new mongo repo error", slog.Any("error", err))
+		logger.Error("order gRPC client conn error", slog.Any("error", err))
 		return
 	}
-	svc := service.NewUserService(repo, logger)
+	defer orderCC.Close()
+
+	// sql db
+	sqlDB, err := sql.Open("postgres", supabaseURI)
+	if err != nil {
+		logger.Error("error connecting to supabase", slog.Any("error", err))
+		return
+	}
+	defer sqlDB.Close()
+
+	sqlDB.SetMaxOpenConns(25)
+	sqlDB.SetMaxIdleConns(25)
+	sqlDB.SetConnMaxLifetime(5 * time.Minute)
+
+	if err := sqlDB.Ping(); err != nil {
+		logger.Error("error pinging supabase", slog.Any("error", err))
+		return
+	}
+
+	// dependency injection
+	orderClient := orderpb.NewOrderServiceClient(orderCC)
+	validate := validator.New(validator.WithRequiredStructEnabled())
+	userPaymentGatewayRepo := repository.NewPaymentGatewayRepository(orderClient)
+	userMongoRepo := repository.NewMongoRepository(client.Database(dbMongoName), validate, mailjetSender, mailjetURL, mailjetUsername, mailjetPassword)
+	userSQLRepo := repository.NewSQLRepository(sqlDB)
+	svc := service.NewUserService(userPaymentGatewayRepo, userMongoRepo, userSQLRepo, logger)
 
 	// cron
 	c := cron.New(cron.WithSeconds())
@@ -87,7 +125,7 @@ func main() {
 
 	// grpc basic auth
 	basicAuthMap := make(map[string]string)
-	basicAuthMap[grpcUser] = grpcPassword
+	basicAuthMap[grpcUsername] = grpcPassword
 
 	// grpc server + middleware
 	grpcServer := grpc.NewServer(
@@ -101,7 +139,7 @@ func main() {
 	)
 
 	// Register the service implementation
-	pb.RegisterPaymentServiceServer(grpcServer, handler.NewPaymentServer(svc))
+	pb.RegisterUserServiceServer(grpcServer, handler.NewHandler(svc))
 
 	logger.Info("gRPC Server running on port " + port)
 
