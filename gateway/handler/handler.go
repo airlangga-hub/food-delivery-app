@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"net/http"
+	"time"
 
 	"github.com/airlangga-hub/food-delivery-app/gateway/helper"
 	"github.com/airlangga-hub/food-delivery-app/gateway/model"
@@ -26,7 +27,7 @@ type OrderService interface {
 	ChooseDriver(ctx context.Context, orderID, driverID uuid.UUID) (model.Order, error)
 	GetOrders(ctx context.Context, userID uuid.UUID) ([]model.Order, error)
 	GiveRating(ctx context.Context, orderID uuid.UUID) error
-	DriverGetPendingOrders(ctx context.Context, ) ([]model.Order, error)
+	DriverGetPendingOrders(ctx context.Context) ([]model.Order, error)
 	DriverApplyToTakeOrder(ctx context.Context, driverID, orderID uuid.UUID) error
 	MarkOrderAsDone(ctx context.Context, orderID, driverID uuid.UUID) error
 }
@@ -59,7 +60,10 @@ func (h *Handler) RegisterCustomer(c *echo.Context) error {
 		Address:   payload.Address,
 	}
 
-	userInfo, err := h.UserSvc.RegisterCustomer(user)
+	ctx, cancel := context.WithTimeout(c.Request().Context(), time.Second*20)
+	defer cancel()
+
+	userInfo, err := h.UserSvc.RegisterCustomer(ctx, user)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "register failed").Wrap(err)
 	}
@@ -80,7 +84,10 @@ func (h *Handler) Login(c *echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, "invalid request body").Wrap(err)
 	}
 
-	token, err := h.UserSvc.Login(payload.Email, payload.Password)
+	ctx, cancel := context.WithTimeout(c.Request().Context(), time.Second*20)
+	defer cancel()
+
+	token, err := h.UserSvc.Login(ctx, payload.Email, payload.Password)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusUnauthorized, "invalid email or password").Wrap(err)
 	}
@@ -112,7 +119,10 @@ func (h *Handler) TopUpBalance(c *echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, "invalid request body").Wrap(err)
 	}
 
-	paymentLink, err := h.UserSvc.TopUpBalance(claims.UserID, payload.Amount)
+	ctx, cancel := context.WithTimeout(c.Request().Context(), time.Second*20)
+	defer cancel()
+
+	paymentLink, err := h.UserSvc.TopUpBalance(ctx, claims.UserID, payload.Amount)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "top up failed").Wrap(err)
 	}
@@ -138,7 +148,10 @@ func (h *Handler) GetUserInfo(c *echo.Context) error {
 		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized user")
 	}
 
-	userInfo, err := h.UserSvc.GetUserInfo(claims.UserID)
+	ctx, cancel := context.WithTimeout(c.Request().Context(), time.Second*20)
+	defer cancel()
+
+	userInfo, err := h.UserSvc.GetUserInfo(ctx, claims.UserID)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "get user info failed").Wrap(err)
 	}
@@ -176,18 +189,16 @@ func (h *Handler) CreateOrder(c *echo.Context) error {
 	items := make([]model.Item, len(payload.Items))
 
 	for i, item := range payload.Items {
-		itemID, err := uuid.Parse(item.ItemID)
-		if err != nil {
-			return echo.NewHTTPError(http.StatusBadRequest, "invalid item id format").Wrap(err)
-		}
-
 		items[i] = model.Item{
-			ID:       itemID,
+			ID:       item.ID,
 			Quantity: item.Quantity,
 		}
 	}
 
-	order, err := h.OrderSvc.CreateOrder(claims.UserID, items)
+	ctx, cancel := context.WithTimeout(c.Request().Context(), time.Second*20)
+	defer cancel()
+
+	order, err := h.OrderSvc.CreateOrder(ctx, claims.UserID, claims.Subject, payload.DeliveryFee, items)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "create order failed").Wrap(err)
 	}
@@ -218,7 +229,10 @@ func (h *Handler) GetDrivers(c *echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, "invalid order id format").Wrap(err)
 	}
 
-	findDrivers, err := h.OrderSvc.GetDrivers(orderID)
+	ctx, cancel := context.WithTimeout(c.Request().Context(), time.Second*20)
+	defer cancel()
+
+	findDrivers, err := h.OrderSvc.GetDrivers(ctx, orderID)
 	if err != nil {
 		if errors.Is(err, model.ErrNotFound) {
 			return echo.NewHTTPError(http.StatusNotFound, "no drivers found, we'll keep looking...").Wrap(err)
@@ -266,7 +280,10 @@ func (h *Handler) ChooseDriver(c *echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, "invalid driver id format").Wrap(err)
 	}
 
-	order, err := h.OrderSvc.ChooseDriver(orderID, driverID)
+	ctx, cancel := context.WithTimeout(c.Request().Context(), time.Second*20)
+	defer cancel()
+
+	order, err := h.OrderSvc.ChooseDriver(ctx, orderID, driverID)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "choose driver failed").Wrap(err)
 	}
@@ -292,7 +309,10 @@ func (h *Handler) GetOrders(c *echo.Context) error {
 		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized user")
 	}
 
-	orders, err := h.OrderSvc.GetOrders(claims.UserID)
+	ctx, cancel := context.WithTimeout(c.Request().Context(), time.Second*20)
+	defer cancel()
+
+	orders, err := h.OrderSvc.GetOrders(ctx, claims.UserID)
 	if err != nil {
 		if errors.Is(err, model.ErrNotFound) {
 			return echo.NewHTTPError(http.StatusNotFound, "you haven't made any orders yet").Wrap(err)
@@ -335,7 +355,10 @@ func (h *Handler) GiveRating(c *echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, "invalid order id format").Wrap(err)
 	}
 
-	if err := h.OrderSvc.GiveRating(orderID); err != nil {
+	ctx, cancel := context.WithTimeout(c.Request().Context(), time.Second*20)
+	defer cancel()
+
+	if err := h.OrderSvc.GiveRating(ctx, orderID); err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "give rating failed").Wrap(err)
 	}
 
@@ -359,7 +382,10 @@ func (h *Handler) DriverGetPendingOrders(c *echo.Context) error {
 		return echo.NewHTTPError(http.StatusUnauthorized, "you're not a driver")
 	}
 
-	orders, err := h.OrderSvc.DriverGetPendingOrders()
+	ctx, cancel := context.WithTimeout(c.Request().Context(), time.Second*20)
+	defer cancel()
+
+	orders, err := h.OrderSvc.DriverGetPendingOrders(ctx)
 	if err != nil {
 		if errors.Is(err, model.ErrNotFound) {
 			return echo.NewHTTPError(http.StatusNotFound, "no pending orders found").Wrap(err)
@@ -393,7 +419,10 @@ func (h *Handler) DriverApplyToTakeOrder(c *echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, "invalid order id format").Wrap(err)
 	}
 
-	if err := h.OrderSvc.DriverApplyToTakeOrder(claims.UserID, orderID); err != nil {
+	ctx, cancel := context.WithTimeout(c.Request().Context(), time.Second*20)
+	defer cancel()
+
+	if err := h.OrderSvc.DriverApplyToTakeOrder(ctx, claims.UserID, orderID); err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "apply to take order failed").Wrap(err)
 	}
 
@@ -422,7 +451,10 @@ func (h *Handler) DriverCompleteOrder(c *echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, "invalid order id format").Wrap(err)
 	}
 
-	if err := h.OrderSvc.MarkOrderAsDone(orderID, claims.UserID); err != nil {
+	ctx, cancel := context.WithTimeout(c.Request().Context(), time.Second*20)
+	defer cancel()
+
+	if err := h.OrderSvc.MarkOrderAsDone(ctx, orderID, claims.UserID); err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "mark order as done failed").Wrap(err)
 	}
 
