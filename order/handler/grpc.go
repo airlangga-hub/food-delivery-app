@@ -275,6 +275,25 @@ func (h *Handler) DriverApplyForOrder(ctx context.Context, req *pb.DriverApplyFo
 	return nil, nil
 }
 
-func (h *Handler) DriverCompleteOrder(ctx context.Context, req *pb.DriverCompleteOrderRequest) (*pb.DriverCompleteOrderResponse, error)
+func (h *Handler) DriverCompleteOrder(ctx context.Context, req *pb.DriverCompleteOrderRequest) (*pb.DriverCompleteOrderResponse, error) {
+	orderID, err := uuid.Parse(req.OrderId)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "order.handler.DriverCompleteOrder (Parse OrderId): %v", err)
+	}
+
+	driverID, err := uuid.Parse(req.DriverId)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "order.handler.DriverCompleteOrder (Parse DriverId): %v", err)
+	}	
+	
+	if err := h.driverSvc.DriverCompleteOrder(ctx, orderID, driverID); err != nil {
+		if errors.Is(err, model.ErrNotFound) {
+			return nil, status.Errorf(codes.NotFound, "order.handler.DriverCompleteOrder (no rows found): %v", err)
+		}
+		return nil, status.Errorf(codes.Internal, "order.handler.DriverCompleteOrder: %v", err)
+	}
+	
+	return nil, nil
+}
 
 func (h *Handler) CreatePaymentSession(ctx context.Context, req *pb.CreatePaymentSessionRequest) (*pb.CreatePaymentSessionResponse, error)
