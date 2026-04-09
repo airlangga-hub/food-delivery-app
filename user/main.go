@@ -143,29 +143,29 @@ func main() {
 
 	logger.Info("gRPC Server running on port " + port)
 
-	chanExit := make(chan error)
+	chanExit := make(chan string)
 
 	go func() {
 		chanSig := make(chan os.Signal, 1)
 		signal.Notify(chanSig, syscall.SIGINT, syscall.SIGTERM)
 		s := <-chanSig
-		chanExit <- fmt.Errorf("Signal %v received, shutting down gRPC server...", s)
+		chanExit <- fmt.Sprintf("Signal %v received, shutting down gRPC server...", s)
 	}()
 
 	go func() {
 		lis, err := net.Listen("tcp", ":"+port)
 		if err != nil {
-			chanExit <- fmt.Errorf("net.Listen error: %v", err)
+			chanExit <- fmt.Sprintf("net.Listen error: %v", err)
 			return
 		}
 		if err = grpcServer.Serve(lis); err != nil && err != grpc.ErrServerStopped {
-			chanExit <- fmt.Errorf("gRPC.Serve error: %v", err)
+			chanExit <- fmt.Sprintf("gRPC.Serve error: %v", err)
 		}
 	}()
+	
+	exitSignal := <-chanExit
 
-	err = <-chanExit
-
-	logger.Error(fmt.Sprintf("Exit signal received: %v", err))
+	logger.Info(fmt.Sprintf("Exit signal received: %s", exitSignal))
 
 	grpcServer.GracefulStop()
 
