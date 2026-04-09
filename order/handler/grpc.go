@@ -6,6 +6,8 @@ import (
 	"github.com/airlangga-hub/food-delivery-app/order/model"
 	"github.com/airlangga-hub/food-delivery-app/order/pb"
 	"github.com/google/uuid"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
 )
 
@@ -34,7 +36,66 @@ func NewHandler(customerSvc CustomerService, driverSvc DriverService) *Handler {
 }
 
 func (h *Handler) CreateOrder(ctx context.Context, req *pb.CreateOrderRequest) (*pb.CreateOrderResponse, error) {
-	
+	items := make([]model.ItemsIn, len(req.Order.ItemsIn))
+
+	for i, itm := range req.Order.ItemsIn {
+		itmID, err := uuid.Parse(itm.Id)
+		if err != nil {
+			return nil, status.Errorf(codes.Internal, "order.handler.CreateOrder (Parse itm.Id): %v", err)
+		}
+
+		items[i] = model.ItemsIn{
+			ID:       itmID,
+			Quantity: int(itm.Quantity),
+		}
+	}
+
+	userID, err := uuid.Parse(req.UserId)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "order.handler.CreateOrder (Parse UserId): %v", err)
+	}
+
+	order, err := h.customerSvc.CreateOrder(ctx, userID, req.UserEmail, model.OrderIn{
+		DeliveryFee: int(req.Order.DeliveryFee),
+		ItemsIn:     items,
+	})
+
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "order.handler.CreateOrder: %v", err)
+	}
+
+	restos := make([]*pb.Restaurant, len(order.Restaurants))
+
+	for i, resto := range order.Restaurants {
+		restoItems := make([]*pb.Item, len(resto.Items))
+
+		for j, itm := range resto.Items {
+			restoItems[j] = &pb.Item{
+				Id:       itm.ID.String(),
+				Name:     itm.Name,
+				Price:    int64(itm.Price),
+				Quantity: int64(itm.Quantity),
+			}
+		}
+
+		restos[i] = &pb.Restaurant{
+			Id:      resto.ID.String(),
+			Name:    resto.Name,
+			Address: resto.Address,
+			Items:   restoItems,
+		}
+	}
+
+	return &pb.CreateOrderResponse{
+		Id:                  order.ID.String(),
+		Restaurants:         restos,
+		DeliveryAddress:     order.DeliveryAddress,
+		CustomerPhoneNumber: order.CustomerPhoneNumber,
+		OrderStatus:         string(order.OrderStatus),
+		DeliveryFee:         int64(order.DeliveryFee),
+		TotalFee:            int64(order.TotalFee),
+		PaymentLink:         order.PaymentLink,
+	}, nil
 }
 
 func (h *Handler) GetDrivers(ctx context.Context, req *pb.GetDriversRequest) (*pb.GetDriversResponse, error)

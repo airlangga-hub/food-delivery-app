@@ -22,18 +22,122 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+type OrderIn struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	DeliveryFee   int64                  `protobuf:"varint,1,opt,name=delivery_fee,json=deliveryFee,proto3" json:"delivery_fee,omitempty"`
+	ItemsIn       []*ItemsIn             `protobuf:"bytes,2,rep,name=items_in,json=itemsIn,proto3" json:"items_in,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *OrderIn) Reset() {
+	*x = OrderIn{}
+	mi := &file_order_proto_msgTypes[0]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *OrderIn) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*OrderIn) ProtoMessage() {}
+
+func (x *OrderIn) ProtoReflect() protoreflect.Message {
+	mi := &file_order_proto_msgTypes[0]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use OrderIn.ProtoReflect.Descriptor instead.
+func (*OrderIn) Descriptor() ([]byte, []int) {
+	return file_order_proto_rawDescGZIP(), []int{0}
+}
+
+func (x *OrderIn) GetDeliveryFee() int64 {
+	if x != nil {
+		return x.DeliveryFee
+	}
+	return 0
+}
+
+func (x *OrderIn) GetItemsIn() []*ItemsIn {
+	if x != nil {
+		return x.ItemsIn
+	}
+	return nil
+}
+
+type ItemsIn struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Quantity      int64                  `protobuf:"varint,2,opt,name=quantity,proto3" json:"quantity,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ItemsIn) Reset() {
+	*x = ItemsIn{}
+	mi := &file_order_proto_msgTypes[1]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ItemsIn) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ItemsIn) ProtoMessage() {}
+
+func (x *ItemsIn) ProtoReflect() protoreflect.Message {
+	mi := &file_order_proto_msgTypes[1]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ItemsIn.ProtoReflect.Descriptor instead.
+func (*ItemsIn) Descriptor() ([]byte, []int) {
+	return file_order_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *ItemsIn) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *ItemsIn) GetQuantity() int64 {
+	if x != nil {
+		return x.Quantity
+	}
+	return 0
+}
+
 type CreateOrderRequest struct {
-	state         protoimpl.MessageState      `protogen:"open.v1"`
-	UserId        string                      `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
-	UserEmail     string                      `protobuf:"bytes,2,opt,name=user_email,json=userEmail,proto3" json:"user_email,omitempty"`
-	Order         *CreateOrderRequest_OrderIn `protobuf:"bytes,3,opt,name=order,proto3" json:"order,omitempty"`
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UserId        string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	UserEmail     string                 `protobuf:"bytes,2,opt,name=user_email,json=userEmail,proto3" json:"user_email,omitempty"`
+	Order         *OrderIn               `protobuf:"bytes,3,opt,name=order,proto3" json:"order,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *CreateOrderRequest) Reset() {
 	*x = CreateOrderRequest{}
-	mi := &file_order_proto_msgTypes[0]
+	mi := &file_order_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -45,7 +149,7 @@ func (x *CreateOrderRequest) String() string {
 func (*CreateOrderRequest) ProtoMessage() {}
 
 func (x *CreateOrderRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_order_proto_msgTypes[0]
+	mi := &file_order_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -58,7 +162,7 @@ func (x *CreateOrderRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateOrderRequest.ProtoReflect.Descriptor instead.
 func (*CreateOrderRequest) Descriptor() ([]byte, []int) {
-	return file_order_proto_rawDescGZIP(), []int{0}
+	return file_order_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *CreateOrderRequest) GetUserId() string {
@@ -75,7 +179,7 @@ func (x *CreateOrderRequest) GetUserEmail() string {
 	return ""
 }
 
-func (x *CreateOrderRequest) GetOrder() *CreateOrderRequest_OrderIn {
+func (x *CreateOrderRequest) GetOrder() *OrderIn {
 	if x != nil {
 		return x.Order
 	}
@@ -91,7 +195,7 @@ type GetDriversRequest struct {
 
 func (x *GetDriversRequest) Reset() {
 	*x = GetDriversRequest{}
-	mi := &file_order_proto_msgTypes[1]
+	mi := &file_order_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -103,7 +207,7 @@ func (x *GetDriversRequest) String() string {
 func (*GetDriversRequest) ProtoMessage() {}
 
 func (x *GetDriversRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_order_proto_msgTypes[1]
+	mi := &file_order_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -116,7 +220,7 @@ func (x *GetDriversRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetDriversRequest.ProtoReflect.Descriptor instead.
 func (*GetDriversRequest) Descriptor() ([]byte, []int) {
-	return file_order_proto_rawDescGZIP(), []int{1}
+	return file_order_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *GetDriversRequest) GetOrderId() string {
@@ -136,7 +240,7 @@ type ChooseDriverRequest struct {
 
 func (x *ChooseDriverRequest) Reset() {
 	*x = ChooseDriverRequest{}
-	mi := &file_order_proto_msgTypes[2]
+	mi := &file_order_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -148,7 +252,7 @@ func (x *ChooseDriverRequest) String() string {
 func (*ChooseDriverRequest) ProtoMessage() {}
 
 func (x *ChooseDriverRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_order_proto_msgTypes[2]
+	mi := &file_order_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -161,7 +265,7 @@ func (x *ChooseDriverRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ChooseDriverRequest.ProtoReflect.Descriptor instead.
 func (*ChooseDriverRequest) Descriptor() ([]byte, []int) {
-	return file_order_proto_rawDescGZIP(), []int{2}
+	return file_order_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *ChooseDriverRequest) GetOrderId() string {
@@ -188,7 +292,7 @@ type GiveRatingRequest struct {
 
 func (x *GiveRatingRequest) Reset() {
 	*x = GiveRatingRequest{}
-	mi := &file_order_proto_msgTypes[3]
+	mi := &file_order_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -200,7 +304,7 @@ func (x *GiveRatingRequest) String() string {
 func (*GiveRatingRequest) ProtoMessage() {}
 
 func (x *GiveRatingRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_order_proto_msgTypes[3]
+	mi := &file_order_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -213,7 +317,7 @@ func (x *GiveRatingRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GiveRatingRequest.ProtoReflect.Descriptor instead.
 func (*GiveRatingRequest) Descriptor() ([]byte, []int) {
-	return file_order_proto_rawDescGZIP(), []int{3}
+	return file_order_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *GiveRatingRequest) GetOrderId() string {
@@ -240,7 +344,7 @@ type DriverApplyForOrderRequest struct {
 
 func (x *DriverApplyForOrderRequest) Reset() {
 	*x = DriverApplyForOrderRequest{}
-	mi := &file_order_proto_msgTypes[4]
+	mi := &file_order_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -252,7 +356,7 @@ func (x *DriverApplyForOrderRequest) String() string {
 func (*DriverApplyForOrderRequest) ProtoMessage() {}
 
 func (x *DriverApplyForOrderRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_order_proto_msgTypes[4]
+	mi := &file_order_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -265,7 +369,7 @@ func (x *DriverApplyForOrderRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DriverApplyForOrderRequest.ProtoReflect.Descriptor instead.
 func (*DriverApplyForOrderRequest) Descriptor() ([]byte, []int) {
-	return file_order_proto_rawDescGZIP(), []int{4}
+	return file_order_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *DriverApplyForOrderRequest) GetOrderId() string {
@@ -292,7 +396,7 @@ type DriverCompleteOrderRequest struct {
 
 func (x *DriverCompleteOrderRequest) Reset() {
 	*x = DriverCompleteOrderRequest{}
-	mi := &file_order_proto_msgTypes[5]
+	mi := &file_order_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -304,7 +408,7 @@ func (x *DriverCompleteOrderRequest) String() string {
 func (*DriverCompleteOrderRequest) ProtoMessage() {}
 
 func (x *DriverCompleteOrderRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_order_proto_msgTypes[5]
+	mi := &file_order_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -317,7 +421,7 @@ func (x *DriverCompleteOrderRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DriverCompleteOrderRequest.ProtoReflect.Descriptor instead.
 func (*DriverCompleteOrderRequest) Descriptor() ([]byte, []int) {
-	return file_order_proto_rawDescGZIP(), []int{5}
+	return file_order_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *DriverCompleteOrderRequest) GetOrderId() string {
@@ -334,23 +438,159 @@ func (x *DriverCompleteOrderRequest) GetDriverId() string {
 	return ""
 }
 
+type Restaurant struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	Address       string                 `protobuf:"bytes,3,opt,name=address,proto3" json:"address,omitempty"`
+	Items         []*Item                `protobuf:"bytes,4,rep,name=items,proto3" json:"items,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Restaurant) Reset() {
+	*x = Restaurant{}
+	mi := &file_order_proto_msgTypes[8]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Restaurant) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Restaurant) ProtoMessage() {}
+
+func (x *Restaurant) ProtoReflect() protoreflect.Message {
+	mi := &file_order_proto_msgTypes[8]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Restaurant.ProtoReflect.Descriptor instead.
+func (*Restaurant) Descriptor() ([]byte, []int) {
+	return file_order_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *Restaurant) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *Restaurant) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *Restaurant) GetAddress() string {
+	if x != nil {
+		return x.Address
+	}
+	return ""
+}
+
+func (x *Restaurant) GetItems() []*Item {
+	if x != nil {
+		return x.Items
+	}
+	return nil
+}
+
+type Item struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	Price         int64                  `protobuf:"varint,3,opt,name=price,proto3" json:"price,omitempty"`
+	Quantity      int64                  `protobuf:"varint,4,opt,name=quantity,proto3" json:"quantity,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Item) Reset() {
+	*x = Item{}
+	mi := &file_order_proto_msgTypes[9]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Item) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Item) ProtoMessage() {}
+
+func (x *Item) ProtoReflect() protoreflect.Message {
+	mi := &file_order_proto_msgTypes[9]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Item.ProtoReflect.Descriptor instead.
+func (*Item) Descriptor() ([]byte, []int) {
+	return file_order_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *Item) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *Item) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *Item) GetPrice() int64 {
+	if x != nil {
+		return x.Price
+	}
+	return 0
+}
+
+func (x *Item) GetQuantity() int64 {
+	if x != nil {
+		return x.Quantity
+	}
+	return 0
+}
+
 type CreateOrderResponse struct {
-	state               protoimpl.MessageState            `protogen:"open.v1"`
-	Id                  string                            `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Restaurants         []*CreateOrderResponse_Restaurant `protobuf:"bytes,2,rep,name=restaurants,proto3" json:"restaurants,omitempty"`
-	DeliveryAddress     string                            `protobuf:"bytes,3,opt,name=delivery_address,json=deliveryAddress,proto3" json:"delivery_address,omitempty"`
-	CustomerPhoneNumber string                            `protobuf:"bytes,4,opt,name=customer_phone_number,json=customerPhoneNumber,proto3" json:"customer_phone_number,omitempty"`
-	OrderStatus         string                            `protobuf:"bytes,5,opt,name=order_status,json=orderStatus,proto3" json:"order_status,omitempty"`
-	DeliveryFee         int64                             `protobuf:"varint,6,opt,name=delivery_fee,json=deliveryFee,proto3" json:"delivery_fee,omitempty"`
-	TotalFee            int64                             `protobuf:"varint,7,opt,name=total_fee,json=totalFee,proto3" json:"total_fee,omitempty"`
-	PaymentLink         string                            `protobuf:"bytes,8,opt,name=payment_link,json=paymentLink,proto3" json:"payment_link,omitempty"`
+	state               protoimpl.MessageState `protogen:"open.v1"`
+	Id                  string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Restaurants         []*Restaurant          `protobuf:"bytes,2,rep,name=restaurants,proto3" json:"restaurants,omitempty"`
+	DeliveryAddress     string                 `protobuf:"bytes,3,opt,name=delivery_address,json=deliveryAddress,proto3" json:"delivery_address,omitempty"`
+	CustomerPhoneNumber string                 `protobuf:"bytes,4,opt,name=customer_phone_number,json=customerPhoneNumber,proto3" json:"customer_phone_number,omitempty"`
+	OrderStatus         string                 `protobuf:"bytes,5,opt,name=order_status,json=orderStatus,proto3" json:"order_status,omitempty"`
+	DeliveryFee         int64                  `protobuf:"varint,6,opt,name=delivery_fee,json=deliveryFee,proto3" json:"delivery_fee,omitempty"`
+	TotalFee            int64                  `protobuf:"varint,7,opt,name=total_fee,json=totalFee,proto3" json:"total_fee,omitempty"`
+	PaymentLink         string                 `protobuf:"bytes,8,opt,name=payment_link,json=paymentLink,proto3" json:"payment_link,omitempty"`
 	unknownFields       protoimpl.UnknownFields
 	sizeCache           protoimpl.SizeCache
 }
 
 func (x *CreateOrderResponse) Reset() {
 	*x = CreateOrderResponse{}
-	mi := &file_order_proto_msgTypes[6]
+	mi := &file_order_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -362,7 +602,7 @@ func (x *CreateOrderResponse) String() string {
 func (*CreateOrderResponse) ProtoMessage() {}
 
 func (x *CreateOrderResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_order_proto_msgTypes[6]
+	mi := &file_order_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -375,7 +615,7 @@ func (x *CreateOrderResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateOrderResponse.ProtoReflect.Descriptor instead.
 func (*CreateOrderResponse) Descriptor() ([]byte, []int) {
-	return file_order_proto_rawDescGZIP(), []int{6}
+	return file_order_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *CreateOrderResponse) GetId() string {
@@ -385,7 +625,7 @@ func (x *CreateOrderResponse) GetId() string {
 	return ""
 }
 
-func (x *CreateOrderResponse) GetRestaurants() []*CreateOrderResponse_Restaurant {
+func (x *CreateOrderResponse) GetRestaurants() []*Restaurant {
 	if x != nil {
 		return x.Restaurants
 	}
@@ -435,15 +675,15 @@ func (x *CreateOrderResponse) GetPaymentLink() string {
 }
 
 type GetDriversResponse struct {
-	state         protoimpl.MessageState       `protogen:"open.v1"`
-	Drivers       []*GetDriversResponse_Driver `protobuf:"bytes,1,rep,name=drivers,proto3" json:"drivers,omitempty"`
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Drivers       []*Driver              `protobuf:"bytes,1,rep,name=drivers,proto3" json:"drivers,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *GetDriversResponse) Reset() {
 	*x = GetDriversResponse{}
-	mi := &file_order_proto_msgTypes[7]
+	mi := &file_order_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -455,7 +695,7 @@ func (x *GetDriversResponse) String() string {
 func (*GetDriversResponse) ProtoMessage() {}
 
 func (x *GetDriversResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_order_proto_msgTypes[7]
+	mi := &file_order_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -468,10 +708,10 @@ func (x *GetDriversResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetDriversResponse.ProtoReflect.Descriptor instead.
 func (*GetDriversResponse) Descriptor() ([]byte, []int) {
-	return file_order_proto_rawDescGZIP(), []int{7}
+	return file_order_proto_rawDescGZIP(), []int{11}
 }
 
-func (x *GetDriversResponse) GetDrivers() []*GetDriversResponse_Driver {
+func (x *GetDriversResponse) GetDrivers() []*Driver {
 	if x != nil {
 		return x.Drivers
 	}
@@ -479,23 +719,23 @@ func (x *GetDriversResponse) GetDrivers() []*GetDriversResponse_Driver {
 }
 
 type ChooseDriverResponse struct {
-	state               protoimpl.MessageState             `protogen:"open.v1"`
-	Id                  string                             `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Restaurants         []*ChooseDriverResponse_Restaurant `protobuf:"bytes,2,rep,name=restaurants,proto3" json:"restaurants,omitempty"`
-	DeliveryAddress     string                             `protobuf:"bytes,3,opt,name=delivery_address,json=deliveryAddress,proto3" json:"delivery_address,omitempty"`
-	CustomerPhoneNumber string                             `protobuf:"bytes,4,opt,name=customer_phone_number,json=customerPhoneNumber,proto3" json:"customer_phone_number,omitempty"`
-	OrderStatus         string                             `protobuf:"bytes,5,opt,name=order_status,json=orderStatus,proto3" json:"order_status,omitempty"`
-	Driver              *ChooseDriverResponse_Driver       `protobuf:"bytes,6,opt,name=driver,proto3" json:"driver,omitempty"`
-	DeliveryFee         int64                              `protobuf:"varint,7,opt,name=delivery_fee,json=deliveryFee,proto3" json:"delivery_fee,omitempty"`
-	TotalFee            int64                              `protobuf:"varint,8,opt,name=total_fee,json=totalFee,proto3" json:"total_fee,omitempty"`
-	PaymentLink         string                             `protobuf:"bytes,9,opt,name=payment_link,json=paymentLink,proto3" json:"payment_link,omitempty"`
+	state               protoimpl.MessageState `protogen:"open.v1"`
+	Id                  string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Restaurants         []*Restaurant          `protobuf:"bytes,2,rep,name=restaurants,proto3" json:"restaurants,omitempty"`
+	DeliveryAddress     string                 `protobuf:"bytes,3,opt,name=delivery_address,json=deliveryAddress,proto3" json:"delivery_address,omitempty"`
+	CustomerPhoneNumber string                 `protobuf:"bytes,4,opt,name=customer_phone_number,json=customerPhoneNumber,proto3" json:"customer_phone_number,omitempty"`
+	OrderStatus         string                 `protobuf:"bytes,5,opt,name=order_status,json=orderStatus,proto3" json:"order_status,omitempty"`
+	Driver              *Driver                `protobuf:"bytes,6,opt,name=driver,proto3" json:"driver,omitempty"`
+	DeliveryFee         int64                  `protobuf:"varint,7,opt,name=delivery_fee,json=deliveryFee,proto3" json:"delivery_fee,omitempty"`
+	TotalFee            int64                  `protobuf:"varint,8,opt,name=total_fee,json=totalFee,proto3" json:"total_fee,omitempty"`
+	PaymentLink         string                 `protobuf:"bytes,9,opt,name=payment_link,json=paymentLink,proto3" json:"payment_link,omitempty"`
 	unknownFields       protoimpl.UnknownFields
 	sizeCache           protoimpl.SizeCache
 }
 
 func (x *ChooseDriverResponse) Reset() {
 	*x = ChooseDriverResponse{}
-	mi := &file_order_proto_msgTypes[8]
+	mi := &file_order_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -507,7 +747,7 @@ func (x *ChooseDriverResponse) String() string {
 func (*ChooseDriverResponse) ProtoMessage() {}
 
 func (x *ChooseDriverResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_order_proto_msgTypes[8]
+	mi := &file_order_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -520,7 +760,7 @@ func (x *ChooseDriverResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ChooseDriverResponse.ProtoReflect.Descriptor instead.
 func (*ChooseDriverResponse) Descriptor() ([]byte, []int) {
-	return file_order_proto_rawDescGZIP(), []int{8}
+	return file_order_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *ChooseDriverResponse) GetId() string {
@@ -530,7 +770,7 @@ func (x *ChooseDriverResponse) GetId() string {
 	return ""
 }
 
-func (x *ChooseDriverResponse) GetRestaurants() []*ChooseDriverResponse_Restaurant {
+func (x *ChooseDriverResponse) GetRestaurants() []*Restaurant {
 	if x != nil {
 		return x.Restaurants
 	}
@@ -558,7 +798,7 @@ func (x *ChooseDriverResponse) GetOrderStatus() string {
 	return ""
 }
 
-func (x *ChooseDriverResponse) GetDriver() *ChooseDriverResponse_Driver {
+func (x *ChooseDriverResponse) GetDriver() *Driver {
 	if x != nil {
 		return x.Driver
 	}
@@ -586,6 +826,90 @@ func (x *ChooseDriverResponse) GetPaymentLink() string {
 	return ""
 }
 
+type Driver struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	AverageRating float64                `protobuf:"fixed64,2,opt,name=average_rating,json=averageRating,proto3" json:"average_rating,omitempty"`
+	Name          string                 `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
+	Bike          string                 `protobuf:"bytes,4,opt,name=bike,proto3" json:"bike,omitempty"`
+	LicensePlate  string                 `protobuf:"bytes,5,opt,name=license_plate,json=licensePlate,proto3" json:"license_plate,omitempty"`
+	PhoneNumber   string                 `protobuf:"bytes,6,opt,name=phone_number,json=phoneNumber,proto3" json:"phone_number,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Driver) Reset() {
+	*x = Driver{}
+	mi := &file_order_proto_msgTypes[13]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Driver) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Driver) ProtoMessage() {}
+
+func (x *Driver) ProtoReflect() protoreflect.Message {
+	mi := &file_order_proto_msgTypes[13]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Driver.ProtoReflect.Descriptor instead.
+func (*Driver) Descriptor() ([]byte, []int) {
+	return file_order_proto_rawDescGZIP(), []int{13}
+}
+
+func (x *Driver) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *Driver) GetAverageRating() float64 {
+	if x != nil {
+		return x.AverageRating
+	}
+	return 0
+}
+
+func (x *Driver) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *Driver) GetBike() string {
+	if x != nil {
+		return x.Bike
+	}
+	return ""
+}
+
+func (x *Driver) GetLicensePlate() string {
+	if x != nil {
+		return x.LicensePlate
+	}
+	return ""
+}
+
+func (x *Driver) GetPhoneNumber() string {
+	if x != nil {
+		return x.PhoneNumber
+	}
+	return ""
+}
+
 type GiveRatingResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	unknownFields protoimpl.UnknownFields
@@ -594,7 +918,7 @@ type GiveRatingResponse struct {
 
 func (x *GiveRatingResponse) Reset() {
 	*x = GiveRatingResponse{}
-	mi := &file_order_proto_msgTypes[9]
+	mi := &file_order_proto_msgTypes[14]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -606,7 +930,7 @@ func (x *GiveRatingResponse) String() string {
 func (*GiveRatingResponse) ProtoMessage() {}
 
 func (x *GiveRatingResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_order_proto_msgTypes[9]
+	mi := &file_order_proto_msgTypes[14]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -619,19 +943,19 @@ func (x *GiveRatingResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GiveRatingResponse.ProtoReflect.Descriptor instead.
 func (*GiveRatingResponse) Descriptor() ([]byte, []int) {
-	return file_order_proto_rawDescGZIP(), []int{9}
+	return file_order_proto_rawDescGZIP(), []int{14}
 }
 
 type DriverGetPendingOrdersResponse struct {
-	state         protoimpl.MessageState                  `protogen:"open.v1"`
-	Orders        []*DriverGetPendingOrdersResponse_Order `protobuf:"bytes,1,rep,name=orders,proto3" json:"orders,omitempty"`
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Orders        []*Order               `protobuf:"bytes,1,rep,name=orders,proto3" json:"orders,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *DriverGetPendingOrdersResponse) Reset() {
 	*x = DriverGetPendingOrdersResponse{}
-	mi := &file_order_proto_msgTypes[10]
+	mi := &file_order_proto_msgTypes[15]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -643,7 +967,7 @@ func (x *DriverGetPendingOrdersResponse) String() string {
 func (*DriverGetPendingOrdersResponse) ProtoMessage() {}
 
 func (x *DriverGetPendingOrdersResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_order_proto_msgTypes[10]
+	mi := &file_order_proto_msgTypes[15]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -656,14 +980,114 @@ func (x *DriverGetPendingOrdersResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DriverGetPendingOrdersResponse.ProtoReflect.Descriptor instead.
 func (*DriverGetPendingOrdersResponse) Descriptor() ([]byte, []int) {
-	return file_order_proto_rawDescGZIP(), []int{10}
+	return file_order_proto_rawDescGZIP(), []int{15}
 }
 
-func (x *DriverGetPendingOrdersResponse) GetOrders() []*DriverGetPendingOrdersResponse_Order {
+func (x *DriverGetPendingOrdersResponse) GetOrders() []*Order {
 	if x != nil {
 		return x.Orders
 	}
 	return nil
+}
+
+type Order struct {
+	state               protoimpl.MessageState `protogen:"open.v1"`
+	Id                  string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Restaurants         []*Restaurant          `protobuf:"bytes,2,rep,name=restaurants,proto3" json:"restaurants,omitempty"`
+	DeliveryAddress     string                 `protobuf:"bytes,3,opt,name=delivery_address,json=deliveryAddress,proto3" json:"delivery_address,omitempty"`
+	CustomerPhoneNumber string                 `protobuf:"bytes,4,opt,name=customer_phone_number,json=customerPhoneNumber,proto3" json:"customer_phone_number,omitempty"`
+	OrderStatus         string                 `protobuf:"bytes,5,opt,name=order_status,json=orderStatus,proto3" json:"order_status,omitempty"`
+	DeliveryFee         int64                  `protobuf:"varint,6,opt,name=delivery_fee,json=deliveryFee,proto3" json:"delivery_fee,omitempty"`
+	TotalFee            int64                  `protobuf:"varint,7,opt,name=total_fee,json=totalFee,proto3" json:"total_fee,omitempty"`
+	PaymentLink         string                 `protobuf:"bytes,8,opt,name=payment_link,json=paymentLink,proto3" json:"payment_link,omitempty"`
+	unknownFields       protoimpl.UnknownFields
+	sizeCache           protoimpl.SizeCache
+}
+
+func (x *Order) Reset() {
+	*x = Order{}
+	mi := &file_order_proto_msgTypes[16]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Order) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Order) ProtoMessage() {}
+
+func (x *Order) ProtoReflect() protoreflect.Message {
+	mi := &file_order_proto_msgTypes[16]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Order.ProtoReflect.Descriptor instead.
+func (*Order) Descriptor() ([]byte, []int) {
+	return file_order_proto_rawDescGZIP(), []int{16}
+}
+
+func (x *Order) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *Order) GetRestaurants() []*Restaurant {
+	if x != nil {
+		return x.Restaurants
+	}
+	return nil
+}
+
+func (x *Order) GetDeliveryAddress() string {
+	if x != nil {
+		return x.DeliveryAddress
+	}
+	return ""
+}
+
+func (x *Order) GetCustomerPhoneNumber() string {
+	if x != nil {
+		return x.CustomerPhoneNumber
+	}
+	return ""
+}
+
+func (x *Order) GetOrderStatus() string {
+	if x != nil {
+		return x.OrderStatus
+	}
+	return ""
+}
+
+func (x *Order) GetDeliveryFee() int64 {
+	if x != nil {
+		return x.DeliveryFee
+	}
+	return 0
+}
+
+func (x *Order) GetTotalFee() int64 {
+	if x != nil {
+		return x.TotalFee
+	}
+	return 0
+}
+
+func (x *Order) GetPaymentLink() string {
+	if x != nil {
+		return x.PaymentLink
+	}
+	return ""
 }
 
 type DriverApplyForOrderResponse struct {
@@ -674,7 +1098,7 @@ type DriverApplyForOrderResponse struct {
 
 func (x *DriverApplyForOrderResponse) Reset() {
 	*x = DriverApplyForOrderResponse{}
-	mi := &file_order_proto_msgTypes[11]
+	mi := &file_order_proto_msgTypes[17]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -686,7 +1110,7 @@ func (x *DriverApplyForOrderResponse) String() string {
 func (*DriverApplyForOrderResponse) ProtoMessage() {}
 
 func (x *DriverApplyForOrderResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_order_proto_msgTypes[11]
+	mi := &file_order_proto_msgTypes[17]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -699,7 +1123,7 @@ func (x *DriverApplyForOrderResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DriverApplyForOrderResponse.ProtoReflect.Descriptor instead.
 func (*DriverApplyForOrderResponse) Descriptor() ([]byte, []int) {
-	return file_order_proto_rawDescGZIP(), []int{11}
+	return file_order_proto_rawDescGZIP(), []int{17}
 }
 
 type DriverCompleteOrderResponse struct {
@@ -710,7 +1134,7 @@ type DriverCompleteOrderResponse struct {
 
 func (x *DriverCompleteOrderResponse) Reset() {
 	*x = DriverCompleteOrderResponse{}
-	mi := &file_order_proto_msgTypes[12]
+	mi := &file_order_proto_msgTypes[18]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -722,7 +1146,7 @@ func (x *DriverCompleteOrderResponse) String() string {
 func (*DriverCompleteOrderResponse) ProtoMessage() {}
 
 func (x *DriverCompleteOrderResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_order_proto_msgTypes[12]
+	mi := &file_order_proto_msgTypes[18]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -735,7 +1159,7 @@ func (x *DriverCompleteOrderResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DriverCompleteOrderResponse.ProtoReflect.Descriptor instead.
 func (*DriverCompleteOrderResponse) Descriptor() ([]byte, []int) {
-	return file_order_proto_rawDescGZIP(), []int{12}
+	return file_order_proto_rawDescGZIP(), []int{18}
 }
 
 type PaymentGatewayItem struct {
@@ -754,7 +1178,7 @@ type PaymentGatewayItem struct {
 
 func (x *PaymentGatewayItem) Reset() {
 	*x = PaymentGatewayItem{}
-	mi := &file_order_proto_msgTypes[13]
+	mi := &file_order_proto_msgTypes[19]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -766,7 +1190,7 @@ func (x *PaymentGatewayItem) String() string {
 func (*PaymentGatewayItem) ProtoMessage() {}
 
 func (x *PaymentGatewayItem) ProtoReflect() protoreflect.Message {
-	mi := &file_order_proto_msgTypes[13]
+	mi := &file_order_proto_msgTypes[19]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -779,7 +1203,7 @@ func (x *PaymentGatewayItem) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PaymentGatewayItem.ProtoReflect.Descriptor instead.
 func (*PaymentGatewayItem) Descriptor() ([]byte, []int) {
-	return file_order_proto_rawDescGZIP(), []int{13}
+	return file_order_proto_rawDescGZIP(), []int{19}
 }
 
 func (x *PaymentGatewayItem) GetReferenceId() string {
@@ -851,7 +1275,7 @@ type CreatePaymentSessionRequest struct {
 
 func (x *CreatePaymentSessionRequest) Reset() {
 	*x = CreatePaymentSessionRequest{}
-	mi := &file_order_proto_msgTypes[14]
+	mi := &file_order_proto_msgTypes[20]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -863,7 +1287,7 @@ func (x *CreatePaymentSessionRequest) String() string {
 func (*CreatePaymentSessionRequest) ProtoMessage() {}
 
 func (x *CreatePaymentSessionRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_order_proto_msgTypes[14]
+	mi := &file_order_proto_msgTypes[20]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -876,7 +1300,7 @@ func (x *CreatePaymentSessionRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreatePaymentSessionRequest.ProtoReflect.Descriptor instead.
 func (*CreatePaymentSessionRequest) Descriptor() ([]byte, []int) {
-	return file_order_proto_rawDescGZIP(), []int{14}
+	return file_order_proto_rawDescGZIP(), []int{20}
 }
 
 func (x *CreatePaymentSessionRequest) GetPaymentType() string {
@@ -942,7 +1366,7 @@ type CreatePaymentSessionResponse struct {
 
 func (x *CreatePaymentSessionResponse) Reset() {
 	*x = CreatePaymentSessionResponse{}
-	mi := &file_order_proto_msgTypes[15]
+	mi := &file_order_proto_msgTypes[21]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -954,7 +1378,7 @@ func (x *CreatePaymentSessionResponse) String() string {
 func (*CreatePaymentSessionResponse) ProtoMessage() {}
 
 func (x *CreatePaymentSessionResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_order_proto_msgTypes[15]
+	mi := &file_order_proto_msgTypes[21]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -967,7 +1391,7 @@ func (x *CreatePaymentSessionResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreatePaymentSessionResponse.ProtoReflect.Descriptor instead.
 func (*CreatePaymentSessionResponse) Descriptor() ([]byte, []int) {
-	return file_order_proto_rawDescGZIP(), []int{15}
+	return file_order_proto_rawDescGZIP(), []int{21}
 }
 
 func (x *CreatePaymentSessionResponse) GetPaymentSessionId() string {
@@ -1110,802 +1534,22 @@ func (x *CreatePaymentSessionResponse) GetPaymentLinkUrl() string {
 	return ""
 }
 
-type CreateOrderRequest_OrderIn struct {
-	state         protoimpl.MessageState                `protogen:"open.v1"`
-	DeliveryFee   int64                                 `protobuf:"varint,1,opt,name=delivery_fee,json=deliveryFee,proto3" json:"delivery_fee,omitempty"`
-	ItemsIn       []*CreateOrderRequest_OrderIn_ItemsIn `protobuf:"bytes,2,rep,name=items_in,json=itemsIn,proto3" json:"items_in,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *CreateOrderRequest_OrderIn) Reset() {
-	*x = CreateOrderRequest_OrderIn{}
-	mi := &file_order_proto_msgTypes[16]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *CreateOrderRequest_OrderIn) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*CreateOrderRequest_OrderIn) ProtoMessage() {}
-
-func (x *CreateOrderRequest_OrderIn) ProtoReflect() protoreflect.Message {
-	mi := &file_order_proto_msgTypes[16]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use CreateOrderRequest_OrderIn.ProtoReflect.Descriptor instead.
-func (*CreateOrderRequest_OrderIn) Descriptor() ([]byte, []int) {
-	return file_order_proto_rawDescGZIP(), []int{0, 0}
-}
-
-func (x *CreateOrderRequest_OrderIn) GetDeliveryFee() int64 {
-	if x != nil {
-		return x.DeliveryFee
-	}
-	return 0
-}
-
-func (x *CreateOrderRequest_OrderIn) GetItemsIn() []*CreateOrderRequest_OrderIn_ItemsIn {
-	if x != nil {
-		return x.ItemsIn
-	}
-	return nil
-}
-
-type CreateOrderRequest_OrderIn_ItemsIn struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Quantity      int64                  `protobuf:"varint,2,opt,name=quantity,proto3" json:"quantity,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *CreateOrderRequest_OrderIn_ItemsIn) Reset() {
-	*x = CreateOrderRequest_OrderIn_ItemsIn{}
-	mi := &file_order_proto_msgTypes[17]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *CreateOrderRequest_OrderIn_ItemsIn) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*CreateOrderRequest_OrderIn_ItemsIn) ProtoMessage() {}
-
-func (x *CreateOrderRequest_OrderIn_ItemsIn) ProtoReflect() protoreflect.Message {
-	mi := &file_order_proto_msgTypes[17]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use CreateOrderRequest_OrderIn_ItemsIn.ProtoReflect.Descriptor instead.
-func (*CreateOrderRequest_OrderIn_ItemsIn) Descriptor() ([]byte, []int) {
-	return file_order_proto_rawDescGZIP(), []int{0, 0, 0}
-}
-
-func (x *CreateOrderRequest_OrderIn_ItemsIn) GetId() string {
-	if x != nil {
-		return x.Id
-	}
-	return ""
-}
-
-func (x *CreateOrderRequest_OrderIn_ItemsIn) GetQuantity() int64 {
-	if x != nil {
-		return x.Quantity
-	}
-	return 0
-}
-
-type CreateOrderResponse_Restaurant struct {
-	state         protoimpl.MessageState      `protogen:"open.v1"`
-	Id            string                      `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Name          string                      `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	Address       string                      `protobuf:"bytes,3,opt,name=address,proto3" json:"address,omitempty"`
-	Items         []*CreateOrderResponse_Item `protobuf:"bytes,4,rep,name=items,proto3" json:"items,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *CreateOrderResponse_Restaurant) Reset() {
-	*x = CreateOrderResponse_Restaurant{}
-	mi := &file_order_proto_msgTypes[18]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *CreateOrderResponse_Restaurant) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*CreateOrderResponse_Restaurant) ProtoMessage() {}
-
-func (x *CreateOrderResponse_Restaurant) ProtoReflect() protoreflect.Message {
-	mi := &file_order_proto_msgTypes[18]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use CreateOrderResponse_Restaurant.ProtoReflect.Descriptor instead.
-func (*CreateOrderResponse_Restaurant) Descriptor() ([]byte, []int) {
-	return file_order_proto_rawDescGZIP(), []int{6, 0}
-}
-
-func (x *CreateOrderResponse_Restaurant) GetId() string {
-	if x != nil {
-		return x.Id
-	}
-	return ""
-}
-
-func (x *CreateOrderResponse_Restaurant) GetName() string {
-	if x != nil {
-		return x.Name
-	}
-	return ""
-}
-
-func (x *CreateOrderResponse_Restaurant) GetAddress() string {
-	if x != nil {
-		return x.Address
-	}
-	return ""
-}
-
-func (x *CreateOrderResponse_Restaurant) GetItems() []*CreateOrderResponse_Item {
-	if x != nil {
-		return x.Items
-	}
-	return nil
-}
-
-type CreateOrderResponse_Item struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	Price         int64                  `protobuf:"varint,3,opt,name=price,proto3" json:"price,omitempty"`
-	Quantity      int64                  `protobuf:"varint,4,opt,name=quantity,proto3" json:"quantity,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *CreateOrderResponse_Item) Reset() {
-	*x = CreateOrderResponse_Item{}
-	mi := &file_order_proto_msgTypes[19]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *CreateOrderResponse_Item) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*CreateOrderResponse_Item) ProtoMessage() {}
-
-func (x *CreateOrderResponse_Item) ProtoReflect() protoreflect.Message {
-	mi := &file_order_proto_msgTypes[19]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use CreateOrderResponse_Item.ProtoReflect.Descriptor instead.
-func (*CreateOrderResponse_Item) Descriptor() ([]byte, []int) {
-	return file_order_proto_rawDescGZIP(), []int{6, 1}
-}
-
-func (x *CreateOrderResponse_Item) GetId() string {
-	if x != nil {
-		return x.Id
-	}
-	return ""
-}
-
-func (x *CreateOrderResponse_Item) GetName() string {
-	if x != nil {
-		return x.Name
-	}
-	return ""
-}
-
-func (x *CreateOrderResponse_Item) GetPrice() int64 {
-	if x != nil {
-		return x.Price
-	}
-	return 0
-}
-
-func (x *CreateOrderResponse_Item) GetQuantity() int64 {
-	if x != nil {
-		return x.Quantity
-	}
-	return 0
-}
-
-type GetDriversResponse_Driver struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	AverageRating float64                `protobuf:"fixed64,2,opt,name=average_rating,json=averageRating,proto3" json:"average_rating,omitempty"`
-	Name          string                 `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
-	Bike          string                 `protobuf:"bytes,4,opt,name=bike,proto3" json:"bike,omitempty"`
-	LicensePlate  string                 `protobuf:"bytes,5,opt,name=license_plate,json=licensePlate,proto3" json:"license_plate,omitempty"`
-	PhoneNumber   string                 `protobuf:"bytes,6,opt,name=phone_number,json=phoneNumber,proto3" json:"phone_number,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *GetDriversResponse_Driver) Reset() {
-	*x = GetDriversResponse_Driver{}
-	mi := &file_order_proto_msgTypes[20]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *GetDriversResponse_Driver) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*GetDriversResponse_Driver) ProtoMessage() {}
-
-func (x *GetDriversResponse_Driver) ProtoReflect() protoreflect.Message {
-	mi := &file_order_proto_msgTypes[20]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use GetDriversResponse_Driver.ProtoReflect.Descriptor instead.
-func (*GetDriversResponse_Driver) Descriptor() ([]byte, []int) {
-	return file_order_proto_rawDescGZIP(), []int{7, 0}
-}
-
-func (x *GetDriversResponse_Driver) GetId() string {
-	if x != nil {
-		return x.Id
-	}
-	return ""
-}
-
-func (x *GetDriversResponse_Driver) GetAverageRating() float64 {
-	if x != nil {
-		return x.AverageRating
-	}
-	return 0
-}
-
-func (x *GetDriversResponse_Driver) GetName() string {
-	if x != nil {
-		return x.Name
-	}
-	return ""
-}
-
-func (x *GetDriversResponse_Driver) GetBike() string {
-	if x != nil {
-		return x.Bike
-	}
-	return ""
-}
-
-func (x *GetDriversResponse_Driver) GetLicensePlate() string {
-	if x != nil {
-		return x.LicensePlate
-	}
-	return ""
-}
-
-func (x *GetDriversResponse_Driver) GetPhoneNumber() string {
-	if x != nil {
-		return x.PhoneNumber
-	}
-	return ""
-}
-
-type ChooseDriverResponse_Restaurant struct {
-	state         protoimpl.MessageState       `protogen:"open.v1"`
-	Id            string                       `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Name          string                       `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	Address       string                       `protobuf:"bytes,3,opt,name=address,proto3" json:"address,omitempty"`
-	Items         []*ChooseDriverResponse_Item `protobuf:"bytes,4,rep,name=items,proto3" json:"items,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *ChooseDriverResponse_Restaurant) Reset() {
-	*x = ChooseDriverResponse_Restaurant{}
-	mi := &file_order_proto_msgTypes[21]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *ChooseDriverResponse_Restaurant) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ChooseDriverResponse_Restaurant) ProtoMessage() {}
-
-func (x *ChooseDriverResponse_Restaurant) ProtoReflect() protoreflect.Message {
-	mi := &file_order_proto_msgTypes[21]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ChooseDriverResponse_Restaurant.ProtoReflect.Descriptor instead.
-func (*ChooseDriverResponse_Restaurant) Descriptor() ([]byte, []int) {
-	return file_order_proto_rawDescGZIP(), []int{8, 0}
-}
-
-func (x *ChooseDriverResponse_Restaurant) GetId() string {
-	if x != nil {
-		return x.Id
-	}
-	return ""
-}
-
-func (x *ChooseDriverResponse_Restaurant) GetName() string {
-	if x != nil {
-		return x.Name
-	}
-	return ""
-}
-
-func (x *ChooseDriverResponse_Restaurant) GetAddress() string {
-	if x != nil {
-		return x.Address
-	}
-	return ""
-}
-
-func (x *ChooseDriverResponse_Restaurant) GetItems() []*ChooseDriverResponse_Item {
-	if x != nil {
-		return x.Items
-	}
-	return nil
-}
-
-type ChooseDriverResponse_Item struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	Price         int64                  `protobuf:"varint,3,opt,name=price,proto3" json:"price,omitempty"`
-	Quantity      int64                  `protobuf:"varint,4,opt,name=quantity,proto3" json:"quantity,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *ChooseDriverResponse_Item) Reset() {
-	*x = ChooseDriverResponse_Item{}
-	mi := &file_order_proto_msgTypes[22]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *ChooseDriverResponse_Item) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ChooseDriverResponse_Item) ProtoMessage() {}
-
-func (x *ChooseDriverResponse_Item) ProtoReflect() protoreflect.Message {
-	mi := &file_order_proto_msgTypes[22]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ChooseDriverResponse_Item.ProtoReflect.Descriptor instead.
-func (*ChooseDriverResponse_Item) Descriptor() ([]byte, []int) {
-	return file_order_proto_rawDescGZIP(), []int{8, 1}
-}
-
-func (x *ChooseDriverResponse_Item) GetId() string {
-	if x != nil {
-		return x.Id
-	}
-	return ""
-}
-
-func (x *ChooseDriverResponse_Item) GetName() string {
-	if x != nil {
-		return x.Name
-	}
-	return ""
-}
-
-func (x *ChooseDriverResponse_Item) GetPrice() int64 {
-	if x != nil {
-		return x.Price
-	}
-	return 0
-}
-
-func (x *ChooseDriverResponse_Item) GetQuantity() int64 {
-	if x != nil {
-		return x.Quantity
-	}
-	return 0
-}
-
-type ChooseDriverResponse_Driver struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	AverageRating float64                `protobuf:"fixed64,2,opt,name=average_rating,json=averageRating,proto3" json:"average_rating,omitempty"`
-	Name          string                 `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
-	Bike          string                 `protobuf:"bytes,4,opt,name=bike,proto3" json:"bike,omitempty"`
-	LicensePlate  string                 `protobuf:"bytes,5,opt,name=license_plate,json=licensePlate,proto3" json:"license_plate,omitempty"`
-	PhoneNumber   string                 `protobuf:"bytes,6,opt,name=phone_number,json=phoneNumber,proto3" json:"phone_number,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *ChooseDriverResponse_Driver) Reset() {
-	*x = ChooseDriverResponse_Driver{}
-	mi := &file_order_proto_msgTypes[23]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *ChooseDriverResponse_Driver) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ChooseDriverResponse_Driver) ProtoMessage() {}
-
-func (x *ChooseDriverResponse_Driver) ProtoReflect() protoreflect.Message {
-	mi := &file_order_proto_msgTypes[23]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ChooseDriverResponse_Driver.ProtoReflect.Descriptor instead.
-func (*ChooseDriverResponse_Driver) Descriptor() ([]byte, []int) {
-	return file_order_proto_rawDescGZIP(), []int{8, 2}
-}
-
-func (x *ChooseDriverResponse_Driver) GetId() string {
-	if x != nil {
-		return x.Id
-	}
-	return ""
-}
-
-func (x *ChooseDriverResponse_Driver) GetAverageRating() float64 {
-	if x != nil {
-		return x.AverageRating
-	}
-	return 0
-}
-
-func (x *ChooseDriverResponse_Driver) GetName() string {
-	if x != nil {
-		return x.Name
-	}
-	return ""
-}
-
-func (x *ChooseDriverResponse_Driver) GetBike() string {
-	if x != nil {
-		return x.Bike
-	}
-	return ""
-}
-
-func (x *ChooseDriverResponse_Driver) GetLicensePlate() string {
-	if x != nil {
-		return x.LicensePlate
-	}
-	return ""
-}
-
-func (x *ChooseDriverResponse_Driver) GetPhoneNumber() string {
-	if x != nil {
-		return x.PhoneNumber
-	}
-	return ""
-}
-
-type DriverGetPendingOrdersResponse_Order struct {
-	state               protoimpl.MessageState                             `protogen:"open.v1"`
-	Id                  string                                             `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Restaurants         []*DriverGetPendingOrdersResponse_Order_Restaurant `protobuf:"bytes,2,rep,name=restaurants,proto3" json:"restaurants,omitempty"`
-	DeliveryAddress     string                                             `protobuf:"bytes,3,opt,name=delivery_address,json=deliveryAddress,proto3" json:"delivery_address,omitempty"`
-	CustomerPhoneNumber string                                             `protobuf:"bytes,4,opt,name=customer_phone_number,json=customerPhoneNumber,proto3" json:"customer_phone_number,omitempty"`
-	OrderStatus         string                                             `protobuf:"bytes,5,opt,name=order_status,json=orderStatus,proto3" json:"order_status,omitempty"`
-	DeliveryFee         int64                                              `protobuf:"varint,6,opt,name=delivery_fee,json=deliveryFee,proto3" json:"delivery_fee,omitempty"`
-	TotalFee            int64                                              `protobuf:"varint,7,opt,name=total_fee,json=totalFee,proto3" json:"total_fee,omitempty"`
-	PaymentLink         string                                             `protobuf:"bytes,8,opt,name=payment_link,json=paymentLink,proto3" json:"payment_link,omitempty"`
-	unknownFields       protoimpl.UnknownFields
-	sizeCache           protoimpl.SizeCache
-}
-
-func (x *DriverGetPendingOrdersResponse_Order) Reset() {
-	*x = DriverGetPendingOrdersResponse_Order{}
-	mi := &file_order_proto_msgTypes[24]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *DriverGetPendingOrdersResponse_Order) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*DriverGetPendingOrdersResponse_Order) ProtoMessage() {}
-
-func (x *DriverGetPendingOrdersResponse_Order) ProtoReflect() protoreflect.Message {
-	mi := &file_order_proto_msgTypes[24]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use DriverGetPendingOrdersResponse_Order.ProtoReflect.Descriptor instead.
-func (*DriverGetPendingOrdersResponse_Order) Descriptor() ([]byte, []int) {
-	return file_order_proto_rawDescGZIP(), []int{10, 0}
-}
-
-func (x *DriverGetPendingOrdersResponse_Order) GetId() string {
-	if x != nil {
-		return x.Id
-	}
-	return ""
-}
-
-func (x *DriverGetPendingOrdersResponse_Order) GetRestaurants() []*DriverGetPendingOrdersResponse_Order_Restaurant {
-	if x != nil {
-		return x.Restaurants
-	}
-	return nil
-}
-
-func (x *DriverGetPendingOrdersResponse_Order) GetDeliveryAddress() string {
-	if x != nil {
-		return x.DeliveryAddress
-	}
-	return ""
-}
-
-func (x *DriverGetPendingOrdersResponse_Order) GetCustomerPhoneNumber() string {
-	if x != nil {
-		return x.CustomerPhoneNumber
-	}
-	return ""
-}
-
-func (x *DriverGetPendingOrdersResponse_Order) GetOrderStatus() string {
-	if x != nil {
-		return x.OrderStatus
-	}
-	return ""
-}
-
-func (x *DriverGetPendingOrdersResponse_Order) GetDeliveryFee() int64 {
-	if x != nil {
-		return x.DeliveryFee
-	}
-	return 0
-}
-
-func (x *DriverGetPendingOrdersResponse_Order) GetTotalFee() int64 {
-	if x != nil {
-		return x.TotalFee
-	}
-	return 0
-}
-
-func (x *DriverGetPendingOrdersResponse_Order) GetPaymentLink() string {
-	if x != nil {
-		return x.PaymentLink
-	}
-	return ""
-}
-
-type DriverGetPendingOrdersResponse_Order_Restaurant struct {
-	state         protoimpl.MessageState                       `protogen:"open.v1"`
-	Id            string                                       `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Name          string                                       `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	Address       string                                       `protobuf:"bytes,3,opt,name=address,proto3" json:"address,omitempty"`
-	Items         []*DriverGetPendingOrdersResponse_Order_Item `protobuf:"bytes,4,rep,name=items,proto3" json:"items,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *DriverGetPendingOrdersResponse_Order_Restaurant) Reset() {
-	*x = DriverGetPendingOrdersResponse_Order_Restaurant{}
-	mi := &file_order_proto_msgTypes[25]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *DriverGetPendingOrdersResponse_Order_Restaurant) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*DriverGetPendingOrdersResponse_Order_Restaurant) ProtoMessage() {}
-
-func (x *DriverGetPendingOrdersResponse_Order_Restaurant) ProtoReflect() protoreflect.Message {
-	mi := &file_order_proto_msgTypes[25]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use DriverGetPendingOrdersResponse_Order_Restaurant.ProtoReflect.Descriptor instead.
-func (*DriverGetPendingOrdersResponse_Order_Restaurant) Descriptor() ([]byte, []int) {
-	return file_order_proto_rawDescGZIP(), []int{10, 0, 0}
-}
-
-func (x *DriverGetPendingOrdersResponse_Order_Restaurant) GetId() string {
-	if x != nil {
-		return x.Id
-	}
-	return ""
-}
-
-func (x *DriverGetPendingOrdersResponse_Order_Restaurant) GetName() string {
-	if x != nil {
-		return x.Name
-	}
-	return ""
-}
-
-func (x *DriverGetPendingOrdersResponse_Order_Restaurant) GetAddress() string {
-	if x != nil {
-		return x.Address
-	}
-	return ""
-}
-
-func (x *DriverGetPendingOrdersResponse_Order_Restaurant) GetItems() []*DriverGetPendingOrdersResponse_Order_Item {
-	if x != nil {
-		return x.Items
-	}
-	return nil
-}
-
-type DriverGetPendingOrdersResponse_Order_Item struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	Price         int64                  `protobuf:"varint,3,opt,name=price,proto3" json:"price,omitempty"`
-	Quantity      int64                  `protobuf:"varint,4,opt,name=quantity,proto3" json:"quantity,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *DriverGetPendingOrdersResponse_Order_Item) Reset() {
-	*x = DriverGetPendingOrdersResponse_Order_Item{}
-	mi := &file_order_proto_msgTypes[26]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *DriverGetPendingOrdersResponse_Order_Item) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*DriverGetPendingOrdersResponse_Order_Item) ProtoMessage() {}
-
-func (x *DriverGetPendingOrdersResponse_Order_Item) ProtoReflect() protoreflect.Message {
-	mi := &file_order_proto_msgTypes[26]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use DriverGetPendingOrdersResponse_Order_Item.ProtoReflect.Descriptor instead.
-func (*DriverGetPendingOrdersResponse_Order_Item) Descriptor() ([]byte, []int) {
-	return file_order_proto_rawDescGZIP(), []int{10, 0, 1}
-}
-
-func (x *DriverGetPendingOrdersResponse_Order_Item) GetId() string {
-	if x != nil {
-		return x.Id
-	}
-	return ""
-}
-
-func (x *DriverGetPendingOrdersResponse_Order_Item) GetName() string {
-	if x != nil {
-		return x.Name
-	}
-	return ""
-}
-
-func (x *DriverGetPendingOrdersResponse_Order_Item) GetPrice() int64 {
-	if x != nil {
-		return x.Price
-	}
-	return 0
-}
-
-func (x *DriverGetPendingOrdersResponse_Order_Item) GetQuantity() int64 {
-	if x != nil {
-		return x.Quantity
-	}
-	return 0
-}
-
 var File_order_proto protoreflect.FileDescriptor
 
 const file_order_proto_rawDesc = "" +
 	"\n" +
-	"\vorder.proto\x12\x02pb\x1a\x1bgoogle/protobuf/empty.proto\"\xab\x02\n" +
+	"\vorder.proto\x12\x02pb\x1a\x1bgoogle/protobuf/empty.proto\"T\n" +
+	"\aOrderIn\x12!\n" +
+	"\fdelivery_fee\x18\x01 \x01(\x03R\vdeliveryFee\x12&\n" +
+	"\bitems_in\x18\x02 \x03(\v2\v.pb.ItemsInR\aitemsIn\"5\n" +
+	"\aItemsIn\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1a\n" +
+	"\bquantity\x18\x02 \x01(\x03R\bquantity\"o\n" +
 	"\x12CreateOrderRequest\x12\x17\n" +
 	"\auser_id\x18\x01 \x01(\tR\x06userId\x12\x1d\n" +
 	"\n" +
-	"user_email\x18\x02 \x01(\tR\tuserEmail\x124\n" +
-	"\x05order\x18\x03 \x01(\v2\x1e.pb.CreateOrderRequest.OrderInR\x05order\x1a\xa6\x01\n" +
-	"\aOrderIn\x12!\n" +
-	"\fdelivery_fee\x18\x01 \x01(\x03R\vdeliveryFee\x12A\n" +
-	"\bitems_in\x18\x02 \x03(\v2&.pb.CreateOrderRequest.OrderIn.ItemsInR\aitemsIn\x1a5\n" +
-	"\aItemsIn\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1a\n" +
-	"\bquantity\x18\x02 \x01(\x03R\bquantity\".\n" +
+	"user_email\x18\x02 \x01(\tR\tuserEmail\x12!\n" +
+	"\x05order\x18\x03 \x01(\v2\v.pb.OrderInR\x05order\".\n" +
 	"\x11GetDriversRequest\x12\x19\n" +
 	"\border_id\x18\x01 \x01(\tR\aorderId\"M\n" +
 	"\x13ChooseDriverRequest\x12\x19\n" +
@@ -1919,57 +1563,41 @@ const file_order_proto_rawDesc = "" +
 	"\tdriver_id\x18\x02 \x01(\tR\bdriverId\"T\n" +
 	"\x1aDriverCompleteOrderRequest\x12\x19\n" +
 	"\border_id\x18\x01 \x01(\tR\aorderId\x12\x1b\n" +
-	"\tdriver_id\x18\x02 \x01(\tR\bdriverId\"\xae\x04\n" +
+	"\tdriver_id\x18\x02 \x01(\tR\bdriverId\"j\n" +
+	"\n" +
+	"Restaurant\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\x12\x18\n" +
+	"\aaddress\x18\x03 \x01(\tR\aaddress\x12\x1e\n" +
+	"\x05items\x18\x04 \x03(\v2\b.pb.ItemR\x05items\"\\\n" +
+	"\x04Item\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\x12\x14\n" +
+	"\x05price\x18\x03 \x01(\x03R\x05price\x12\x1a\n" +
+	"\bquantity\x18\x04 \x01(\x03R\bquantity\"\xbc\x02\n" +
 	"\x13CreateOrderResponse\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\x12D\n" +
-	"\vrestaurants\x18\x02 \x03(\v2\".pb.CreateOrderResponse.RestaurantR\vrestaurants\x12)\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x120\n" +
+	"\vrestaurants\x18\x02 \x03(\v2\x0e.pb.RestaurantR\vrestaurants\x12)\n" +
 	"\x10delivery_address\x18\x03 \x01(\tR\x0fdeliveryAddress\x122\n" +
 	"\x15customer_phone_number\x18\x04 \x01(\tR\x13customerPhoneNumber\x12!\n" +
 	"\forder_status\x18\x05 \x01(\tR\vorderStatus\x12!\n" +
 	"\fdelivery_fee\x18\x06 \x01(\x03R\vdeliveryFee\x12\x1b\n" +
 	"\ttotal_fee\x18\a \x01(\x03R\btotalFee\x12!\n" +
-	"\fpayment_link\x18\b \x01(\tR\vpaymentLink\x1a~\n" +
-	"\n" +
-	"Restaurant\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
-	"\x04name\x18\x02 \x01(\tR\x04name\x12\x18\n" +
-	"\aaddress\x18\x03 \x01(\tR\aaddress\x122\n" +
-	"\x05items\x18\x04 \x03(\v2\x1c.pb.CreateOrderResponse.ItemR\x05items\x1a\\\n" +
-	"\x04Item\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
-	"\x04name\x18\x02 \x01(\tR\x04name\x12\x14\n" +
-	"\x05price\x18\x03 \x01(\x03R\x05price\x12\x1a\n" +
-	"\bquantity\x18\x04 \x01(\x03R\bquantity\"\xff\x01\n" +
-	"\x12GetDriversResponse\x127\n" +
-	"\adrivers\x18\x01 \x03(\v2\x1d.pb.GetDriversResponse.DriverR\adrivers\x1a\xaf\x01\n" +
-	"\x06Driver\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\x12%\n" +
-	"\x0eaverage_rating\x18\x02 \x01(\x01R\raverageRating\x12\x12\n" +
-	"\x04name\x18\x03 \x01(\tR\x04name\x12\x12\n" +
-	"\x04bike\x18\x04 \x01(\tR\x04bike\x12#\n" +
-	"\rlicense_plate\x18\x05 \x01(\tR\flicensePlate\x12!\n" +
-	"\fphone_number\x18\x06 \x01(\tR\vphoneNumber\"\x9c\x06\n" +
+	"\fpayment_link\x18\b \x01(\tR\vpaymentLink\":\n" +
+	"\x12GetDriversResponse\x12$\n" +
+	"\adrivers\x18\x01 \x03(\v2\n" +
+	".pb.DriverR\adrivers\"\xe1\x02\n" +
 	"\x14ChooseDriverResponse\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\x12E\n" +
-	"\vrestaurants\x18\x02 \x03(\v2#.pb.ChooseDriverResponse.RestaurantR\vrestaurants\x12)\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x120\n" +
+	"\vrestaurants\x18\x02 \x03(\v2\x0e.pb.RestaurantR\vrestaurants\x12)\n" +
 	"\x10delivery_address\x18\x03 \x01(\tR\x0fdeliveryAddress\x122\n" +
 	"\x15customer_phone_number\x18\x04 \x01(\tR\x13customerPhoneNumber\x12!\n" +
-	"\forder_status\x18\x05 \x01(\tR\vorderStatus\x127\n" +
-	"\x06driver\x18\x06 \x01(\v2\x1f.pb.ChooseDriverResponse.DriverR\x06driver\x12!\n" +
+	"\forder_status\x18\x05 \x01(\tR\vorderStatus\x12\"\n" +
+	"\x06driver\x18\x06 \x01(\v2\n" +
+	".pb.DriverR\x06driver\x12!\n" +
 	"\fdelivery_fee\x18\a \x01(\x03R\vdeliveryFee\x12\x1b\n" +
 	"\ttotal_fee\x18\b \x01(\x03R\btotalFee\x12!\n" +
-	"\fpayment_link\x18\t \x01(\tR\vpaymentLink\x1a\x7f\n" +
-	"\n" +
-	"Restaurant\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
-	"\x04name\x18\x02 \x01(\tR\x04name\x12\x18\n" +
-	"\aaddress\x18\x03 \x01(\tR\aaddress\x123\n" +
-	"\x05items\x18\x04 \x03(\v2\x1d.pb.ChooseDriverResponse.ItemR\x05items\x1a\\\n" +
-	"\x04Item\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
-	"\x04name\x18\x02 \x01(\tR\x04name\x12\x14\n" +
-	"\x05price\x18\x03 \x01(\x03R\x05price\x12\x1a\n" +
-	"\bquantity\x18\x04 \x01(\x03R\bquantity\x1a\xaf\x01\n" +
+	"\fpayment_link\x18\t \x01(\tR\vpaymentLink\"\xaf\x01\n" +
 	"\x06Driver\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12%\n" +
 	"\x0eaverage_rating\x18\x02 \x01(\x01R\raverageRating\x12\x12\n" +
@@ -1977,29 +1605,18 @@ const file_order_proto_rawDesc = "" +
 	"\x04bike\x18\x04 \x01(\tR\x04bike\x12#\n" +
 	"\rlicense_plate\x18\x05 \x01(\tR\flicensePlate\x12!\n" +
 	"\fphone_number\x18\x06 \x01(\tR\vphoneNumber\"\x14\n" +
-	"\x12GiveRatingResponse\"\xa8\x05\n" +
-	"\x1eDriverGetPendingOrdersResponse\x12@\n" +
-	"\x06orders\x18\x01 \x03(\v2(.pb.DriverGetPendingOrdersResponse.OrderR\x06orders\x1a\xc3\x04\n" +
+	"\x12GiveRatingResponse\"C\n" +
+	"\x1eDriverGetPendingOrdersResponse\x12!\n" +
+	"\x06orders\x18\x01 \x03(\v2\t.pb.OrderR\x06orders\"\xae\x02\n" +
 	"\x05Order\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\x12U\n" +
-	"\vrestaurants\x18\x02 \x03(\v23.pb.DriverGetPendingOrdersResponse.Order.RestaurantR\vrestaurants\x12)\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x120\n" +
+	"\vrestaurants\x18\x02 \x03(\v2\x0e.pb.RestaurantR\vrestaurants\x12)\n" +
 	"\x10delivery_address\x18\x03 \x01(\tR\x0fdeliveryAddress\x122\n" +
 	"\x15customer_phone_number\x18\x04 \x01(\tR\x13customerPhoneNumber\x12!\n" +
 	"\forder_status\x18\x05 \x01(\tR\vorderStatus\x12!\n" +
 	"\fdelivery_fee\x18\x06 \x01(\x03R\vdeliveryFee\x12\x1b\n" +
 	"\ttotal_fee\x18\a \x01(\x03R\btotalFee\x12!\n" +
-	"\fpayment_link\x18\b \x01(\tR\vpaymentLink\x1a\x8f\x01\n" +
-	"\n" +
-	"Restaurant\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
-	"\x04name\x18\x02 \x01(\tR\x04name\x12\x18\n" +
-	"\aaddress\x18\x03 \x01(\tR\aaddress\x12C\n" +
-	"\x05items\x18\x04 \x03(\v2-.pb.DriverGetPendingOrdersResponse.Order.ItemR\x05items\x1a\\\n" +
-	"\x04Item\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
-	"\x04name\x18\x02 \x01(\tR\x04name\x12\x14\n" +
-	"\x05price\x18\x03 \x01(\x03R\x05price\x12\x1a\n" +
-	"\bquantity\x18\x04 \x01(\x03R\bquantity\"\x1d\n" +
+	"\fpayment_link\x18\b \x01(\tR\vpaymentLink\"\x1d\n" +
 	"\x1bDriverApplyForOrderResponse\"\x1d\n" +
 	"\x1bDriverCompleteOrderResponse\"\xf3\x01\n" +
 	"\x12PaymentGatewayItem\x12!\n" +
@@ -2067,72 +1684,65 @@ func file_order_proto_rawDescGZIP() []byte {
 	return file_order_proto_rawDescData
 }
 
-var file_order_proto_msgTypes = make([]protoimpl.MessageInfo, 27)
+var file_order_proto_msgTypes = make([]protoimpl.MessageInfo, 22)
 var file_order_proto_goTypes = []any{
-	(*CreateOrderRequest)(nil),                              // 0: pb.CreateOrderRequest
-	(*GetDriversRequest)(nil),                               // 1: pb.GetDriversRequest
-	(*ChooseDriverRequest)(nil),                             // 2: pb.ChooseDriverRequest
-	(*GiveRatingRequest)(nil),                               // 3: pb.GiveRatingRequest
-	(*DriverApplyForOrderRequest)(nil),                      // 4: pb.DriverApplyForOrderRequest
-	(*DriverCompleteOrderRequest)(nil),                      // 5: pb.DriverCompleteOrderRequest
-	(*CreateOrderResponse)(nil),                             // 6: pb.CreateOrderResponse
-	(*GetDriversResponse)(nil),                              // 7: pb.GetDriversResponse
-	(*ChooseDriverResponse)(nil),                            // 8: pb.ChooseDriverResponse
-	(*GiveRatingResponse)(nil),                              // 9: pb.GiveRatingResponse
-	(*DriverGetPendingOrdersResponse)(nil),                  // 10: pb.DriverGetPendingOrdersResponse
-	(*DriverApplyForOrderResponse)(nil),                     // 11: pb.DriverApplyForOrderResponse
-	(*DriverCompleteOrderResponse)(nil),                     // 12: pb.DriverCompleteOrderResponse
-	(*PaymentGatewayItem)(nil),                              // 13: pb.PaymentGatewayItem
-	(*CreatePaymentSessionRequest)(nil),                     // 14: pb.CreatePaymentSessionRequest
-	(*CreatePaymentSessionResponse)(nil),                    // 15: pb.CreatePaymentSessionResponse
-	(*CreateOrderRequest_OrderIn)(nil),                      // 16: pb.CreateOrderRequest.OrderIn
-	(*CreateOrderRequest_OrderIn_ItemsIn)(nil),              // 17: pb.CreateOrderRequest.OrderIn.ItemsIn
-	(*CreateOrderResponse_Restaurant)(nil),                  // 18: pb.CreateOrderResponse.Restaurant
-	(*CreateOrderResponse_Item)(nil),                        // 19: pb.CreateOrderResponse.Item
-	(*GetDriversResponse_Driver)(nil),                       // 20: pb.GetDriversResponse.Driver
-	(*ChooseDriverResponse_Restaurant)(nil),                 // 21: pb.ChooseDriverResponse.Restaurant
-	(*ChooseDriverResponse_Item)(nil),                       // 22: pb.ChooseDriverResponse.Item
-	(*ChooseDriverResponse_Driver)(nil),                     // 23: pb.ChooseDriverResponse.Driver
-	(*DriverGetPendingOrdersResponse_Order)(nil),            // 24: pb.DriverGetPendingOrdersResponse.Order
-	(*DriverGetPendingOrdersResponse_Order_Restaurant)(nil), // 25: pb.DriverGetPendingOrdersResponse.Order.Restaurant
-	(*DriverGetPendingOrdersResponse_Order_Item)(nil),       // 26: pb.DriverGetPendingOrdersResponse.Order.Item
-	(*emptypb.Empty)(nil),                                   // 27: google.protobuf.Empty
+	(*OrderIn)(nil),                        // 0: pb.OrderIn
+	(*ItemsIn)(nil),                        // 1: pb.ItemsIn
+	(*CreateOrderRequest)(nil),             // 2: pb.CreateOrderRequest
+	(*GetDriversRequest)(nil),              // 3: pb.GetDriversRequest
+	(*ChooseDriverRequest)(nil),            // 4: pb.ChooseDriverRequest
+	(*GiveRatingRequest)(nil),              // 5: pb.GiveRatingRequest
+	(*DriverApplyForOrderRequest)(nil),     // 6: pb.DriverApplyForOrderRequest
+	(*DriverCompleteOrderRequest)(nil),     // 7: pb.DriverCompleteOrderRequest
+	(*Restaurant)(nil),                     // 8: pb.Restaurant
+	(*Item)(nil),                           // 9: pb.Item
+	(*CreateOrderResponse)(nil),            // 10: pb.CreateOrderResponse
+	(*GetDriversResponse)(nil),             // 11: pb.GetDriversResponse
+	(*ChooseDriverResponse)(nil),           // 12: pb.ChooseDriverResponse
+	(*Driver)(nil),                         // 13: pb.Driver
+	(*GiveRatingResponse)(nil),             // 14: pb.GiveRatingResponse
+	(*DriverGetPendingOrdersResponse)(nil), // 15: pb.DriverGetPendingOrdersResponse
+	(*Order)(nil),                          // 16: pb.Order
+	(*DriverApplyForOrderResponse)(nil),    // 17: pb.DriverApplyForOrderResponse
+	(*DriverCompleteOrderResponse)(nil),    // 18: pb.DriverCompleteOrderResponse
+	(*PaymentGatewayItem)(nil),             // 19: pb.PaymentGatewayItem
+	(*CreatePaymentSessionRequest)(nil),    // 20: pb.CreatePaymentSessionRequest
+	(*CreatePaymentSessionResponse)(nil),   // 21: pb.CreatePaymentSessionResponse
+	(*emptypb.Empty)(nil),                  // 22: google.protobuf.Empty
 }
 var file_order_proto_depIdxs = []int32{
-	16, // 0: pb.CreateOrderRequest.order:type_name -> pb.CreateOrderRequest.OrderIn
-	18, // 1: pb.CreateOrderResponse.restaurants:type_name -> pb.CreateOrderResponse.Restaurant
-	20, // 2: pb.GetDriversResponse.drivers:type_name -> pb.GetDriversResponse.Driver
-	21, // 3: pb.ChooseDriverResponse.restaurants:type_name -> pb.ChooseDriverResponse.Restaurant
-	23, // 4: pb.ChooseDriverResponse.driver:type_name -> pb.ChooseDriverResponse.Driver
-	24, // 5: pb.DriverGetPendingOrdersResponse.orders:type_name -> pb.DriverGetPendingOrdersResponse.Order
-	13, // 6: pb.CreatePaymentSessionRequest.items:type_name -> pb.PaymentGatewayItem
-	13, // 7: pb.CreatePaymentSessionResponse.items:type_name -> pb.PaymentGatewayItem
-	17, // 8: pb.CreateOrderRequest.OrderIn.items_in:type_name -> pb.CreateOrderRequest.OrderIn.ItemsIn
-	19, // 9: pb.CreateOrderResponse.Restaurant.items:type_name -> pb.CreateOrderResponse.Item
-	22, // 10: pb.ChooseDriverResponse.Restaurant.items:type_name -> pb.ChooseDriverResponse.Item
-	25, // 11: pb.DriverGetPendingOrdersResponse.Order.restaurants:type_name -> pb.DriverGetPendingOrdersResponse.Order.Restaurant
-	26, // 12: pb.DriverGetPendingOrdersResponse.Order.Restaurant.items:type_name -> pb.DriverGetPendingOrdersResponse.Order.Item
-	0,  // 13: pb.OrderService.CreateOrder:input_type -> pb.CreateOrderRequest
-	1,  // 14: pb.OrderService.GetDrivers:input_type -> pb.GetDriversRequest
-	2,  // 15: pb.OrderService.ChooseDriver:input_type -> pb.ChooseDriverRequest
-	3,  // 16: pb.OrderService.GiveRating:input_type -> pb.GiveRatingRequest
-	27, // 17: pb.OrderService.DriverGetPendingOrders:input_type -> google.protobuf.Empty
-	4,  // 18: pb.OrderService.DriverApplyForOrder:input_type -> pb.DriverApplyForOrderRequest
-	5,  // 19: pb.OrderService.DriverCompleteOrder:input_type -> pb.DriverCompleteOrderRequest
-	14, // 20: pb.OrderService.CreatePaymentSession:input_type -> pb.CreatePaymentSessionRequest
-	6,  // 21: pb.OrderService.CreateOrder:output_type -> pb.CreateOrderResponse
-	7,  // 22: pb.OrderService.GetDrivers:output_type -> pb.GetDriversResponse
-	8,  // 23: pb.OrderService.ChooseDriver:output_type -> pb.ChooseDriverResponse
-	9,  // 24: pb.OrderService.GiveRating:output_type -> pb.GiveRatingResponse
-	10, // 25: pb.OrderService.DriverGetPendingOrders:output_type -> pb.DriverGetPendingOrdersResponse
-	11, // 26: pb.OrderService.DriverApplyForOrder:output_type -> pb.DriverApplyForOrderResponse
-	12, // 27: pb.OrderService.DriverCompleteOrder:output_type -> pb.DriverCompleteOrderResponse
-	15, // 28: pb.OrderService.CreatePaymentSession:output_type -> pb.CreatePaymentSessionResponse
-	21, // [21:29] is the sub-list for method output_type
-	13, // [13:21] is the sub-list for method input_type
-	13, // [13:13] is the sub-list for extension type_name
-	13, // [13:13] is the sub-list for extension extendee
-	0,  // [0:13] is the sub-list for field type_name
+	1,  // 0: pb.OrderIn.items_in:type_name -> pb.ItemsIn
+	0,  // 1: pb.CreateOrderRequest.order:type_name -> pb.OrderIn
+	9,  // 2: pb.Restaurant.items:type_name -> pb.Item
+	8,  // 3: pb.CreateOrderResponse.restaurants:type_name -> pb.Restaurant
+	13, // 4: pb.GetDriversResponse.drivers:type_name -> pb.Driver
+	8,  // 5: pb.ChooseDriverResponse.restaurants:type_name -> pb.Restaurant
+	13, // 6: pb.ChooseDriverResponse.driver:type_name -> pb.Driver
+	16, // 7: pb.DriverGetPendingOrdersResponse.orders:type_name -> pb.Order
+	8,  // 8: pb.Order.restaurants:type_name -> pb.Restaurant
+	19, // 9: pb.CreatePaymentSessionRequest.items:type_name -> pb.PaymentGatewayItem
+	19, // 10: pb.CreatePaymentSessionResponse.items:type_name -> pb.PaymentGatewayItem
+	2,  // 11: pb.OrderService.CreateOrder:input_type -> pb.CreateOrderRequest
+	3,  // 12: pb.OrderService.GetDrivers:input_type -> pb.GetDriversRequest
+	4,  // 13: pb.OrderService.ChooseDriver:input_type -> pb.ChooseDriverRequest
+	5,  // 14: pb.OrderService.GiveRating:input_type -> pb.GiveRatingRequest
+	22, // 15: pb.OrderService.DriverGetPendingOrders:input_type -> google.protobuf.Empty
+	6,  // 16: pb.OrderService.DriverApplyForOrder:input_type -> pb.DriverApplyForOrderRequest
+	7,  // 17: pb.OrderService.DriverCompleteOrder:input_type -> pb.DriverCompleteOrderRequest
+	20, // 18: pb.OrderService.CreatePaymentSession:input_type -> pb.CreatePaymentSessionRequest
+	10, // 19: pb.OrderService.CreateOrder:output_type -> pb.CreateOrderResponse
+	11, // 20: pb.OrderService.GetDrivers:output_type -> pb.GetDriversResponse
+	12, // 21: pb.OrderService.ChooseDriver:output_type -> pb.ChooseDriverResponse
+	14, // 22: pb.OrderService.GiveRating:output_type -> pb.GiveRatingResponse
+	15, // 23: pb.OrderService.DriverGetPendingOrders:output_type -> pb.DriverGetPendingOrdersResponse
+	17, // 24: pb.OrderService.DriverApplyForOrder:output_type -> pb.DriverApplyForOrderResponse
+	18, // 25: pb.OrderService.DriverCompleteOrder:output_type -> pb.DriverCompleteOrderResponse
+	21, // 26: pb.OrderService.CreatePaymentSession:output_type -> pb.CreatePaymentSessionResponse
+	19, // [19:27] is the sub-list for method output_type
+	11, // [11:19] is the sub-list for method input_type
+	11, // [11:11] is the sub-list for extension type_name
+	11, // [11:11] is the sub-list for extension extendee
+	0,  // [0:11] is the sub-list for field type_name
 }
 
 func init() { file_order_proto_init() }
@@ -2146,7 +1756,7 @@ func file_order_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_order_proto_rawDesc), len(file_order_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   27,
+			NumMessages:   22,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

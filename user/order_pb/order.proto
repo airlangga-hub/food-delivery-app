@@ -5,18 +5,20 @@ import "google/protobuf/empty.proto";
 
 option go_package = "github.com/airlangga-hub/food-delivery-app/order/pb";
 
+message OrderIn {
+  int64 delivery_fee = 1;
+  repeated ItemsIn items_in = 2;
+}
+
+message ItemsIn {
+  string id = 1;
+  int64 quantity = 2;
+}
+
 message CreateOrderRequest {
   string user_id = 1;
   string user_email = 2;
   OrderIn order = 3;
-  message OrderIn {
-    int64 delivery_fee = 1;
-    repeated ItemsIn items_in = 2;
-    message ItemsIn {
-      string id = 1;
-      int64 quantity = 2;
-    }
-  }
 }
 
 message GetDriversRequest {
@@ -43,6 +45,20 @@ message DriverCompleteOrderRequest {
   string driver_id = 2;
 }
 
+message Restaurant {
+  string id = 1;
+  string name = 2;
+  string address = 3;
+  repeated Item items = 4;
+}
+
+message Item {
+  string id = 1;
+  string name = 2;
+  int64 price = 3;
+  int64 quantity = 4;
+}
+
 message CreateOrderResponse {
   string id = 1;
   repeated Restaurant restaurants = 2;
@@ -52,30 +68,10 @@ message CreateOrderResponse {
   int64 delivery_fee = 6;
   int64 total_fee = 7;
   string payment_link = 8;
-  message Restaurant {
-    string id = 1;
-    string name = 2;
-    string address = 3;
-    repeated Item items = 4;
-  }
-  message Item {
-    string id = 1;
-    string name = 2;
-    int64 price = 3;
-    int64 quantity = 4;
-  }
 }
 
 message GetDriversResponse {
   repeated Driver drivers = 1;
-  message Driver {
-    string id = 1;
-    double average_rating = 2;
-    string name = 3;
-    string bike = 4;
-    string license_plate = 5;
-    string phone_number = 6;
-  }
 }
 
 message ChooseDriverResponse {
@@ -88,54 +84,32 @@ message ChooseDriverResponse {
   int64 delivery_fee = 7;
   int64 total_fee = 8;
   string payment_link = 9;
-  message Restaurant {
-    string id = 1;
-    string name = 2;
-    string address = 3;
-    repeated Item items = 4;
-  }
-  message Item {
-    string id = 1;
-    string name = 2;
-    int64 price = 3;
-    int64 quantity = 4;
-  }
-  message Driver {
-    string id = 1;
-    double average_rating = 2;
-    string name = 3;
-    string bike = 4;
-    string license_plate = 5;
-    string phone_number = 6;
-  }
+}
+
+message Driver {
+  string id = 1;
+  double average_rating = 2;
+  string name = 3;
+  string bike = 4;
+  string license_plate = 5;
+  string phone_number = 6;
 }
 
 message GiveRatingResponse {} // empty response
 
 message DriverGetPendingOrdersResponse {
   repeated Order orders = 1;
-  message Order {
-    string id = 1;
-    repeated Restaurant restaurants = 2;
-    string delivery_address = 3;
-    string customer_phone_number = 4;
-    string order_status = 5;
-    int64 delivery_fee = 6;
-    int64 total_fee = 7;
-    string payment_link = 8;
-    message Restaurant {
-      string id = 1;
-      string name = 2;
-      string address = 3;
-      repeated Item items = 4;
-    }
-    message Item {
-      string id = 1;
-      string name = 2;
-      int64 price = 3;
-      int64 quantity = 4;
-    }
-  }
+}
+
+message Order {
+  string id = 1;
+  repeated Restaurant restaurants = 2;
+  string delivery_address = 3;
+  string customer_phone_number = 4;
+  string order_status = 5;
+  int64 delivery_fee = 6;
+  int64 total_fee = 7;
+  string payment_link = 8;
 }
 
 message DriverApplyForOrderResponse {} // empty response
