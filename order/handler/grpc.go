@@ -9,7 +9,7 @@ import (
 	"github.com/google/uuid"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-	emptypb "google.golang.org/protobuf/types/known/emptypb"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 type CustomerService interface {
@@ -18,6 +18,7 @@ type CustomerService interface {
 	ChooseDriver(ctx context.Context, orderID, driverID uuid.UUID) (model.Order, error)
 	GiveRating(ctx context.Context, orderID uuid.UUID, rating int) error
 	CreatePaymentSession(ctx context.Context, paymentType model.PaymentType, userID uuid.UUID, userEmail string, amount int, items []model.PaymentGatewayItem) (model.PaymentGatewayResponse, error)
+	GetOrdersByUserID(ctx context.Context, userID uuid.UUID, role model.RoleUser) ([]model.Order, error)
 }
 
 type DriverService interface {
@@ -359,4 +360,65 @@ func (h *Handler) CreatePaymentSession(ctx context.Context, req *pb.CreatePaymen
 		CancelReturnUrl:  pgResp.CancelReturnURL,
 		PaymentLinkUrl:   pgResp.PaymentLinkURL,
 	}, nil
+}
+
+func (h *Handler) GetOrdersByUserID(ctx context.Context, req *pb.GetOrdersByUserIDRequest) (*pb.GetOrdersByUserIDResponse, error) {
+	userID, err := uuid.Parse(req.UserId)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "order.handler.GetOrdersByUserID (Parse UserId): %v", err)
+	}
+
+	orders, err := h.customerSvc.GetOrdersByUserID(ctx, userID, model.RoleUser(req.Role))
+	if err != nil {
+		if errors.Is(err, model.ErrNotFound) {
+			return nil, status.Errorf(codes.NotFound, "order.handler.GetOrdersByUserID (no rows found): %v", err)
+		}
+		return nil, status.Errorf(codes.Internal, "order.handler.GetOrdersByUserID: %v", err)
+	}
+
+	resultOrders := make([]*pb.Order, len(orders))
+
+	for i, order := range orders {
+		restos := make([]*pb.Restaurant, len(order.Restaurants))
+
+		for j, resto := range order.Restaurants {
+			restoItems := make([]*pb.Item, len(resto.Items))
+
+			for k, itm := range resto.Items {
+				restoItems[k] = &pb.Item{
+					Id:       itm.ID.String(),
+					Name:     itm.Name,
+					Price:    int64(itm.Price),
+					Quantity: int64(itm.Quantity),
+				}
+			}
+
+			restos[j] = &pb.Restaurant{
+				Id:      resto.ID.String(),
+				Name:    resto.Name,
+				Address: resto.Address,
+				Items:   restoItems,
+			}
+		}
+
+		resultOrders[i] = &pb.Order{
+			Id:                  order.ID.String(),
+			Restaurants:         restos,
+			DeliveryAddress:     order.DeliveryAddress,
+			CustomerPhoneNumber: order.CustomerPhoneNumber,
+			OrderStatus:         string(order.OrderStatus),
+			DeliveryFee:         int64(order.DeliveryFee),
+			TotalFee:            int64(order.TotalFee),
+			PaymentLink:         order.PaymentLink,
+			Driver: &pb.Driver{
+				AverageRating: order.Driver.AverageRating,
+				Name:          order.Driver.Name,
+				Bike:          order.Driver.Bike,
+				LicensePlate:  order.Driver.LicensePlate,
+				PhoneNumber:   order.Driver.PhoneNumber,
+			},
+		}
+	}
+	
+	return &pb.GetOrdersByUserIDResponse{Orders: resultOrders}, nil
 }

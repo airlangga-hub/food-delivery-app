@@ -110,6 +110,7 @@ message Order {
   int64 delivery_fee = 6;
   int64 total_fee = 7;
   string payment_link = 8;
+  Driver driver = 9;
 }
 
 message DriverApplyForOrderResponse {} // empty response
@@ -158,6 +159,15 @@ message CreatePaymentSessionResponse {
   string payment_link_url = 20;
 }
 
+message GetOrdersByUserIDRequest {
+      string user_id = 1;
+      string role = 2;
+}
+
+message GetOrdersByUserIDResponse {
+      repeated Order orders = 1;
+}
+
 service OrderService {
   rpc CreateOrder(CreateOrderRequest) returns (CreateOrderResponse);
   rpc GetDrivers(GetDriversRequest) returns (GetDriversResponse);
@@ -167,4 +177,5 @@ service OrderService {
   rpc DriverApplyForOrder(DriverApplyForOrderRequest) returns (DriverApplyForOrderResponse); // empty response
   rpc DriverCompleteOrder(DriverCompleteOrderRequest) returns (DriverCompleteOrderResponse); // empty response
   rpc CreatePaymentSession(CreatePaymentSessionRequest) returns (CreatePaymentSessionResponse);
+  rpc GetOrdersByUserID(GetOrdersByUserIDRequest) returns (GetOrdersByUserIDResponse);
 }

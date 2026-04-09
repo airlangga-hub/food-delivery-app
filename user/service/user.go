@@ -76,7 +76,7 @@ func (s *userService) Login(ctx context.Context, email string, password string) 
 		return "", fmt.Errorf("user.service.Login (CompareHashAndPassword): %w", err)
 	}
 
-	token, err := helper.MakeJWT(userLogin.UserID.String(), userLogin.Email, helper.Role(userLogin.Role), []byte(s.jwtKey))
+	token, err := helper.MakeJWT(userLogin.UserID.String(), userLogin.Email, model.RoleUser(userLogin.Role), []byte(s.jwtKey))
 	if err != nil {
 		return "", fmt.Errorf("user.service.Login (MakeJWT): %w", err)
 	}

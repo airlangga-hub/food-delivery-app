@@ -7,6 +7,9 @@ type Order struct {
 	CustomerPhoneNumber string       `json:"customer_phone_number"`
 	OrderStatus         OrderStatus  `json:"order_status"`
 	Driver              *Driver      `json:"driver,omitempty"`
+	DeliveryFee         int          `json:"delivery_fee"`
+	TotalFee            int          `json:"total_fee"`
+	PaymentLink         string       `json:"payment_link,omitempty"`
 }
 
 type Restaurant struct {

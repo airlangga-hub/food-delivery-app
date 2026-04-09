@@ -3,24 +3,18 @@ package helper
 import (
 	"time"
 
+	"github.com/airlangga-hub/food-delivery-app/user/model"
 	"github.com/golang-jwt/jwt/v5"
-)
-
-type Role string
-
-const (
-	RoleCustomer Role = "customer"
-	RoleDriver   Role = "driver"
 )
 
 type MyClaims struct {
 	jwt.RegisteredClaims
 	UserID string
 	Email  string
-	Role   Role
+	Role   model.RoleUser
 }
 
-func MakeJWT(userID string, email string, role Role, key []byte) (string, error) {
+func MakeJWT(userID string, email string, role model.RoleUser, key []byte) (string, error) {
 	token := jwt.NewWithClaims(
 		jwt.SigningMethodHS256,
 		&MyClaims{

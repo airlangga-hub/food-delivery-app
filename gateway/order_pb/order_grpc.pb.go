@@ -28,6 +28,7 @@ const (
 	OrderService_DriverApplyForOrder_FullMethodName    = "/pb.OrderService/DriverApplyForOrder"
 	OrderService_DriverCompleteOrder_FullMethodName    = "/pb.OrderService/DriverCompleteOrder"
 	OrderService_CreatePaymentSession_FullMethodName   = "/pb.OrderService/CreatePaymentSession"
+	OrderService_GetOrdersByUserID_FullMethodName      = "/pb.OrderService/GetOrdersByUserID"
 )
 
 // OrderServiceClient is the client API for OrderService service.
@@ -42,6 +43,7 @@ type OrderServiceClient interface {
 	DriverApplyForOrder(ctx context.Context, in *DriverApplyForOrderRequest, opts ...grpc.CallOption) (*DriverApplyForOrderResponse, error)
 	DriverCompleteOrder(ctx context.Context, in *DriverCompleteOrderRequest, opts ...grpc.CallOption) (*DriverCompleteOrderResponse, error)
 	CreatePaymentSession(ctx context.Context, in *CreatePaymentSessionRequest, opts ...grpc.CallOption) (*CreatePaymentSessionResponse, error)
+	GetOrdersByUserID(ctx context.Context, in *GetOrdersByUserIDRequest, opts ...grpc.CallOption) (*GetOrdersByUserIDResponse, error)
 }
 
 type orderServiceClient struct {
@@ -132,6 +134,16 @@ func (c *orderServiceClient) CreatePaymentSession(ctx context.Context, in *Creat
 	return out, nil
 }
 
+func (c *orderServiceClient) GetOrdersByUserID(ctx context.Context, in *GetOrdersByUserIDRequest, opts ...grpc.CallOption) (*GetOrdersByUserIDResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetOrdersByUserIDResponse)
+	err := c.cc.Invoke(ctx, OrderService_GetOrdersByUserID_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // OrderServiceServer is the server API for OrderService service.
 // All implementations must embed UnimplementedOrderServiceServer
 // for forward compatibility.
@@ -144,6 +156,7 @@ type OrderServiceServer interface {
 	DriverApplyForOrder(context.Context, *DriverApplyForOrderRequest) (*DriverApplyForOrderResponse, error)
 	DriverCompleteOrder(context.Context, *DriverCompleteOrderRequest) (*DriverCompleteOrderResponse, error)
 	CreatePaymentSession(context.Context, *CreatePaymentSessionRequest) (*CreatePaymentSessionResponse, error)
+	GetOrdersByUserID(context.Context, *GetOrdersByUserIDRequest) (*GetOrdersByUserIDResponse, error)
 	mustEmbedUnimplementedOrderServiceServer()
 }
 
@@ -177,6 +190,9 @@ func (UnimplementedOrderServiceServer) DriverCompleteOrder(context.Context, *Dri
 }
 func (UnimplementedOrderServiceServer) CreatePaymentSession(context.Context, *CreatePaymentSessionRequest) (*CreatePaymentSessionResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method CreatePaymentSession not implemented")
+}
+func (UnimplementedOrderServiceServer) GetOrdersByUserID(context.Context, *GetOrdersByUserIDRequest) (*GetOrdersByUserIDResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetOrdersByUserID not implemented")
 }
 func (UnimplementedOrderServiceServer) mustEmbedUnimplementedOrderServiceServer() {}
 func (UnimplementedOrderServiceServer) testEmbeddedByValue()                      {}
@@ -343,6 +359,24 @@ func _OrderService_CreatePaymentSession_Handler(srv interface{}, ctx context.Con
 	return interceptor(ctx, in, info, handler)
 }
 
+func _OrderService_GetOrdersByUserID_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetOrdersByUserIDRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(OrderServiceServer).GetOrdersByUserID(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: OrderService_GetOrdersByUserID_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(OrderServiceServer).GetOrdersByUserID(ctx, req.(*GetOrdersByUserIDRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // OrderService_ServiceDesc is the grpc.ServiceDesc for OrderService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -381,6 +415,10 @@ var OrderService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CreatePaymentSession",
 			Handler:    _OrderService_CreatePaymentSession_Handler,
+		},
+		{
+			MethodName: "GetOrdersByUserID",
+			Handler:    _OrderService_GetOrdersByUserID_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

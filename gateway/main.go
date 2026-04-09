@@ -130,7 +130,7 @@ func main() {
 	customers.POST("/create", h.CreateOrder)
 	customers.GET("/:order_id/drivers", h.GetDrivers)
 	customers.POST("/:order_id/drivers", h.ChooseDriver)
-	customers.GET("", h.GetOrders)
+	customers.GET("", h.CustomerGetOrders)
 	customers.POST("/:order_id/rating", h.GiveRating)
 
 	// driver

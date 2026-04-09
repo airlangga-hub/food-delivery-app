@@ -80,6 +80,9 @@ func (s *orderService) CreateOrder(ctx context.Context, userID string, userEmail
 		DeliveryAddress:     resp.DeliveryAddress,
 		CustomerPhoneNumber: resp.CustomerPhoneNumber,
 		OrderStatus:         model.OrderStatus(resp.OrderStatus),
+		DeliveryFee:         int(resp.DeliveryFee),
+		TotalFee:            int(resp.TotalFee),
+		PaymentLink:         resp.PaymentLink,
 	}, nil
 }
 
@@ -159,6 +162,9 @@ func (s *orderService) ChooseDriver(ctx context.Context, orderID, driverID strin
 		DeliveryAddress:     resp.DeliveryAddress,
 		CustomerPhoneNumber: resp.CustomerPhoneNumber,
 		OrderStatus:         model.OrderStatus(resp.OrderStatus),
+		DeliveryFee:         int(resp.DeliveryFee),
+		TotalFee:            int(resp.TotalFee),
+		PaymentLink:         resp.PaymentLink,
 		Driver: &model.Driver{
 			ID:            resp.Driver.Id,
 			AverageRating: resp.Driver.AverageRating,
@@ -170,7 +176,68 @@ func (s *orderService) ChooseDriver(ctx context.Context, orderID, driverID strin
 	}, nil
 }
 
-func (s *orderService) GetOrders(ctx context.Context, userID string) ([]model.Order, error)
+func (s *orderService) CustomerGetOrders(ctx context.Context, userID string) ([]model.Order, error) {
+	resp, err := s.orderClient.GetOrdersByUserID(ctx, &orderpb.GetOrdersByUserIDRequest{UserId: userID, Role: string(model.RoleUserCustomer)})
+
+	if err != nil {
+		st, ok := status.FromError(err)
+		if !ok {
+			slog.Info("gateway.service.GetOrders (FromError): not gRPC error: %w", slog.Any("error", err))
+		}
+
+		if st.Code() == codes.NotFound {
+			return nil, fmt.Errorf("gateway.service.GetOrders (no rows found): %w: %w", model.ErrNotFound, err)
+		}
+
+		return nil, fmt.Errorf("gateway.service.GetOrders: %w", err)
+	}
+
+	resultOrders := make([]model.Order, len(resp.Orders))
+
+	for i, order := range resp.Orders {
+		restos := make([]model.Restaurant, len(order.Restaurants))
+
+		for j, resto := range order.Restaurants {
+			restoItems := make([]model.Item, len(resto.Items))
+
+			for k, itm := range resto.Items {
+				restoItems[k] = model.Item{
+					ID:       itm.Id,
+					Name:     itm.Name,
+					Price:    int(itm.Price),
+					Quantity: int(itm.Quantity),
+				}
+			}
+
+			restos[j] = model.Restaurant{
+				ID:      resto.Id,
+				Name:    resto.Name,
+				Address: resto.Address,
+				Items:   restoItems,
+			}
+		}
+
+		resultOrders[i] = model.Order{
+			ID:                  order.Id,
+			Restaurants:         restos,
+			DeliveryAddress:     order.DeliveryAddress,
+			CustomerPhoneNumber: order.CustomerPhoneNumber,
+			OrderStatus:         model.OrderStatus(order.OrderStatus),
+			DeliveryFee:         int(order.DeliveryFee),
+			TotalFee:            int(order.TotalFee),
+			PaymentLink:         order.PaymentLink,
+			Driver: &model.Driver{
+				AverageRating: order.Driver.AverageRating,
+				Name:          order.Driver.Name,
+				Bike:          order.Driver.Bike,
+				LicensePlate:  order.Driver.LicensePlate,
+				PhoneNumber:   order.Driver.PhoneNumber,
+			},
+		}
+	}
+	
+	return resultOrders, nil
+}
 
 func (s *orderService) GiveRating(ctx context.Context, orderID string) error
 

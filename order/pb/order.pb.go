@@ -1000,6 +1000,7 @@ type Order struct {
 	DeliveryFee         int64                  `protobuf:"varint,6,opt,name=delivery_fee,json=deliveryFee,proto3" json:"delivery_fee,omitempty"`
 	TotalFee            int64                  `protobuf:"varint,7,opt,name=total_fee,json=totalFee,proto3" json:"total_fee,omitempty"`
 	PaymentLink         string                 `protobuf:"bytes,8,opt,name=payment_link,json=paymentLink,proto3" json:"payment_link,omitempty"`
+	Driver              *Driver                `protobuf:"bytes,9,opt,name=driver,proto3" json:"driver,omitempty"`
 	unknownFields       protoimpl.UnknownFields
 	sizeCache           protoimpl.SizeCache
 }
@@ -1088,6 +1089,13 @@ func (x *Order) GetPaymentLink() string {
 		return x.PaymentLink
 	}
 	return ""
+}
+
+func (x *Order) GetDriver() *Driver {
+	if x != nil {
+		return x.Driver
+	}
+	return nil
 }
 
 type DriverApplyForOrderResponse struct {
@@ -1534,6 +1542,102 @@ func (x *CreatePaymentSessionResponse) GetPaymentLinkUrl() string {
 	return ""
 }
 
+type GetOrdersByUserIDRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UserId        string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	Role          string                 `protobuf:"bytes,2,opt,name=role,proto3" json:"role,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetOrdersByUserIDRequest) Reset() {
+	*x = GetOrdersByUserIDRequest{}
+	mi := &file_order_proto_msgTypes[22]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetOrdersByUserIDRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetOrdersByUserIDRequest) ProtoMessage() {}
+
+func (x *GetOrdersByUserIDRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_order_proto_msgTypes[22]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetOrdersByUserIDRequest.ProtoReflect.Descriptor instead.
+func (*GetOrdersByUserIDRequest) Descriptor() ([]byte, []int) {
+	return file_order_proto_rawDescGZIP(), []int{22}
+}
+
+func (x *GetOrdersByUserIDRequest) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
+func (x *GetOrdersByUserIDRequest) GetRole() string {
+	if x != nil {
+		return x.Role
+	}
+	return ""
+}
+
+type GetOrdersByUserIDResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Orders        []*Order               `protobuf:"bytes,1,rep,name=orders,proto3" json:"orders,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetOrdersByUserIDResponse) Reset() {
+	*x = GetOrdersByUserIDResponse{}
+	mi := &file_order_proto_msgTypes[23]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetOrdersByUserIDResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetOrdersByUserIDResponse) ProtoMessage() {}
+
+func (x *GetOrdersByUserIDResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_order_proto_msgTypes[23]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetOrdersByUserIDResponse.ProtoReflect.Descriptor instead.
+func (*GetOrdersByUserIDResponse) Descriptor() ([]byte, []int) {
+	return file_order_proto_rawDescGZIP(), []int{23}
+}
+
+func (x *GetOrdersByUserIDResponse) GetOrders() []*Order {
+	if x != nil {
+		return x.Orders
+	}
+	return nil
+}
+
 var File_order_proto protoreflect.FileDescriptor
 
 const file_order_proto_rawDesc = "" +
@@ -1607,7 +1711,7 @@ const file_order_proto_rawDesc = "" +
 	"\fphone_number\x18\x06 \x01(\tR\vphoneNumber\"\x14\n" +
 	"\x12GiveRatingResponse\"C\n" +
 	"\x1eDriverGetPendingOrdersResponse\x12!\n" +
-	"\x06orders\x18\x01 \x03(\v2\t.pb.OrderR\x06orders\"\xae\x02\n" +
+	"\x06orders\x18\x01 \x03(\v2\t.pb.OrderR\x06orders\"\xd2\x02\n" +
 	"\x05Order\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x120\n" +
 	"\vrestaurants\x18\x02 \x03(\v2\x0e.pb.RestaurantR\vrestaurants\x12)\n" +
@@ -1616,7 +1720,9 @@ const file_order_proto_rawDesc = "" +
 	"\forder_status\x18\x05 \x01(\tR\vorderStatus\x12!\n" +
 	"\fdelivery_fee\x18\x06 \x01(\x03R\vdeliveryFee\x12\x1b\n" +
 	"\ttotal_fee\x18\a \x01(\x03R\btotalFee\x12!\n" +
-	"\fpayment_link\x18\b \x01(\tR\vpaymentLink\"\x1d\n" +
+	"\fpayment_link\x18\b \x01(\tR\vpaymentLink\x12\"\n" +
+	"\x06driver\x18\t \x01(\v2\n" +
+	".pb.DriverR\x06driver\"\x1d\n" +
 	"\x1bDriverApplyForOrderResponse\"\x1d\n" +
 	"\x1bDriverCompleteOrderResponse\"\xf3\x01\n" +
 	"\x12PaymentGatewayItem\x12!\n" +
@@ -1659,7 +1765,12 @@ const file_order_proto_rawDesc = "" +
 	"\x05items\x18\x11 \x03(\v2\x16.pb.PaymentGatewayItemR\x05items\x12,\n" +
 	"\x12success_return_url\x18\x12 \x01(\tR\x10successReturnUrl\x12*\n" +
 	"\x11cancel_return_url\x18\x13 \x01(\tR\x0fcancelReturnUrl\x12(\n" +
-	"\x10payment_link_url\x18\x14 \x01(\tR\x0epaymentLinkUrl2\xec\x04\n" +
+	"\x10payment_link_url\x18\x14 \x01(\tR\x0epaymentLinkUrl\"G\n" +
+	"\x18GetOrdersByUserIDRequest\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\tR\x06userId\x12\x12\n" +
+	"\x04role\x18\x02 \x01(\tR\x04role\">\n" +
+	"\x19GetOrdersByUserIDResponse\x12!\n" +
+	"\x06orders\x18\x01 \x03(\v2\t.pb.OrderR\x06orders2\xbe\x05\n" +
 	"\fOrderService\x12>\n" +
 	"\vCreateOrder\x12\x16.pb.CreateOrderRequest\x1a\x17.pb.CreateOrderResponse\x12;\n" +
 	"\n" +
@@ -1670,7 +1781,8 @@ const file_order_proto_rawDesc = "" +
 	"\x16DriverGetPendingOrders\x12\x16.google.protobuf.Empty\x1a\".pb.DriverGetPendingOrdersResponse\x12V\n" +
 	"\x13DriverApplyForOrder\x12\x1e.pb.DriverApplyForOrderRequest\x1a\x1f.pb.DriverApplyForOrderResponse\x12V\n" +
 	"\x13DriverCompleteOrder\x12\x1e.pb.DriverCompleteOrderRequest\x1a\x1f.pb.DriverCompleteOrderResponse\x12Y\n" +
-	"\x14CreatePaymentSession\x12\x1f.pb.CreatePaymentSessionRequest\x1a .pb.CreatePaymentSessionResponseB5Z3github.com/airlangga-hub/food-delivery-app/order/pbb\x06proto3"
+	"\x14CreatePaymentSession\x12\x1f.pb.CreatePaymentSessionRequest\x1a .pb.CreatePaymentSessionResponse\x12P\n" +
+	"\x11GetOrdersByUserID\x12\x1c.pb.GetOrdersByUserIDRequest\x1a\x1d.pb.GetOrdersByUserIDResponseB5Z3github.com/airlangga-hub/food-delivery-app/order/pbb\x06proto3"
 
 var (
 	file_order_proto_rawDescOnce sync.Once
@@ -1684,7 +1796,7 @@ func file_order_proto_rawDescGZIP() []byte {
 	return file_order_proto_rawDescData
 }
 
-var file_order_proto_msgTypes = make([]protoimpl.MessageInfo, 22)
+var file_order_proto_msgTypes = make([]protoimpl.MessageInfo, 24)
 var file_order_proto_goTypes = []any{
 	(*OrderIn)(nil),                        // 0: pb.OrderIn
 	(*ItemsIn)(nil),                        // 1: pb.ItemsIn
@@ -1708,7 +1820,9 @@ var file_order_proto_goTypes = []any{
 	(*PaymentGatewayItem)(nil),             // 19: pb.PaymentGatewayItem
 	(*CreatePaymentSessionRequest)(nil),    // 20: pb.CreatePaymentSessionRequest
 	(*CreatePaymentSessionResponse)(nil),   // 21: pb.CreatePaymentSessionResponse
-	(*emptypb.Empty)(nil),                  // 22: google.protobuf.Empty
+	(*GetOrdersByUserIDRequest)(nil),       // 22: pb.GetOrdersByUserIDRequest
+	(*GetOrdersByUserIDResponse)(nil),      // 23: pb.GetOrdersByUserIDResponse
+	(*emptypb.Empty)(nil),                  // 24: google.protobuf.Empty
 }
 var file_order_proto_depIdxs = []int32{
 	1,  // 0: pb.OrderIn.items_in:type_name -> pb.ItemsIn
@@ -1720,29 +1834,33 @@ var file_order_proto_depIdxs = []int32{
 	13, // 6: pb.ChooseDriverResponse.driver:type_name -> pb.Driver
 	16, // 7: pb.DriverGetPendingOrdersResponse.orders:type_name -> pb.Order
 	8,  // 8: pb.Order.restaurants:type_name -> pb.Restaurant
-	19, // 9: pb.CreatePaymentSessionRequest.items:type_name -> pb.PaymentGatewayItem
-	19, // 10: pb.CreatePaymentSessionResponse.items:type_name -> pb.PaymentGatewayItem
-	2,  // 11: pb.OrderService.CreateOrder:input_type -> pb.CreateOrderRequest
-	3,  // 12: pb.OrderService.GetDrivers:input_type -> pb.GetDriversRequest
-	4,  // 13: pb.OrderService.ChooseDriver:input_type -> pb.ChooseDriverRequest
-	5,  // 14: pb.OrderService.GiveRating:input_type -> pb.GiveRatingRequest
-	22, // 15: pb.OrderService.DriverGetPendingOrders:input_type -> google.protobuf.Empty
-	6,  // 16: pb.OrderService.DriverApplyForOrder:input_type -> pb.DriverApplyForOrderRequest
-	7,  // 17: pb.OrderService.DriverCompleteOrder:input_type -> pb.DriverCompleteOrderRequest
-	20, // 18: pb.OrderService.CreatePaymentSession:input_type -> pb.CreatePaymentSessionRequest
-	10, // 19: pb.OrderService.CreateOrder:output_type -> pb.CreateOrderResponse
-	11, // 20: pb.OrderService.GetDrivers:output_type -> pb.GetDriversResponse
-	12, // 21: pb.OrderService.ChooseDriver:output_type -> pb.ChooseDriverResponse
-	14, // 22: pb.OrderService.GiveRating:output_type -> pb.GiveRatingResponse
-	15, // 23: pb.OrderService.DriverGetPendingOrders:output_type -> pb.DriverGetPendingOrdersResponse
-	17, // 24: pb.OrderService.DriverApplyForOrder:output_type -> pb.DriverApplyForOrderResponse
-	18, // 25: pb.OrderService.DriverCompleteOrder:output_type -> pb.DriverCompleteOrderResponse
-	21, // 26: pb.OrderService.CreatePaymentSession:output_type -> pb.CreatePaymentSessionResponse
-	19, // [19:27] is the sub-list for method output_type
-	11, // [11:19] is the sub-list for method input_type
-	11, // [11:11] is the sub-list for extension type_name
-	11, // [11:11] is the sub-list for extension extendee
-	0,  // [0:11] is the sub-list for field type_name
+	13, // 9: pb.Order.driver:type_name -> pb.Driver
+	19, // 10: pb.CreatePaymentSessionRequest.items:type_name -> pb.PaymentGatewayItem
+	19, // 11: pb.CreatePaymentSessionResponse.items:type_name -> pb.PaymentGatewayItem
+	16, // 12: pb.GetOrdersByUserIDResponse.orders:type_name -> pb.Order
+	2,  // 13: pb.OrderService.CreateOrder:input_type -> pb.CreateOrderRequest
+	3,  // 14: pb.OrderService.GetDrivers:input_type -> pb.GetDriversRequest
+	4,  // 15: pb.OrderService.ChooseDriver:input_type -> pb.ChooseDriverRequest
+	5,  // 16: pb.OrderService.GiveRating:input_type -> pb.GiveRatingRequest
+	24, // 17: pb.OrderService.DriverGetPendingOrders:input_type -> google.protobuf.Empty
+	6,  // 18: pb.OrderService.DriverApplyForOrder:input_type -> pb.DriverApplyForOrderRequest
+	7,  // 19: pb.OrderService.DriverCompleteOrder:input_type -> pb.DriverCompleteOrderRequest
+	20, // 20: pb.OrderService.CreatePaymentSession:input_type -> pb.CreatePaymentSessionRequest
+	22, // 21: pb.OrderService.GetOrdersByUserID:input_type -> pb.GetOrdersByUserIDRequest
+	10, // 22: pb.OrderService.CreateOrder:output_type -> pb.CreateOrderResponse
+	11, // 23: pb.OrderService.GetDrivers:output_type -> pb.GetDriversResponse
+	12, // 24: pb.OrderService.ChooseDriver:output_type -> pb.ChooseDriverResponse
+	14, // 25: pb.OrderService.GiveRating:output_type -> pb.GiveRatingResponse
+	15, // 26: pb.OrderService.DriverGetPendingOrders:output_type -> pb.DriverGetPendingOrdersResponse
+	17, // 27: pb.OrderService.DriverApplyForOrder:output_type -> pb.DriverApplyForOrderResponse
+	18, // 28: pb.OrderService.DriverCompleteOrder:output_type -> pb.DriverCompleteOrderResponse
+	21, // 29: pb.OrderService.CreatePaymentSession:output_type -> pb.CreatePaymentSessionResponse
+	23, // 30: pb.OrderService.GetOrdersByUserID:output_type -> pb.GetOrdersByUserIDResponse
+	22, // [22:31] is the sub-list for method output_type
+	13, // [13:22] is the sub-list for method input_type
+	13, // [13:13] is the sub-list for extension type_name
+	13, // [13:13] is the sub-list for extension extendee
+	0,  // [0:13] is the sub-list for field type_name
 }
 
 func init() { file_order_proto_init() }
@@ -1756,7 +1874,7 @@ func file_order_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_order_proto_rawDesc), len(file_order_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   22,
+			NumMessages:   24,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

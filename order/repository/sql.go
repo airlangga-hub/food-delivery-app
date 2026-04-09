@@ -249,12 +249,13 @@ func (r *sqlRepository) GetOrderByOrderID(ctx context.Context, tx *sql.Tx, order
 	return resultOrder, nil
 }
 
-func (r *sqlRepository) GetOrdersByUserID(ctx context.Context, userID uuid.UUID, role string) ([]model.Order, error) {
+func (r *sqlRepository) GetOrdersByUserID(ctx context.Context, userID uuid.UUID, role model.RoleUser) ([]model.Order, error) {
 	var filterCol string
+	
 	switch role {
-	case "customer":
+	case model.RoleUserCustomer:
 		filterCol = "customer_id"
-	case "driver":
+	case model.RoleUserDriver:
 		filterCol = "driver_id"
 	default:
 		return nil, fmt.Errorf("invalid role: %s: %w", role, model.ErrNotFound)

@@ -6,6 +6,7 @@ type (
 	LedgerReason              string
 	OrderStatus               string
 	PaymentGatewayRefIDPrefix string
+	RoleUser                  string
 )
 
 const (
@@ -26,4 +27,7 @@ const (
 
 	PaymentGatewayRefIDPrefixTopUp PaymentGatewayRefIDPrefix = "TOPUP_"
 	PaymentGatewayRefIDPrefixOrder PaymentGatewayRefIDPrefix = "ORDER_"
+
+	RoleUserCustomer RoleUser = "customer"
+	RoleUserDriver   RoleUser = "driver"
 )

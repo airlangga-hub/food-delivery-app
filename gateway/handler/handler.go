@@ -24,7 +24,7 @@ type OrderService interface {
 	CreateOrder(ctx context.Context, userID string, userEmail string, deliveryFee int, items []model.Item) (model.Order, error)
 	GetDrivers(ctx context.Context, orderID string) (model.FindDriver, error)
 	ChooseDriver(ctx context.Context, orderID, driverID string) (model.Order, error)
-	GetOrders(ctx context.Context, userID string) ([]model.Order, error)
+	CustomerGetOrders(ctx context.Context, userID string) ([]model.Order, error)
 	GiveRating(ctx context.Context, orderID string) error
 	DriverGetPendingOrders(ctx context.Context) ([]model.Order, error)
 	DriverApplyToTakeOrder(ctx context.Context, driverID, orderID string) error
@@ -105,7 +105,7 @@ func (h *Handler) TopUpBalance(c *echo.Context) error {
 		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized user")
 	}
 
-	if claims.Role != helper.RoleCustomer {
+	if claims.Role != model.RoleUserCustomer {
 		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized user")
 	}
 
@@ -143,7 +143,7 @@ func (h *Handler) GetUserInfo(c *echo.Context) error {
 		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized user")
 	}
 
-	if claims.Role != helper.RoleCustomer {
+	if claims.Role != model.RoleUserCustomer {
 		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized user")
 	}
 
@@ -172,7 +172,7 @@ func (h *Handler) CreateOrder(c *echo.Context) error {
 		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized user")
 	}
 
-	if claims.Role != helper.RoleCustomer {
+	if claims.Role != model.RoleUserCustomer {
 		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized user")
 	}
 
@@ -219,7 +219,7 @@ func (h *Handler) GetDrivers(c *echo.Context) error {
 		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized user")
 	}
 
-	if claims.Role != helper.RoleCustomer {
+	if claims.Role != model.RoleUserCustomer {
 		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized user")
 	}
 
@@ -256,7 +256,7 @@ func (h *Handler) ChooseDriver(c *echo.Context) error {
 		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized user")
 	}
 
-	if claims.Role != helper.RoleCustomer {
+	if claims.Role != model.RoleUserCustomer {
 		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized user")
 	}
 
@@ -288,7 +288,7 @@ func (h *Handler) ChooseDriver(c *echo.Context) error {
 	})
 }
 
-func (h *Handler) GetOrders(c *echo.Context) error {
+func (h *Handler) CustomerGetOrders(c *echo.Context) error {
 	token, ok := c.Get("user").(*jwt.Token)
 	if !ok {
 		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized user")
@@ -299,14 +299,14 @@ func (h *Handler) GetOrders(c *echo.Context) error {
 		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized user")
 	}
 
-	if claims.Role != helper.RoleCustomer {
+	if claims.Role != model.RoleUserCustomer {
 		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized user")
 	}
 
 	ctx, cancel := context.WithTimeout(c.Request().Context(), time.Second*20)
 	defer cancel()
 
-	orders, err := h.OrderSvc.GetOrders(ctx, claims.UserID)
+	orders, err := h.OrderSvc.CustomerGetOrders(ctx, claims.UserID)
 	if err != nil {
 		if errors.Is(err, model.ErrNotFound) {
 			return echo.NewHTTPError(http.StatusNotFound, "you haven't made any orders yet").Wrap(err)
@@ -331,7 +331,7 @@ func (h *Handler) GiveRating(c *echo.Context) error {
 		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized user")
 	}
 
-	if claims.Role != helper.RoleCustomer {
+	if claims.Role != model.RoleUserCustomer {
 		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized user")
 	}
 
@@ -372,7 +372,7 @@ func (h *Handler) DriverGetPendingOrders(c *echo.Context) error {
 		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized user")
 	}
 
-	if claims.Role != helper.RoleDriver {
+	if claims.Role != model.RoleUserDriver {
 		return echo.NewHTTPError(http.StatusUnauthorized, "you're not a driver")
 	}
 
@@ -404,7 +404,7 @@ func (h *Handler) DriverApplyToTakeOrder(c *echo.Context) error {
 		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized user")
 	}
 
-	if claims.Role != helper.RoleDriver {
+	if claims.Role != model.RoleUserDriver {
 		return echo.NewHTTPError(http.StatusUnauthorized, "you're not a driver")
 	}
 
@@ -436,7 +436,7 @@ func (h *Handler) DriverCompleteOrder(c *echo.Context) error {
 		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized user")
 	}
 
-	if claims.Role != helper.RoleDriver {
+	if claims.Role != model.RoleUserDriver {
 		return echo.NewHTTPError(http.StatusUnauthorized, "you're not a driver")
 	}
 

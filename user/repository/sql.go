@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/airlangga-hub/food-delivery-app/user/helper"
 	"github.com/airlangga-hub/food-delivery-app/user/model"
 	"github.com/google/uuid"
 )
@@ -64,7 +63,7 @@ func (r *sqlRepository) RegisterCustomer(ctx context.Context, input model.UserRe
 		input.LastName,
 		input.Address,
 		input.PhoneNumber,
-		helper.RoleCustomer,
+		model.RoleUserCustomer,
 	)
 
 	if err != nil {
