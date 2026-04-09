@@ -28,10 +28,10 @@ func main() {
 	godotenv.Load()
 
 	mongoURI := os.Getenv("MONGO_URI")
-	port := os.Getenv("PORT")
+	port := os.Getenv("CONTAINER_PORT")
 	xenditAPIkey := os.Getenv("XENDIT_API_KEY")
 	xenditPaymentSessionURL := os.Getenv("XENDIT_PAYMENT_SESSION_URL")
-	dbMongoName := os.Getenv("DB_MONGO_NAME_PAYMENT")
+	dbMongoName := os.Getenv("DB_MONGO_NAME")
 	mailjetSender := os.Getenv("MAILJET_SENDER")
 	mailjetURL := os.Getenv("MAILJET_URL")
 	mailjetUsername := os.Getenv("MAILJET_BASIC_AUTH_USERNAME")
@@ -57,7 +57,7 @@ func main() {
 
 	// dependency injection
 	validate := validator.New(validator.WithRequiredStructEnabled())
-	repo, err := repository.NewRepository(client.Database(dbMongoName), xenditPaymentSessionURL, xenditAPIkey, mailjetSender, mailjetURL, mailjetUsername, mailjetPassword, validate)
+	repo := repository.NewMongoRepository(client.Database(dbMongoName), mailjetSender, mailjetURL, mailjetUsername, mailjetPassword, validate)
 	if err != nil {
 		logger.Error("new mongo repo error", slog.Any("error", err))
 		return
