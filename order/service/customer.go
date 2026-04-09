@@ -94,3 +94,11 @@ func (s *customerService) GiveRating(ctx context.Context, orderID uuid.UUID, rat
 	}
 	return nil
 }
+
+func(s *customerService) CreatePaymentSession(ctx context.Context, paymentType model.PaymentType, userID uuid.UUID, userEmail string, amount int, items []model.PaymentGatewayItem) (model.PaymentGatewayResponse, error) {
+	paymentGatewayResp, err := s.customerPaymentGatewayRepo.CreatePaymentSession(ctx, paymentType, userID, userEmail, amount, items)
+	if err != nil {
+		return model.PaymentGatewayResponse{}, fmt.Errorf("order.service.CreatePaymentSession: %w", err)
+	}
+	return paymentGatewayResp, nil
+}
