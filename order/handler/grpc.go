@@ -254,7 +254,26 @@ func (h *Handler) DriverGetPendingOrders(ctx context.Context, req *emptypb.Empty
 	return &pb.DriverGetPendingOrdersResponse{Orders: resultOrders}, nil
 }
 
-func (h *Handler) DriverApplyForOrder(ctx context.Context, req *pb.DriverApplyForOrderRequest) (*pb.DriverApplyForOrderResponse, error)
+func (h *Handler) DriverApplyForOrder(ctx context.Context, req *pb.DriverApplyForOrderRequest) (*pb.DriverApplyForOrderResponse, error) {
+	orderID, err := uuid.Parse(req.OrderId)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "order.handler.DriverApplyForOrder (Parse OrderId): %v", err)
+	}
+
+	driverID, err := uuid.Parse(req.DriverId)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "order.handler.DriverApplyForOrder (Parse DriverId): %v", err)
+	}
+	
+	if err := h.driverSvc.DriverApplyForOrder(ctx, orderID, driverID); err != nil {
+		if errors.Is(err, model.ErrNotFound) {
+			return nil, status.Errorf(codes.NotFound, "order.handler.DriverApplyForOrder (no rows found): %v", err)
+		}
+		return nil, status.Errorf(codes.Internal, "order.handler.DriverApplyForOrder: %v", err)
+	}
+	
+	return nil, nil
+}
 
 func (h *Handler) DriverCompleteOrder(ctx context.Context, req *pb.DriverCompleteOrderRequest) (*pb.DriverCompleteOrderResponse, error)
 
