@@ -67,7 +67,7 @@ func main() {
 	userClient := userpb.NewUserServiceClient(userCC)
 	orderClient := orderpb.NewOrderServiceClient(orderCC)
 	userSvc := service.NewUserService(userClient)
-	orderSvc := service.NewOrderService(orderClient)
+	orderSvc := service.NewOrderService(orderClient, logger)
 	validate := validator.New(validator.WithRequiredStructEnabled())
 	h := handler.New(userSvc, orderSvc, validate)
 
