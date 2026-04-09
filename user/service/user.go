@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"fmt"
+	"log/slog"
 
 	"github.com/airlangga-hub/food-delivery-app/user/model"
 	"github.com/google/uuid"
@@ -15,6 +16,11 @@ type UserPaymentGatewayRepository interface {
 
 type UserMongoRepository interface {
 	CreatePaymentRecord(ctx context.Context, paymentRecord model.PaymentRecord) error
+	GetPendingEmailRecords(ctx context.Context) ([]model.PaymentRecord, error)
+	SendEmail(ctx context.Context, rec model.PaymentRecord) error
+	MarkEmailAsSending(ctx context.Context, id string) error
+	IfErrorMarkEmailAsPending(ctx context.Context, id string) error
+	MarkEmailAsSent(ctx context.Context, id string) error
 }
 
 type UserSQLRepository interface {
@@ -28,13 +34,15 @@ type userService struct {
 	userPaymentGatewayRepository UserPaymentGatewayRepository
 	userMongoRepository          UserMongoRepository
 	userSqlRepository            UserSQLRepository
+	logger                       *slog.Logger
 }
 
-func NewUserService(userpaymentGatewayRepo UserPaymentGatewayRepository, userMongoRepo UserMongoRepository, userSqlRepo UserSQLRepository) *userService {
+func NewUserService(userpaymentGatewayRepo UserPaymentGatewayRepository, userMongoRepo UserMongoRepository, userSqlRepo UserSQLRepository, logger *slog.Logger) *userService {
 	return &userService{
 		userPaymentGatewayRepository: userpaymentGatewayRepo,
 		userMongoRepository:          userMongoRepo,
 		userSqlRepository:            userSqlRepo,
+		logger:                       logger,
 	}
 }
 
@@ -121,5 +129,43 @@ func (s *userService) PaymentGatewayWebhook(ctx context.Context, userID uuid.UUI
 		return fmt.Errorf("order.service.PaymentGatewayWebhook (UpdateLedger): %w", err)
 	}
 
+	return nil
+}
+
+func (s *userService) ProcessUnsentEmail(ctx context.Context) error {
+	records, err := s.userMongoRepository.GetPendingEmailRecords(ctx)
+	if err != nil {
+		return fmt.Errorf("service.ProcessEmailQueue: %w", err)
+	}
+
+	if len(records) == 0 {
+		s.logger.Info("Not Found", slog.String("Not Found", "no records with unsent email found"))
+		return nil
+	}
+
+	for _, rec := range records {
+		
+		recordID := rec.ID.Hex()
+
+		if err := s.userMongoRepository.MarkEmailAsSending(ctx, recordID); err != nil {
+			s.logger.Error(fmt.Sprintf("Failed to update status to sending for record %s", recordID), slog.Any("error", err))
+			continue
+		}
+
+		if err := s.userMongoRepository.SendEmail(ctx, rec); err != nil {
+			s.logger.Error(fmt.Sprintf("Failed to send email to %s", rec.Email), slog.Any("error", err))
+
+			if err := s.userMongoRepository.IfErrorMarkEmailAsPending(ctx, recordID); err != nil {
+				s.logger.Error(fmt.Sprintf("Failed to update status to pending for record %s", recordID), slog.Any("error", err))
+				continue
+			}
+
+			continue
+		}
+
+		if err := s.userMongoRepository.MarkEmailAsSent(ctx, recordID); err != nil {
+			s.logger.Error(fmt.Sprintf("Failed to update status to sent for record %s", recordID), slog.Any("error", err))
+		}
+	}
 	return nil
 }
