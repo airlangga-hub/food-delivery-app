@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+	"errors"
 
 	"github.com/airlangga-hub/food-delivery-app/user/model"
 	"github.com/airlangga-hub/food-delivery-app/user/pb"
@@ -53,12 +54,31 @@ func (h *Handler) RegisterCustomer(ctx context.Context, req *pb.RegisterCustomer
 
 func (h *Handler) Login(ctx context.Context, req *pb.LoginRequest) (*pb.LoginResponse, error) {
 	if err := h.Svc.Login(ctx, req.Email, req.Password); err != nil {
+		if errors.Is(err, model.ErrNotFound) {
+			return nil, status.Errorf(codes.NotFound, "user.handler.Login (user not found): %v: %v", model.ErrNotFound, err)
+		}
 		return nil, status.Errorf(codes.Internal, "user.handler.Login: %v", err)
 	}
 	return nil, nil
 }
 
-func (h *Handler) GetUserInfo(ctx context.Context, req *pb.GetUserInfoRequest) (*pb.GetUserInfoResponse, error)
+func (h *Handler) GetUserInfo(ctx context.Context, req *pb.GetUserInfoRequest) (*pb.GetUserInfoResponse, error) {
+	userinfo, err := h.Svc.GetUserInfo(ctx, req.Email)
+	if err != nil {
+		if errors.Is(err, model.ErrNotFound) {
+			return nil, status.Errorf(codes.Internal, "user.handler.GetUserInfo (user not found): %v: %v", model.ErrNotFound, err)
+		}
+		return nil, status.Errorf(codes.Internal, "user.handler.GetUserInfo: %v", err)
+	}
+	return &pb.GetUserInfoResponse{
+		FirstName:   userinfo.FirstName,
+		LastName:    userinfo.LastName,
+		Email:       userinfo.Email,
+		Address:     userinfo.Address,
+		PhoneNumber: userinfo.PhoneNumber,
+		Balance:     int64(userinfo.Balance),
+	}, nil
+}
 
 func (h *Handler) PaymentGatewayWebhook(ctx context.Context, req *pb.PaymentGatewayWebhookRequest) (*pb.PaymentGatewayWebhookResponse, error)
 
