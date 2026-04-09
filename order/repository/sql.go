@@ -166,6 +166,7 @@ func (r *sqlRepository) GetOrderByOrderID(ctx context.Context, tx *sql.Tx, order
 	resultOrder := model.Order{ID: orderID}
 	restoMap := make(map[uuid.UUID]*model.Restaurant)
 
+	found := false
 	for rows.Next() {
 		var restoName, restoAddr, itemName, deliveryAddr, customerPhoneNumber, orderStatus string
 		var restoID, itemID uuid.UUID
@@ -188,22 +189,24 @@ func (r *sqlRepository) GetOrderByOrderID(ctx context.Context, tx *sql.Tx, order
 			return model.Order{}, fmt.Errorf("order.customer_repo.CreateOrder (fetch full rows.Scan): %w", err)
 		}
 
-		if driverID.Valid {
-			resultOrder.Driver = model.Driver{
-				ID:            driverID.UUID,
-				AverageRating: driverAvgRating.Float64,
-				Name:          fmt.Sprintf("%s %s", driverFName.String, driverLName.String),
-				Bike:          driverBike.String,
-				LicensePlate:  driverPlate.String,
-				PhoneNumber:   driverPhone.String,
+		if !found {
+			if driverID.Valid {
+				resultOrder.Driver = model.Driver{
+					ID:            driverID.UUID,
+					AverageRating: driverAvgRating.Float64,
+					Name:          fmt.Sprintf("%s %s", driverFName.String, driverLName.String),
+					Bike:          driverBike.String,
+					LicensePlate:  driverPlate.String,
+					PhoneNumber:   driverPhone.String,
+				}
 			}
-		}
 
-		resultOrder.DeliveryAddress = deliveryAddr
-		resultOrder.CustomerPhoneNumber = customerPhoneNumber
-		resultOrder.OrderStatus = model.OrderStatus(orderStatus)
-		resultOrder.DeliveryFee = deliveryFee
-		resultOrder.TotalFee = totalFee
+			resultOrder.DeliveryAddress = deliveryAddr
+			resultOrder.CustomerPhoneNumber = customerPhoneNumber
+			resultOrder.OrderStatus = model.OrderStatus(orderStatus)
+			resultOrder.DeliveryFee = deliveryFee
+			resultOrder.TotalFee = totalFee
+		}
 
 		restaurant, ok := restoMap[restoID]
 		if !ok {
@@ -228,6 +231,15 @@ func (r *sqlRepository) GetOrderByOrderID(ctx context.Context, tx *sql.Tx, order
 				Quantity: itemQty,
 			})
 		}
+
+		found = true
+	}
+	
+	if !found {
+		return model.Order{}, fmt.Errorf("order.repository.GetOrderByOrderID (no rows found): %w", model.ErrNotFound)
+	}
+	if err := rows.Err(); err != nil {
+		return model.Order{}, fmt.Errorf("order.repository.GetOrderByOrderID (rows.Err): %w", err)
 	}
 
 	for _, resto := range restoMap {
@@ -294,6 +306,7 @@ func (r *sqlRepository) GetOrdersByUserID(ctx context.Context, userID uuid.UUID,
 	ordersMap := make(map[uuid.UUID]*model.Order)
 	orderRestoMap := make(map[uuid.UUID]map[uuid.UUID]*model.Restaurant)
 
+	found := false
 	for rows.Next() {
 		var restoName, restoAddr, itemName, deliveryAddr, customerPhoneNumber, orderStatus string
 		var restoID, itemID, orderID uuid.UUID
@@ -371,6 +384,15 @@ func (r *sqlRepository) GetOrdersByUserID(ctx context.Context, userID uuid.UUID,
 			Price:    itemPrice,
 			Quantity: itemQty,
 		})
+		
+		found = true
+	}
+	
+	if !found {
+		return nil, fmt.Errorf("order.repository.GetOrdersByUserID (no rows found): %w", model.ErrNotFound)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("order.repository.GetOrdersByUserID (rows.Err): %w", err)
 	}
 
 	result := make([]model.Order, 0, len(ordersMap))
@@ -651,6 +673,10 @@ func (r *sqlRepository) DriverGetPendingOrders(ctx context.Context) ([]model.Ord
 			o.Restaurants = append(o.Restaurants, *resto)
 		}
 		result = append(result, *o)
+	}
+	
+	if len(result) == 0 {
+		return nil, fmt.Errorf("order.repository.DriverGetPendingOrders (no rows found): %w", model.ErrNotFound)
 	}
 
 	return result, nil
