@@ -51,7 +51,12 @@ func (h *Handler) RegisterCustomer(ctx context.Context, req *pb.RegisterCustomer
 	}, nil
 }
 
-func (h *Handler) Login(ctx context.Context, req *pb.LoginRequest) (*pb.LoginResponse, error)
+func (h *Handler) Login(ctx context.Context, req *pb.LoginRequest) (*pb.LoginResponse, error) {
+	if err := h.Svc.Login(ctx, req.Email, req.Password); err != nil {
+		return nil, status.Errorf(codes.Internal, "user.handler.Login: %v", err)
+	}
+	return nil, nil
+}
 
 func (h *Handler) GetUserInfo(ctx context.Context, req *pb.GetUserInfoRequest) (*pb.GetUserInfoResponse, error)
 
