@@ -98,7 +98,32 @@ func (h *Handler) CreateOrder(ctx context.Context, req *pb.CreateOrderRequest) (
 	}, nil
 }
 
-func (h *Handler) GetDrivers(ctx context.Context, req *pb.GetDriversRequest) (*pb.GetDriversResponse, error)
+func (h *Handler) GetDrivers(ctx context.Context, req *pb.GetDriversRequest) (*pb.GetDriversResponse, error) {
+	orderID, err := uuid.Parse(req.OrderId)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "order.handler.GetDrivers (Parse OrderId): %v", err)
+	}
+
+	drivers, err := h.customerSvc.GetDrivers(ctx, orderID)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "order.handler.GetDrivers: %v", err)
+	}
+
+	resultDrivers := make([]*pb.Driver, len(drivers))
+
+	for i, driver := range drivers {
+		resultDrivers[i] = &pb.Driver{
+			Id:            driver.ID.String(),
+			AverageRating: driver.AverageRating,
+			Name:          driver.Name,
+			Bike:          driver.Bike,
+			LicensePlate:  driver.LicensePlate,
+			PhoneNumber:   driver.PhoneNumber,
+		}
+	}
+	
+	return &pb.GetDriversResponse{Drivers: resultDrivers}, nil
+}
 
 func (h *Handler) ChooseDriver(ctx context.Context, req *pb.ChooseDriverRequest) (*pb.ChooseDriverResponse, error)
 
