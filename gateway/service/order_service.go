@@ -9,6 +9,7 @@ import (
 	orderpb "github.com/airlangga-hub/food-delivery-app/gateway/order_pb"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 type orderService struct {
@@ -258,7 +259,60 @@ func (s *orderService) GiveRating(ctx context.Context, orderID string, rating in
 	return nil
 }
 
-func (s *orderService) DriverGetPendingOrders(ctx context.Context) ([]model.Order, error)
+func (s *orderService) DriverGetPendingOrders(ctx context.Context) ([]model.Order, error) {
+	resp, err := s.orderClient.DriverGetPendingOrders(ctx, &emptypb.Empty{})
+	
+	if err != nil {
+		st, ok := status.FromError(err)
+		if !ok {
+			slog.Info("gateway.service.DriverGetPendingOrders (FromError): not gRPC error: %w", slog.Any("error", err))
+		}
+
+		if st.Code() == codes.NotFound {
+			return nil, fmt.Errorf("gateway.service.DriverGetPendingOrders (no rows found): %w: %w", model.ErrNotFound, err)
+		}
+
+		return nil, fmt.Errorf("gateway.service.DriverGetPendingOrders: %w", err)
+	}
+	
+	resultOrders := make([]model.Order, len(resp.Orders))
+
+	for i, order := range resp.Orders {
+		restos := make([]model.Restaurant, len(order.Restaurants))
+
+		for j, resto := range order.Restaurants {
+			restoItems := make([]model.Item, len(resto.Items))
+
+			for k, restoItem := range resto.Items {
+				restoItems[k] = model.Item{
+					ID:       restoItem.Id,
+					Name:     restoItem.Name,
+					Price:    int(restoItem.Price),
+					Quantity: int(restoItem.Quantity),
+				}
+			}
+
+			restos[j] = model.Restaurant{
+				ID:      resto.Id,
+				Name:    resto.Name,
+				Address: resto.Address,
+				Items:   restoItems,
+			}
+		}
+
+		resultOrders[i] = model.Order{
+			ID:                  order.Id,
+			Restaurants:         restos,
+			DeliveryAddress:     order.DeliveryAddress,
+			CustomerPhoneNumber: order.CustomerPhoneNumber,
+			OrderStatus:         model.OrderStatus(order.OrderStatus),
+			DeliveryFee:         int(order.DeliveryFee),
+			TotalFee:            int(order.TotalFee),
+		}
+	}
+	
+	return resultOrders, nil
+}
 
 func (s *orderService) DriverApplyToTakeOrder(ctx context.Context, driverID, orderID string) error
 
