@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"context"
 	"errors"
 	"net/http"
 
@@ -13,21 +14,21 @@ import (
 )
 
 type UserService interface {
-	RegisterCustomer(user model.UserRegister) (model.UserInfo, error)
-	Login(email, password string) (string, error)
-	TopUpBalance(userID uuid.UUID, amount int) (model.PaymentLink, error)
-	GetUserInfo(userID uuid.UUID) (model.UserInfo, error)
+	RegisterCustomer(ctx context.Context, user model.UserRegister) (model.UserInfo, error)
+	Login(ctx context.Context, email, password string) (string, error)
+	TopUpBalance(ctx context.Context, userID uuid.UUID, amount int) (model.PaymentLink, error)
+	GetUserInfo(ctx context.Context, userID uuid.UUID) (model.UserInfo, error)
 }
 
 type OrderService interface {
-	CreateOrder(userID uuid.UUID, items []model.Item) (model.Order, error)
-	GetDrivers(orderID uuid.UUID) (model.FindDriver, error)
-	ChooseDriver(orderID, driverID uuid.UUID) (model.Order, error)
-	GetOrders(userID uuid.UUID) ([]model.Order, error)
-	GiveRating(orderID uuid.UUID) error
-	DriverGetPendingOrders() ([]model.Order, error)
-	DriverApplyToTakeOrder(driverID, orderID uuid.UUID) error
-	MarkOrderAsDone(orderID, driverID uuid.UUID) error
+	CreateOrder(ctx context.Context, userID uuid.UUID, userEmail string, deliveryFee int, items []model.Item) (model.Order, error)
+	GetDrivers(ctx context.Context, orderID uuid.UUID) (model.FindDriver, error)
+	ChooseDriver(ctx context.Context, orderID, driverID uuid.UUID) (model.Order, error)
+	GetOrders(ctx context.Context, userID uuid.UUID) ([]model.Order, error)
+	GiveRating(ctx context.Context, orderID uuid.UUID) error
+	DriverGetPendingOrders(ctx context.Context, ) ([]model.Order, error)
+	DriverApplyToTakeOrder(ctx context.Context, driverID, orderID uuid.UUID) error
+	MarkOrderAsDone(ctx context.Context, orderID, driverID uuid.UUID) error
 }
 
 type Handler struct {

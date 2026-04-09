@@ -1,11 +1,7 @@
 package model
 
-import "github.com/google/uuid"
-
-
-
 type Order struct {
-	ID                  uuid.UUID    `json:"id"`
+	ID                  string       `json:"id"`
 	Restaurants         []Restaurant `json:"restaurants"`
 	DeliveryAddress     string       `json:"delivery_address"`
 	CustomerPhoneNumber string       `json:"customer_phone_number"`
@@ -14,26 +10,26 @@ type Order struct {
 }
 
 type Restaurant struct {
-	ID      uuid.UUID `json:"id"`
-	Name    string    `json:"name"`
-	Address string    `json:"address"`
-	Items   []Item    `json:"items"`
+	ID      string `json:"id"`
+	Name    string `json:"name"`
+	Address string `json:"address"`
+	Items   []Item `json:"items"`
 }
 
 type Item struct {
-	ID       uuid.UUID `json:"id"`
-	Name     string    `json:"item_name"`
-	Price    int       `json:"price"`
-	Quantity int       `json:"quantity"`
+	ID       string `json:"id"`
+	Name     string `json:"item_name"`
+	Price    int    `json:"price"`
+	Quantity int    `json:"quantity"`
 }
 
 type Driver struct {
-	ID            uuid.UUID `json:"id"`
-	AverageRating float64   `json:"average_rating"`
-	Name          string    `json:"name"`
-	Bike          string    `json:"bike"`
-	LicensePlate  string    `json:"license_plate"`
-	PhoneNumber   string    `json:"phone_number"`
+	ID            string  `json:"id"`
+	AverageRating float64 `json:"average_rating"`
+	Name          string  `json:"name"`
+	Bike          string  `json:"bike"`
+	LicensePlate  string  `json:"license_plate"`
+	PhoneNumber   string  `json:"phone_number"`
 }
 
 type FindDriver struct {
