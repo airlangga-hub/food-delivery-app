@@ -14,7 +14,7 @@ type UserInfo struct {
 	LastName  string `json:"last_name"`
 	Email     string `json:"email"`
 	PhoneNumber string `json:"phone_number"`
-	Address   string `json:"address"`
+	Address   string `json:"address,omitempty"`
 	Balance   int    `json:"balance"`
 }
 

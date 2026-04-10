@@ -14,7 +14,7 @@ import (
 type UserService interface {
 	RegisterCustomer(ctx context.Context, input model.UserRegister) (model.UserInfo, error)
 	Login(ctx context.Context, email string, password string) (string, error)
-	GetUserInfo(ctx context.Context, email string) (model.UserInfo, error)
+	GetUserInfo(ctx context.Context, email string, role model.RoleUser) (model.UserInfo, error)
 	PaymentGatewayWebhook(ctx context.Context, userID uuid.UUID, paymentType model.PaymentType, amount int) error
 	TopUpBalance(ctx context.Context, userID uuid.UUID, userEmail string, amount int) (model.PaymentLink, error)
 	CreatePaymentRecord(ctx context.Context, paymentRecord model.PaymentRecord) error
@@ -65,7 +65,7 @@ func (h *Handler) Login(ctx context.Context, req *pb.LoginRequest) (*pb.LoginRes
 }
 
 func (h *Handler) GetUserInfo(ctx context.Context, req *pb.GetUserInfoRequest) (*pb.GetUserInfoResponse, error) {
-	userinfo, err := h.Svc.GetUserInfo(ctx, req.Email)
+	userinfo, err := h.Svc.GetUserInfo(ctx, req.Email, model.RoleUser(req.Role))
 	if err != nil {
 		if errors.Is(err, model.ErrNotFound) {
 			return nil, status.Errorf(codes.NotFound, "user.handler.GetUserInfo (user not found): %v", err)

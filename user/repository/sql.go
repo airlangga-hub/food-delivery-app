@@ -99,28 +99,46 @@ func (r *sqlRepository) Login(ctx context.Context, email string) (model.UserLogi
 	return user, nil
 }
 
-func (r *sqlRepository) GetUserInfo(ctx context.Context, email string) (model.UserInfo, error) {
+func (r *sqlRepository) GetUserInfo(ctx context.Context, email string, role model.RoleUser) (model.UserInfo, error) {
 	var u model.UserInfo
+
+	var tableName string
+	var addressCol string
+
+	switch role {
+	case model.RoleUserCustomer:
+		tableName = "customer_profiles"
+		addressCol = "p.address"
+	case model.RoleUserDriver:
+		tableName = "driver_profiles"
+		addressCol = "''"
+	default:
+		return model.UserInfo{}, fmt.Errorf("invalid role: %s", role)
+	}
 
 	err := r.db.QueryRowContext(
 		ctx,
-		`SELECT
-			cp.first_name,
-			cp.last_name,
-			u.email,
-			cp.address,
-			cp.phone_number,
-			COALESCE((
-				SELECT SUM(amount)
-				FROM final_project.ledgers
-				WHERE user_id = u.id
-			), 0) AS balance
-		FROM
-			final_project.users u
-		JOIN
-			final_project.customer_profiles cp ON u.id = cp.user_id
-		WHERE
-			u.email = $1`,
+		fmt.Sprintf(`
+				SELECT
+					p.first_name,
+					p.last_name,
+					u.email,
+					%s AS address,
+					p.phone_number,
+					COALESCE((
+						SELECT SUM(amount)
+						FROM final_project.ledgers
+						WHERE user_id = u.id
+					), 0) AS balance
+				FROM
+					final_project.users u
+				JOIN
+					final_project.%s p ON u.id = p.user_id
+				WHERE
+					u.email = $1`,
+			addressCol,
+			tableName,
+		),
 		email,
 	).Scan(
 		&u.FirstName,
