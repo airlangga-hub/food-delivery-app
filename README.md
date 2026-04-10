@@ -11,13 +11,14 @@ Group two application for Hacktiv8 phase three final project.
 
 ## Technologies Used
 
-| Technology                                      | Description                                                           |
-| ----------------------------------------------- | --------------------------------------------------------------------- |
-| [Go (programming language)](https://go.dev/)    | Main programming language, known for efficiency and concurrency.      |
-| [Echo](https://echo.labstack.com/)              | Minimalist web framework for building high-performance REST APIs.     |
-| [gRPC](https://grpc.io/)                        | A high performance, open source universal RPC framework.              |
-| [Supabase](https://supabase.com/)               | Cloud-based PostgreSQL platform for reliable data storage.            |
-| [Xendit](https://www.xendit.co)                 | Payment gateway integration for automated transaction handling.       |
+| Technology                                     | Description                                                                                          |
+| ---------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| [Go (programming language)](https://go.dev/)   | Main programming language, known for efficiency and concurrency.                                     |
+| [Echo](https://echo.labstack.com/)             | Minimalist web framework for building high-performance REST APIs.                                    |
+| [gRPC](https://grpc.io/)                       | High performance, open source universal RPC framework.                                               |
+| [Supabase](https://supabase.com/)              | Cloud-based PostgreSQL platform for reliable data storage.                                           |
+| [Xendit](https://www.xendit.co)                | Payment gateway integration for automated transaction handling.                                      |
+| [Mailjet](https://www.mailjet.com/)            | Cloud-based solution for designing, sending, and tracking both marketing and transactional emails.   |
 
 ## Project Structure
 
