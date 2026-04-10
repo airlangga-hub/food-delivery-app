@@ -55,6 +55,15 @@ func (s *customerService) CreateOrder(ctx context.Context, userID uuid.UUID, use
 		}
 	}
 
+	items = append(items, model.PaymentGatewayItem{
+		ReferenceID:   uuid.NewString(),
+		Name:          "Delivery Fee",
+		Type:          "PHYSICAL_SERVICE",
+		Category:      "Order",
+		NetUnitAmount: order.DeliveryFee,
+		Quantity:      1,
+	})
+
 	paymentGatewayResponse, err := s.customerPaymentGatewayRepo.CreatePaymentSession(ctx, model.PaymentTypeOrder, userID, userEmail, oorder.TotalFee, items)
 	if err != nil {
 		return model.Order{}, fmt.Errorf("order.customer_service.CreateOrder (CreatePaymentSession): %w", err)
