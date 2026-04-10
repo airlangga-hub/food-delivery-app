@@ -22,19 +22,19 @@ local:
 	docker compose -f docker-compose.yaml -f docker-compose.local.yaml up -d
 
 build-gateway:
-	docker build -t airlangga491/final-project-gateway:latest ./gateway/
+	docker build --platform linux/amd64 -t airlangga491/final-project-gateway:latest ./gateway/
 
 push-gateway:
 	docker push airlangga491/final-project-gateway:latest
 
 build-order:
-	docker build -t airlangga491/final-project-order:latest ./order/
+	docker build --platform linux/amd64 -t airlangga491/final-project-order:latest ./order/
 
 push-order:
 	docker push airlangga491/final-project-order:latest
 
 build-user:
-	docker build -t airlangga491/final-project-user:latest ./user/
+	docker build --platform linux/amd64 -t airlangga491/final-project-user:latest ./user/
 
 push-user:
 	docker push airlangga491/final-project-user:latest
