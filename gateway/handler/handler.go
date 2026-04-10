@@ -3,7 +3,7 @@ package handler
 import (
 	"context"
 	"errors"
-	"fmt"
+	"log"
 	"net/http"
 	"strings"
 	"time"
@@ -102,7 +102,7 @@ func (h *Handler) TopUpBalance(c *echo.Context) error {
 	if !ok {
 		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized user")
 	}
-	fmt.Println("token:", token)
+	log.Println("token:", token)
 	claims, ok := token.Claims.(*helper.MyClaims)
 	if !ok {
 		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized user")
@@ -500,6 +500,6 @@ func (h *Handler) XenditWebhook(c *echo.Context) error {
 	if err := h.UserSvc.PaymentGatewayWebhook(ctx, split[1], paymentType, int(payload.Data.Amount)); err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "webhook error").Wrap(err)
 	}
-	
+
 	return c.JSON(http.StatusOK, Response{Message: http.StatusText(http.StatusOK)})
 }

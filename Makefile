@@ -15,10 +15,10 @@ gen-order:
 logs:
 	docker compose logs -f
 
-compose-local-build:
+local-build:
 	docker compose -f docker-compose.yaml -f docker-compose.local.yaml up --build -d
 
-compose-local:
+local:
 	docker compose -f docker-compose.yaml -f docker-compose.local.yaml up -d
 
 build-gateway:
