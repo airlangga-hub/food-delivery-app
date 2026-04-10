@@ -19,12 +19,12 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	UserService_RegisterCustomer_FullMethodName          = "/pb.UserService/RegisterCustomer"
-	UserService_Login_FullMethodName                     = "/pb.UserService/Login"
-	UserService_GetUserInfo_FullMethodName               = "/pb.UserService/GetUserInfo"
-	UserService_TopUpBalance_FullMethodName              = "/pb.UserService/TopUpBalance"
-	UserService_PaymentGatewayWebhook_FullMethodName     = "/pb.UserService/PaymentGatewayWebhook"
-	UserService_CreateCreatePaymentRecord_FullMethodName = "/pb.UserService/CreateCreatePaymentRecord"
+	UserService_RegisterCustomer_FullMethodName          = "/user_pb.UserService/RegisterCustomer"
+	UserService_Login_FullMethodName                     = "/user_pb.UserService/Login"
+	UserService_GetUserInfo_FullMethodName               = "/user_pb.UserService/GetUserInfo"
+	UserService_TopUpBalance_FullMethodName              = "/user_pb.UserService/TopUpBalance"
+	UserService_PaymentGatewayWebhook_FullMethodName     = "/user_pb.UserService/PaymentGatewayWebhook"
+	UserService_CreateCreatePaymentRecord_FullMethodName = "/user_pb.UserService/CreateCreatePaymentRecord"
 )
 
 // UserServiceClient is the client API for UserService service.
@@ -278,7 +278,7 @@ func _UserService_CreateCreatePaymentRecord_Handler(srv interface{}, ctx context
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var UserService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "pb.UserService",
+	ServiceName: "user_pb.UserService",
 	HandlerType: (*UserServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{

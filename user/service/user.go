@@ -146,11 +146,6 @@ func (s *userService) ProcessUnsentEmail(ctx context.Context) error {
 		return fmt.Errorf("service.ProcessEmailQueue: %w", err)
 	}
 
-	if len(records) == 0 {
-		s.logger.Info("Not Found", slog.String("Not Found", "no records with unsent email found"))
-		return nil
-	}
-
 	for _, rec := range records {
 
 		recordID := rec.ID.Hex()

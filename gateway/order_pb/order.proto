@@ -1,5 +1,5 @@
 syntax = "proto3";
-package pb;
+package order_pb;
 
 import "google/protobuf/empty.proto";
 
