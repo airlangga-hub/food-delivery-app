@@ -112,7 +112,7 @@ func (h *Handler) TopUpBalance(ctx context.Context, req *pb.TopUpBalanceRequest)
 	}, nil
 }
 
-func (h *Handler) CreatePaymentRecord(ctx context.Context, req *pb.CreateCreatePaymentRecordRequest) (*pb.CreateCreatePaymentRecordResponse, error) {
+func (h *Handler) CreatePaymentRecord(ctx context.Context, req *pb.CreatePaymentRecordRequest) (*pb.CreatePaymentRecordResponse, error) {
 	items := make([]model.PaymentGatewayItem, len(req.PaymentGatewayResponse.Items))
 
 	for i, itm := range req.PaymentGatewayResponse.Items {
