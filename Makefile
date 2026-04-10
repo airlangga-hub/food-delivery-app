@@ -16,10 +16,10 @@ logs:
 	docker compose logs -f
 
 local-build:
-	docker compose -f docker-compose.yaml -f docker-compose.local.yaml up --build -d
+	docker compose -f docker-compose.yaml -f docker-compose.local.yaml up --build
 
 local:
-	docker compose -f docker-compose.yaml -f docker-compose.local.yaml up -d
+	docker compose -f docker-compose.yaml -f docker-compose.local.yaml up
 
 build-gateway:
 	docker build -t airlangga491/final-project-gateway:latest ./gateway/
