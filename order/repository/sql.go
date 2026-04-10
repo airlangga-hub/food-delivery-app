@@ -146,8 +146,8 @@ func (r *sqlRepository) GetOrderByOrderID(ctx context.Context, tx *sql.Tx, order
 		    o.order_status, o.delivery_fee, o.total_fee,
 		    dp.user_id, dp.first_name, dp.last_name, dp.bike, dp.license_plate, dp.phone_number,
 		    (SELECT COALESCE(AVG(rating), 0)
-		     FROM ratings
-		     JOIN orders ON ratings.order_id = orders.id
+		     FROM final_project.ratings
+		     JOIN final_project.orders ON final_project.ratings.order_id = orders.id
 		     WHERE orders.driver_id = o.driver_id) as avg_rating
 		FROM final_project.orders o
 		JOIN final_project.customer_profiles cp ON o.customer_id = cp.user_id
@@ -282,7 +282,7 @@ func (r *sqlRepository) GetOrdersByUserID(ctx context.Context, userID uuid.UUID,
 			dp.bike,
 			dp.license_plate,
 			dp.phone_number,
-			(SELECT COALESCE(AVG(rating), 0) FROM ratings JOIN orders ON ratings.order_id = orders.id WHERE orders.driver_id = o.driver_id) as avg_rating
+			(SELECT COALESCE(AVG(rating), 0) FROM final_project.ratings JOIN final_project.orders ON final_project.ratings.order_id = orders.id WHERE orders.driver_id = o.driver_id) as avg_rating
 		FROM
 			final_project.orders o
 		JOIN
@@ -417,9 +417,9 @@ func (r *sqlRepository) GetDrivers(ctx context.Context, orderID uuid.UUID) ([]mo
 			      SELECT
 					ROUND(AVG(r.rating)::numeric, 1)
 			      FROM
-					orders o
+					final_project.orders o
 			      JOIN
-					ratings r
+					final_project.ratings r
 					ON r.order_id = o.id
 			      WHERE
 					o.driver_id = dp.user_id
