@@ -51,7 +51,24 @@ func (s *userService) RegisterCustomer(ctx context.Context, user model.UserRegis
 	}, nil
 }
 
-func (s *userService) Login(ctx context.Context, email, password string) (string, error)
+func (s *userService) Login(ctx context.Context, email, password string) (string, error) {
+	resp, err := s.userClient.Login(ctx, &userpb.LoginRequest{Email: email, Password: password})
+	
+	if err != nil {
+		st, ok := status.FromError(err)
+		if !ok {
+			slog.Info("gateway.service.RegisterCustomer (FromError): not gRPC error: %w", slog.Any("error", err))
+		}
+
+		if st.Code() == codes.NotFound {
+			return "", fmt.Errorf("gateway.service.RegisterCustomer (no rows found): %w: %w", model.ErrNotFound, err)
+		}
+
+		return "", fmt.Errorf("gateway.service.RegisterCustomer: %w", err)
+	}
+	
+	return resp.Token, nil
+}
 
 func (s *userService) TopUpBalance(ctx context.Context, userID string, amount int) (model.PaymentLink, error)
 
