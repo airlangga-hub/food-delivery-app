@@ -102,7 +102,7 @@ func (h *Handler) TopUpBalance(c *echo.Context) error {
 	if !ok {
 		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized user")
 	}
-	log.Println("token:", token)
+
 	claims, ok := token.Claims.(*helper.MyClaims)
 	if !ok {
 		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized user")
