@@ -12,7 +12,7 @@ gen-order:
 			--go-grpc_out=. --go-grpc_opt=paths=source_relative \
 			order.proto
 
-compose-logs:
+logs:
 	docker compose logs -f
 
 compose-local-build:
