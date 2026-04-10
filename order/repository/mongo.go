@@ -55,7 +55,7 @@ func (r *mongoRepository) CreatePaymentRecord(ctx context.Context, paymentRecord
 		PaymentLinkUrl:   paymentRecord.PaymentGatewayResponse.PaymentLinkURL,
 	}
 
-	_, err := r.userClient.CreateCreatePaymentRecord(ctx, &userpb.CreateCreatePaymentRecordRequest{
+	_, err := r.userClient.CreatePaymentRecord(ctx, &userpb.CreatePaymentRecordRequest{
 		Id:                     paymentRecord.ID,
 		Email:                  paymentRecord.Email,
 		EmailStatus:            string(paymentRecord.EmailStatus),
