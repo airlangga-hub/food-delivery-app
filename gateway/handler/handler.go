@@ -145,10 +145,6 @@ func (h *Handler) GetUserInfo(c *echo.Context) error {
 		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized user")
 	}
 
-	if claims.Role != model.RoleUserCustomer {
-		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized user")
-	}
-
 	ctx, cancel := context.WithTimeout(c.Request().Context(), time.Second*20)
 	defer cancel()
 
