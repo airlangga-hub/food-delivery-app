@@ -3,6 +3,7 @@ package handler
 import (
 	"context"
 	"errors"
+	"fmt"
 	"net/http"
 	"strings"
 	"time"
@@ -101,7 +102,7 @@ func (h *Handler) TopUpBalance(c *echo.Context) error {
 	if !ok {
 		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized user")
 	}
-
+	fmt.Println("token:", token)
 	claims, ok := token.Claims.(*helper.MyClaims)
 	if !ok {
 		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized user")

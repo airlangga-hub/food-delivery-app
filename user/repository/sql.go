@@ -45,14 +45,14 @@ func (r *sqlRepository) RegisterCustomer(ctx context.Context, input model.UserRe
 		ctx,
 		`WITH new_user AS (
 			INSERT INTO
-				users (email, password_hash, role)
+				final_project.users (email, password_hash, role)
 			VALUES
 				($1, $2, $7)
 			RETURNING
 				id
 		)
 		INSERT INTO
-			customer_profiles (user_id, first_name, last_name, address, phone_number)
+			final_project.customer_profiles (user_id, first_name, last_name, address, phone_number)
 		SELECT
 			id, $3, $4, $5, $6
 		FROM
@@ -82,7 +82,7 @@ func (r *sqlRepository) RegisterCustomer(ctx context.Context, input model.UserRe
 func (r *sqlRepository) Login(ctx context.Context, email string) (model.UserLogin, error) {
 	var user model.UserLogin
 
-	err := r.db.QueryRowContext(ctx, `SELECT id, password_hash, email, role FROM users WHERE email = $1`, email).Scan(
+	err := r.db.QueryRowContext(ctx, `SELECT id, password_hash, email, role FROM final_project.users WHERE email = $1`, email).Scan(
 		&user.UserID,
 		&user.PasswordHash,
 		&user.Email,
@@ -116,9 +116,9 @@ func (r *sqlRepository) GetUserInfo(ctx context.Context, email string) (model.Us
 				WHERE user_id = u.id
 			), 0) AS balance
 		FROM
-			users u
+			final_project.users u
 		JOIN
-			customer_profiles cp ON u.id = cp.user_id
+			final_project.customer_profiles cp ON u.id = cp.user_id
 		WHERE
 			u.email = $1`,
 		email,
