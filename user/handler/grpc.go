@@ -7,7 +7,6 @@ import (
 	"github.com/airlangga-hub/food-delivery-app/user/model"
 	pb "github.com/airlangga-hub/food-delivery-app/user/pb"
 	"github.com/google/uuid"
-	"go.mongodb.org/mongo-driver/v2/bson"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -151,13 +150,7 @@ func (h *Handler) CreatePaymentRecord(ctx context.Context, req *pb.CreatePayment
 		PaymentLinkURL:   req.PaymentGatewayResponse.PaymentLinkUrl,
 	}
 
-	objID, err := bson.ObjectIDFromHex(req.Id)
-	if err != nil {
-		return nil, status.Errorf(codes.Internal, "user.handler.CreatePaymentRecord (ObjectIDFromHex): %v", err)
-	}
-
 	if err := h.Svc.CreatePaymentRecord(ctx, model.PaymentRecord{
-		ID:                     objID,
 		Email:                  req.Email,
 		EmailStatus:            model.EmailStatus(req.EmailStatus),
 		PaymentType:            model.PaymentType(req.PaymentType),
