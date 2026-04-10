@@ -5,7 +5,7 @@ type UserRegister struct {
 	LastName    string `json:"last_name"`
 	Email       string `json:"email"`
 	Password    string `json:"password"`
-	Address     string `json:"address,omitempty"`
+	Address     string `json:"address"`
 	PhoneNumber string `json:"phone_number"`
 }
 
@@ -14,7 +14,7 @@ type UserInfo struct {
 	LastName  string `json:"last_name"`
 	Email     string `json:"email"`
 	PhoneNumber string `json:"phone_number"`
-	Address   string `json:"address"`
+	Address   string `json:"address,omitempty"`
 	Balance   int    `json:"balance"`
 }
 
