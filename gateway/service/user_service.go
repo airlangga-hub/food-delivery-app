@@ -57,20 +57,37 @@ func (s *userService) Login(ctx context.Context, email, password string) (string
 	if err != nil {
 		st, ok := status.FromError(err)
 		if !ok {
-			slog.Info("gateway.service.RegisterCustomer (FromError): not gRPC error: %w", slog.Any("error", err))
+			slog.Info("gateway.service.Login (FromError): not gRPC error: %w", slog.Any("error", err))
 		}
 
 		if st.Code() == codes.NotFound {
-			return "", fmt.Errorf("gateway.service.RegisterCustomer (no rows found): %w: %w", model.ErrNotFound, err)
+			return "", fmt.Errorf("gateway.service.Login (no rows found): %w: %w", model.ErrNotFound, err)
 		}
 
-		return "", fmt.Errorf("gateway.service.RegisterCustomer: %w", err)
+		return "", fmt.Errorf("gateway.service.Login: %w", err)
 	}
 	
 	return resp.Token, nil
 }
 
-func (s *userService) TopUpBalance(ctx context.Context, userID string, amount int) (model.PaymentLink, error)
+func (s *userService) TopUpBalance(ctx context.Context, userID, userEmail string, amount int) (model.PaymentLink, error) {
+	resp, err := s.userClient.TopUpBalance(ctx, &userpb.TopUpBalanceRequest{UserId: userID, UserEmail: userEmail, Amount: int64(amount)})
+	
+	if err != nil {
+		st, ok := status.FromError(err)
+		if !ok {
+			slog.Info("gateway.service.TopUpBalance (FromError): not gRPC error: %w", slog.Any("error", err))
+		}
+
+		if st.Code() == codes.NotFound {
+			return model.PaymentLink{}, fmt.Errorf("gateway.service.TopUpBalance (no rows found): %w: %w", model.ErrNotFound, err)
+		}
+
+		return model.PaymentLink{}, fmt.Errorf("gateway.service.TopUpBalance: %w", err)
+	}
+	
+	return model.PaymentLink{PaymentLink: resp.PaymentLink}, nil
+}
 
 func (s *userService) GetUserInfo(ctx context.Context, userID string) (model.UserInfo, error)
 

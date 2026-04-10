@@ -17,7 +17,7 @@ import (
 type UserService interface {
 	RegisterCustomer(ctx context.Context, user model.UserRegister) (model.UserInfo, error)
 	Login(ctx context.Context, email, password string) (string, error)
-	TopUpBalance(ctx context.Context, userID string, amount int) (model.PaymentLink, error)
+	TopUpBalance(ctx context.Context, userID, userEmail string, amount int) (model.PaymentLink, error)
 	GetUserInfo(ctx context.Context, userID string) (model.UserInfo, error)
 	PaymentGatewayWebhook(ctx context.Context, userID string, paymentType model.PaymentType, amount int) error
 }
@@ -123,7 +123,7 @@ func (h *Handler) TopUpBalance(c *echo.Context) error {
 	ctx, cancel := context.WithTimeout(c.Request().Context(), time.Second*20)
 	defer cancel()
 
-	paymentLink, err := h.UserSvc.TopUpBalance(ctx, claims.UserID, payload.Amount)
+	paymentLink, err := h.UserSvc.TopUpBalance(ctx, claims.UserID, claims.Subject, payload.Amount)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "top up failed").Wrap(err)
 	}
