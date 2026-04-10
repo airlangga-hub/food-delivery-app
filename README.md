@@ -87,7 +87,11 @@ food-delivery-app/
 │   ├── Dockerfile
 │   ├── go.mod
 │   ├── go.sum
-│   └── main.go           
+│   └── main.go
+├── pb/
+│   ├── user_grpc.pb.go
+│   ├── user.pb.go
+│   └── user.proto            
 ├── user/                 
 │   ├── auth/
 │   │   └── auth.go            
@@ -118,7 +122,7 @@ food-delivery-app/
 │   │   └── sql.go
 │   ├── service/
 │   │   └── user.go
-│   ├── user_pb/
+│   ├── util/
 │   │   └── database/
 │   │       └── database.go
 │   ├── Dockerfile
