@@ -111,6 +111,9 @@ func main() {
 			return new(helper.MyClaims)
 		},
 	}
+	
+	// xendit webhook
+	e.POST("/xendit/webhook", h.XenditWebhook)
 
 	// user
 	users := e.Group("/users")

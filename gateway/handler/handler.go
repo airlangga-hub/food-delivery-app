@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/airlangga-hub/food-delivery-app/gateway/helper"
@@ -18,6 +19,7 @@ type UserService interface {
 	Login(ctx context.Context, email, password string) (string, error)
 	TopUpBalance(ctx context.Context, userID string, amount int) (model.PaymentLink, error)
 	GetUserInfo(ctx context.Context, userID string) (model.UserInfo, error)
+	PaymentGatewayWebhook(ctx context.Context, userID string, paymentType model.PaymentType, amount int) error
 }
 
 type OrderService interface {
@@ -470,4 +472,33 @@ func (h *Handler) DriverCompleteOrder(c *echo.Context) error {
 	return c.JSON(http.StatusCreated, Response{
 		Message: http.StatusText(http.StatusCreated),
 	})
+}
+
+func (h *Handler) XenditWebhook(c *echo.Context) error {
+	var payload XenditWebhookRequest
+	if err := c.Bind(&payload); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, "invalid request body").Wrap(err)
+	}
+
+	if err := h.Validate.Struct(payload); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, "invalid request body").Wrap(err)
+	}
+
+	split := strings.Split(payload.Data.ReferenceID, "_")
+
+	var paymentType model.PaymentType
+	if strings.HasPrefix(payload.Data.ReferenceID, string(model.PaymentGatewayRefIDPrefixTopUp)) {
+		paymentType = model.PaymentTypeTopUp
+	} else if strings.HasPrefix(payload.Data.ReferenceID, string(model.PaymentGatewayRefIDPrefixOrder)) {
+		paymentType = model.PaymentTypeOrder
+	}
+
+	ctx, cancel := context.WithTimeout(c.Request().Context(), time.Second*20)
+	defer cancel()
+
+	if err := h.UserSvc.PaymentGatewayWebhook(ctx, split[1], paymentType, int(payload.Data.Amount)); err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "webhook error").Wrap(err)
+	}
+	
+	return c.JSON(http.StatusOK, Response{Message: http.StatusText(http.StatusOK)})
 }
