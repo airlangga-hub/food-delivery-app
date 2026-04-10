@@ -4,7 +4,7 @@ gen-user:
 			--go_out=. --go_opt=paths=source_relative \
 			--go-grpc_out=. --go-grpc_opt=paths=source_relative \
 			user.proto
-			
+
 gen-order:
 	cd order/pb && \
 		protoc \
@@ -12,15 +12,21 @@ gen-order:
 			--go-grpc_out=. --go-grpc_opt=paths=source_relative \
 			order.proto
 
+compose-local-build:
+	docker compose -f docker-compose.yaml -f docker-compose.local.yaml up --build -d
+
+compose-local:
+	docker compose -f docker-compose.yaml -f docker-compose.local.yaml up -d
+
 build-gateway:
 	docker build -t airlangga491/final-project-gateway:latest ./gateway/
-	
+
 push-gateway:
 	docker push airlangga491/final-project-gateway:latest
-			
+
 build-order:
 	docker build -t airlangga491/final-project-order:latest ./order/
-	
+
 push-order:
 	docker push airlangga491/final-project-order:latest
 
