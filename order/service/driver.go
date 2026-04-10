@@ -18,11 +18,11 @@ type driverService struct {
 	driverSqlRepo DriverSQLRepository
 }
 
-func NewDriverSQLRepository(driverSqlRepo DriverSQLRepository) *driverService {
+func NewDriverService(driverSqlRepo DriverSQLRepository) *driverService {
 	return &driverService{driverSqlRepo: driverSqlRepo}
 }
 
-func (s *driverService) DriverGetPendingOrders(ctx context.Context) ([]model.Order, error) {
+func(s *driverService) DriverGetPendingOrders(ctx context.Context) ([]model.Order, error) {
 	orders, err := s.driverSqlRepo.DriverGetPendingOrders(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("order.service.DriverGetPendingOrders: %w", err)
@@ -30,14 +30,14 @@ func (s *driverService) DriverGetPendingOrders(ctx context.Context) ([]model.Ord
 	return orders, nil
 }
 
-func (s *driverService) DriverApplyForOrder(ctx context.Context, orderID uuid.UUID, driverID uuid.UUID) error {
+func(s *driverService) DriverApplyForOrder(ctx context.Context, orderID uuid.UUID, driverID uuid.UUID) error {
 	if err := s.driverSqlRepo.DriverApplyForOrder(ctx, orderID, driverID); err != nil {
 		return fmt.Errorf("order.service.DriverApplyForOrder: %w", err)
 	}
 	return nil
 }
 
-func (s *driverService) DriverCompleteOrder(ctx context.Context, orderID uuid.UUID, driverID uuid.UUID) error {
+func(s *driverService) DriverCompleteOrder(ctx context.Context, orderID uuid.UUID, driverID uuid.UUID) error {
 	if err := s.driverSqlRepo.DriverCompleteOrder(ctx, orderID, driverID); err != nil {
 		return fmt.Errorf("order.service.DriverCompleteOrder: %w", err)
 	}

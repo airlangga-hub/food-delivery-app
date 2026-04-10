@@ -3,7 +3,9 @@ package service
 import (
 	"context"
 	"fmt"
+	"log/slog"
 
+	"github.com/airlangga-hub/food-delivery-app/user/helper"
 	"github.com/airlangga-hub/food-delivery-app/user/model"
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
@@ -15,12 +17,17 @@ type UserPaymentGatewayRepository interface {
 
 type UserMongoRepository interface {
 	CreatePaymentRecord(ctx context.Context, paymentRecord model.PaymentRecord) error
+	GetPendingEmailRecords(ctx context.Context) ([]model.PaymentRecord, error)
+	SendEmail(ctx context.Context, rec model.PaymentRecord) error
+	MarkEmailAsSending(ctx context.Context, id string) error
+	IfErrorMarkEmailAsPending(ctx context.Context, id string) error
+	MarkEmailAsSent(ctx context.Context, id string) error
 }
 
 type UserSQLRepository interface {
 	UpdateLedger(ctx context.Context, userID uuid.UUID, reason model.LedgerReason, amount int) error
 	RegisterCustomer(ctx context.Context, user model.UserRegister) (model.UserInfo, error)
-	Login(ctx context.Context, email string) (string, error)
+	Login(ctx context.Context, email string) (model.UserLogin, error)
 	GetUserInfo(ctx context.Context, email string) (model.UserInfo, error)
 }
 
@@ -28,13 +35,17 @@ type userService struct {
 	userPaymentGatewayRepository UserPaymentGatewayRepository
 	userMongoRepository          UserMongoRepository
 	userSqlRepository            UserSQLRepository
+	logger                       *slog.Logger
+	jwtKey                       string
 }
 
-func NewUserService(userpaymentGatewayRepo UserPaymentGatewayRepository, userMongoRepo UserMongoRepository, userSqlRepo UserSQLRepository) *userService {
+func NewUserService(userpaymentGatewayRepo UserPaymentGatewayRepository, userMongoRepo UserMongoRepository, userSqlRepo UserSQLRepository, logger *slog.Logger, jwtKey string) *userService {
 	return &userService{
 		userPaymentGatewayRepository: userpaymentGatewayRepo,
 		userMongoRepository:          userMongoRepo,
 		userSqlRepository:            userSqlRepo,
+		logger:                       logger,
+		jwtKey:                       jwtKey,
 	}
 }
 
@@ -54,18 +65,23 @@ func (s *userService) RegisterCustomer(ctx context.Context, input model.UserRegi
 	return userInfo, nil
 }
 
-func (s *userService) Login(ctx context.Context, email string, password string) error {
-	hashedPassword, err := s.userSqlRepository.Login(ctx, email)
+func (s *userService) Login(ctx context.Context, email string, password string) (string, error) {
+	userLogin, err := s.userSqlRepository.Login(ctx, email)
 	if err != nil {
-		return fmt.Errorf("user.service.Login (Login): %w", err)
+		return "", fmt.Errorf("user.service.Login (Login): %w", err)
 	}
 
-	err = bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
+	err = bcrypt.CompareHashAndPassword([]byte(userLogin.PasswordHash), []byte(password))
 	if err != nil {
-		return fmt.Errorf("user.service.Login (CompareHashAndPassword): %w", err)
+		return "", fmt.Errorf("user.service.Login (CompareHashAndPassword): %w", err)
 	}
 
-	return nil
+	token, err := helper.MakeJWT(userLogin.UserID.String(), userLogin.Email, model.RoleUser(userLogin.Role), []byte(s.jwtKey))
+	if err != nil {
+		return "", fmt.Errorf("user.service.Login (MakeJWT): %w", err)
+	}
+
+	return token, nil
 }
 
 func (s *userService) GetUserInfo(ctx context.Context, email string) (model.UserInfo, error) {
@@ -121,5 +137,50 @@ func (s *userService) PaymentGatewayWebhook(ctx context.Context, userID uuid.UUI
 		return fmt.Errorf("order.service.PaymentGatewayWebhook (UpdateLedger): %w", err)
 	}
 
+	return nil
+}
+
+func (s *userService) ProcessUnsentEmail(ctx context.Context) error {
+	records, err := s.userMongoRepository.GetPendingEmailRecords(ctx)
+	if err != nil {
+		return fmt.Errorf("service.ProcessEmailQueue: %w", err)
+	}
+
+	if len(records) == 0 {
+		s.logger.Info("Not Found", slog.String("Not Found", "no records with unsent email found"))
+		return nil
+	}
+
+	for _, rec := range records {
+
+		recordID := rec.ID.Hex()
+
+		if err := s.userMongoRepository.MarkEmailAsSending(ctx, recordID); err != nil {
+			s.logger.Error(fmt.Sprintf("Failed to update status to sending for record %s", recordID), slog.Any("error", err))
+			continue
+		}
+
+		if err := s.userMongoRepository.SendEmail(ctx, rec); err != nil {
+			s.logger.Error(fmt.Sprintf("Failed to send email to %s", rec.Email), slog.Any("error", err))
+
+			if err := s.userMongoRepository.IfErrorMarkEmailAsPending(ctx, recordID); err != nil {
+				s.logger.Error(fmt.Sprintf("Failed to update status to pending for record %s", recordID), slog.Any("error", err))
+				continue
+			}
+
+			continue
+		}
+
+		if err := s.userMongoRepository.MarkEmailAsSent(ctx, recordID); err != nil {
+			s.logger.Error(fmt.Sprintf("Failed to update status to sent for record %s", recordID), slog.Any("error", err))
+		}
+	}
+	return nil
+}
+
+func (s *userService) CreatePaymentRecord(ctx context.Context, paymentRecord model.PaymentRecord) error {
+	if err := s.userMongoRepository.CreatePaymentRecord(ctx, paymentRecord); err != nil {
+		return fmt.Errorf("user.service.CreatePaymentRecord: %w", err)
+	}
 	return nil
 }

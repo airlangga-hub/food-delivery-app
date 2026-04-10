@@ -9,9 +9,13 @@ import (
 	"syscall"
 	"time"
 
+	orderpb "github.com/airlangga-hub/food-delivery-app/gateway/order_pb"
+	userpb "github.com/airlangga-hub/food-delivery-app/gateway/user_pb"
+	
 	"github.com/airlangga-hub/food-delivery-app/gateway/auth"
 	"github.com/airlangga-hub/food-delivery-app/gateway/handler"
 	"github.com/airlangga-hub/food-delivery-app/gateway/helper"
+	"github.com/airlangga-hub/food-delivery-app/gateway/service"
 	"github.com/go-playground/validator/v10"
 	"github.com/golang-jwt/jwt/v5"
 	_ "github.com/joho/godotenv/autoload"
@@ -63,7 +67,7 @@ func main() {
 	userClient := userpb.NewUserServiceClient(userCC)
 	orderClient := orderpb.NewOrderServiceClient(orderCC)
 	userSvc := service.NewUserService(userClient)
-	orderSvc := service.NewOrderService(orderClient)
+	orderSvc := service.NewOrderService(orderClient, logger)
 	validate := validator.New(validator.WithRequiredStructEnabled())
 	h := handler.New(userSvc, orderSvc, validate)
 
@@ -107,6 +111,9 @@ func main() {
 			return new(helper.MyClaims)
 		},
 	}
+	
+	// xendit webhook
+	e.POST("/xendit/webhook", h.XenditWebhook)
 
 	// user
 	users := e.Group("/users")
@@ -126,7 +133,7 @@ func main() {
 	customers.POST("/create", h.CreateOrder)
 	customers.GET("/:order_id/drivers", h.GetDrivers)
 	customers.POST("/:order_id/drivers", h.ChooseDriver)
-	customers.GET("", h.GetOrders)
+	customers.GET("", h.CustomerGetOrders)
 	customers.POST("/:order_id/rating", h.GiveRating)
 
 	// driver

@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 
 	"github.com/airlangga-hub/food-delivery-app/user/model"
@@ -62,7 +63,7 @@ func (r *sqlRepository) RegisterCustomer(ctx context.Context, input model.UserRe
 		input.LastName,
 		input.Address,
 		input.PhoneNumber,
-		model.UserRoleCustomer,
+		model.RoleUserCustomer,
 	)
 
 	if err != nil {
@@ -78,15 +79,24 @@ func (r *sqlRepository) RegisterCustomer(ctx context.Context, input model.UserRe
 	}, nil
 }
 
-func (r *sqlRepository) Login(ctx context.Context, email string) (string, error) {
-	var passwordHash string
+func (r *sqlRepository) Login(ctx context.Context, email string) (model.UserLogin, error) {
+	var user model.UserLogin
 
-	err := r.db.QueryRowContext(ctx, `SELECT password_hash FROM users WHERE email = $1`, email).Scan(&passwordHash)
+	err := r.db.QueryRowContext(ctx, `SELECT id, password_hash, email, role FROM users WHERE email = $1`, email).Scan(
+		&user.UserID,
+		&user.PasswordHash,
+		&user.Email,
+		&user.Role,
+	)
+
 	if err != nil {
-		return "", fmt.Errorf("user.repository.Login (QueryRowContext): %w", err)
+		if errors.Is(err, sql.ErrNoRows) {
+			return model.UserLogin{}, fmt.Errorf("user.repository.Login (no rows found): %w", model.ErrNotFound)
+		}
+		return model.UserLogin{}, fmt.Errorf("user.repository.Login (Scan): %w", err)
 	}
 
-	return passwordHash, nil
+	return user, nil
 }
 
 func (r *sqlRepository) GetUserInfo(ctx context.Context, email string) (model.UserInfo, error) {

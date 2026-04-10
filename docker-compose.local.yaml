@@ -1,0 +1,21 @@
+services:
+      user:
+            build:
+                  context: ./user/
+                  dockerfile: Dockerfile
+            image: airlangga491/final-project-user:local
+            restart: "no"
+
+      order:
+            build:
+                  context: ./order/
+                  dockerfile: Dockerfile
+            image: airlangga491/final-project-order:local
+            restart: "no"
+
+      gateway:
+            build:
+                  context: ./gateway/
+                  dockerfile: Dockerfile
+            image: airlangga491/final-project-gateway:local
+            restart: "no"

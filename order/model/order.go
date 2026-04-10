@@ -2,14 +2,6 @@ package model
 
 import "github.com/google/uuid"
 
-type OrderStatus string
-
-const (
-	OrderStatusSearchingForDriver OrderStatus = "pending"
-	OrderStatusDriverOTW          OrderStatus = "otw"
-	OrderStatusDone               OrderStatus = "done"
-)
-
 type OrderIn struct {
 	DeliveryFee int
 	ItemsIn     []ItemsIn

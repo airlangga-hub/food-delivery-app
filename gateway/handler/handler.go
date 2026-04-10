@@ -1,33 +1,36 @@
 package handler
 
 import (
+	"context"
 	"errors"
 	"net/http"
+	"strings"
+	"time"
 
 	"github.com/airlangga-hub/food-delivery-app/gateway/helper"
 	"github.com/airlangga-hub/food-delivery-app/gateway/model"
 	"github.com/go-playground/validator/v10"
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/google/uuid"
 	"github.com/labstack/echo/v5"
 )
 
 type UserService interface {
-	RegisterCustomer(user model.UserRegister) (model.UserInfo, error)
-	Login(email, password string) (string, error)
-	TopUpBalance(userID uuid.UUID, amount int) (model.PaymentLink, error)
-	GetUserInfo(userID uuid.UUID) (model.UserInfo, error)
+	RegisterCustomer(ctx context.Context, user model.UserRegister) (model.UserInfo, error)
+	Login(ctx context.Context, email, password string) (string, error)
+	TopUpBalance(ctx context.Context, userID, userEmail string, amount int) (model.PaymentLink, error)
+	GetUserInfo(ctx context.Context, email string) (model.UserInfo, error)
+	PaymentGatewayWebhook(ctx context.Context, userID string, paymentType model.PaymentType, amount int) error
 }
 
 type OrderService interface {
-	CreateOrder(userID uuid.UUID, items []model.Item) (model.Order, error)
-	GetDrivers(orderID uuid.UUID) (model.FindDriver, error)
-	ChooseDriver(orderID, driverID uuid.UUID) (model.Order, error)
-	GetOrders(userID uuid.UUID) ([]model.Order, error)
-	GiveRating(orderID uuid.UUID) error
-	DriverGetPendingOrders() ([]model.Order, error)
-	DriverApplyToTakeOrder(driverID, orderID uuid.UUID) error
-	MarkOrderAsDone(orderID, driverID uuid.UUID) error
+	CreateOrder(ctx context.Context, userID string, userEmail string, deliveryFee int, items []model.Item) (model.Order, error)
+	GetDrivers(ctx context.Context, orderID string) (model.FindDriver, error)
+	ChooseDriver(ctx context.Context, orderID, driverID string) (model.Order, error)
+	CustomerGetOrders(ctx context.Context, userID string) ([]model.Order, error)
+	GiveRating(ctx context.Context, orderID string, rating int) error
+	DriverGetPendingOrders(ctx context.Context) ([]model.Order, error)
+	DriverApplyToTakeOrder(ctx context.Context, driverID, orderID string) error
+	DriverCompleteOrder(ctx context.Context, orderID, driverID string) error
 }
 
 type Handler struct {
@@ -58,7 +61,10 @@ func (h *Handler) RegisterCustomer(c *echo.Context) error {
 		Address:   payload.Address,
 	}
 
-	userInfo, err := h.UserSvc.RegisterCustomer(user)
+	ctx, cancel := context.WithTimeout(c.Request().Context(), time.Second*20)
+	defer cancel()
+
+	userInfo, err := h.UserSvc.RegisterCustomer(ctx, user)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "register failed").Wrap(err)
 	}
@@ -79,7 +85,10 @@ func (h *Handler) Login(c *echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, "invalid request body").Wrap(err)
 	}
 
-	token, err := h.UserSvc.Login(payload.Email, payload.Password)
+	ctx, cancel := context.WithTimeout(c.Request().Context(), time.Second*20)
+	defer cancel()
+
+	token, err := h.UserSvc.Login(ctx, payload.Email, payload.Password)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusUnauthorized, "invalid email or password").Wrap(err)
 	}
@@ -98,7 +107,7 @@ func (h *Handler) TopUpBalance(c *echo.Context) error {
 		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized user")
 	}
 
-	if claims.Role != helper.RoleCustomer {
+	if claims.Role != model.RoleUserCustomer {
 		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized user")
 	}
 
@@ -111,7 +120,10 @@ func (h *Handler) TopUpBalance(c *echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, "invalid request body").Wrap(err)
 	}
 
-	paymentLink, err := h.UserSvc.TopUpBalance(claims.UserID, payload.Amount)
+	ctx, cancel := context.WithTimeout(c.Request().Context(), time.Second*20)
+	defer cancel()
+
+	paymentLink, err := h.UserSvc.TopUpBalance(ctx, claims.UserID, claims.Subject, payload.Amount)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "top up failed").Wrap(err)
 	}
@@ -133,11 +145,14 @@ func (h *Handler) GetUserInfo(c *echo.Context) error {
 		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized user")
 	}
 
-	if claims.Role != helper.RoleCustomer {
+	if claims.Role != model.RoleUserCustomer {
 		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized user")
 	}
 
-	userInfo, err := h.UserSvc.GetUserInfo(claims.UserID)
+	ctx, cancel := context.WithTimeout(c.Request().Context(), time.Second*20)
+	defer cancel()
+
+	userInfo, err := h.UserSvc.GetUserInfo(ctx, claims.Subject)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "get user info failed").Wrap(err)
 	}
@@ -159,7 +174,7 @@ func (h *Handler) CreateOrder(c *echo.Context) error {
 		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized user")
 	}
 
-	if claims.Role != helper.RoleCustomer {
+	if claims.Role != model.RoleUserCustomer {
 		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized user")
 	}
 
@@ -175,19 +190,20 @@ func (h *Handler) CreateOrder(c *echo.Context) error {
 	items := make([]model.Item, len(payload.Items))
 
 	for i, item := range payload.Items {
-		itemID, err := uuid.Parse(item.ItemID)
-		if err != nil {
-			return echo.NewHTTPError(http.StatusBadRequest, "invalid item id format").Wrap(err)
-		}
-
 		items[i] = model.Item{
-			ID:       itemID,
+			ID:       item.ID,
 			Quantity: item.Quantity,
 		}
 	}
 
-	order, err := h.OrderSvc.CreateOrder(claims.UserID, items)
+	ctx, cancel := context.WithTimeout(c.Request().Context(), time.Second*20)
+	defer cancel()
+
+	order, err := h.OrderSvc.CreateOrder(ctx, claims.UserID, claims.Subject, payload.DeliveryFee, items)
 	if err != nil {
+		if errors.Is(err, model.ErrNotFound) {
+			return echo.NewHTTPError(http.StatusNotFound, "nothing found").Wrap(err)
+		}
 		return echo.NewHTTPError(http.StatusInternalServerError, "create order failed").Wrap(err)
 	}
 
@@ -208,16 +224,19 @@ func (h *Handler) GetDrivers(c *echo.Context) error {
 		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized user")
 	}
 
-	if claims.Role != helper.RoleCustomer {
+	if claims.Role != model.RoleUserCustomer {
 		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized user")
 	}
 
-	orderID, err := uuid.Parse(c.Param("order_id"))
-	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, "invalid order id format").Wrap(err)
+	orderID := c.Param("order_id")
+	if orderID == "" {
+		return echo.NewHTTPError(http.StatusBadRequest, "order id must not be empty")
 	}
 
-	findDrivers, err := h.OrderSvc.GetDrivers(orderID)
+	ctx, cancel := context.WithTimeout(c.Request().Context(), time.Second*20)
+	defer cancel()
+
+	findDrivers, err := h.OrderSvc.GetDrivers(ctx, orderID)
 	if err != nil {
 		if errors.Is(err, model.ErrNotFound) {
 			return echo.NewHTTPError(http.StatusNotFound, "no drivers found, we'll keep looking...").Wrap(err)
@@ -242,7 +261,7 @@ func (h *Handler) ChooseDriver(c *echo.Context) error {
 		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized user")
 	}
 
-	if claims.Role != helper.RoleCustomer {
+	if claims.Role != model.RoleUserCustomer {
 		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized user")
 	}
 
@@ -255,18 +274,19 @@ func (h *Handler) ChooseDriver(c *echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, "invalid request body").Wrap(err)
 	}
 
-	orderID, err := uuid.Parse(c.Param("order_id"))
-	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, "invalid order id format").Wrap(err)
+	orderID := c.Param("order_id")
+	if orderID == "" {
+		return echo.NewHTTPError(http.StatusBadRequest, "order id must not be empty")
 	}
 
-	driverID, err := uuid.Parse(payload.DriverID)
-	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, "invalid driver id format").Wrap(err)
-	}
+	ctx, cancel := context.WithTimeout(c.Request().Context(), time.Second*20)
+	defer cancel()
 
-	order, err := h.OrderSvc.ChooseDriver(orderID, driverID)
+	order, err := h.OrderSvc.ChooseDriver(ctx, orderID, payload.DriverID)
 	if err != nil {
+		if errors.Is(err, model.ErrNotFound) {
+			return echo.NewHTTPError(http.StatusNotFound, "nothing found").Wrap(err)
+		}
 		return echo.NewHTTPError(http.StatusInternalServerError, "choose driver failed").Wrap(err)
 	}
 
@@ -276,7 +296,7 @@ func (h *Handler) ChooseDriver(c *echo.Context) error {
 	})
 }
 
-func (h *Handler) GetOrders(c *echo.Context) error {
+func (h *Handler) CustomerGetOrders(c *echo.Context) error {
 	token, ok := c.Get("user").(*jwt.Token)
 	if !ok {
 		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized user")
@@ -287,14 +307,17 @@ func (h *Handler) GetOrders(c *echo.Context) error {
 		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized user")
 	}
 
-	if claims.Role != helper.RoleCustomer {
+	if claims.Role != model.RoleUserCustomer {
 		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized user")
 	}
 
-	orders, err := h.OrderSvc.GetOrders(claims.UserID)
+	ctx, cancel := context.WithTimeout(c.Request().Context(), time.Second*20)
+	defer cancel()
+
+	orders, err := h.OrderSvc.CustomerGetOrders(ctx, claims.UserID)
 	if err != nil {
 		if errors.Is(err, model.ErrNotFound) {
-			return echo.NewHTTPError(http.StatusNotFound, "you haven't made any orders yet").Wrap(err)
+			return echo.NewHTTPError(http.StatusNotFound, "no orders found").Wrap(err)
 		}
 		return echo.NewHTTPError(http.StatusInternalServerError, "get orders failed").Wrap(err)
 	}
@@ -316,7 +339,7 @@ func (h *Handler) GiveRating(c *echo.Context) error {
 		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized user")
 	}
 
-	if claims.Role != helper.RoleCustomer {
+	if claims.Role != model.RoleUserCustomer {
 		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized user")
 	}
 
@@ -329,12 +352,18 @@ func (h *Handler) GiveRating(c *echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, "invalid query params").Wrap(err)
 	}
 
-	orderID, err := uuid.Parse(c.Param("order_id"))
-	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, "invalid order id format").Wrap(err)
+	orderID := c.Param("order_id")
+	if orderID == "" {
+		return echo.NewHTTPError(http.StatusBadRequest, "order id must not be empty")
 	}
 
-	if err := h.OrderSvc.GiveRating(orderID); err != nil {
+	ctx, cancel := context.WithTimeout(c.Request().Context(), time.Second*20)
+	defer cancel()
+
+	if err := h.OrderSvc.GiveRating(ctx, orderID, payload.Rating); err != nil {
+		if errors.Is(err, model.ErrNotFound) {
+			return echo.NewHTTPError(http.StatusNotFound, "nothing found").Wrap(err)
+		}
 		return echo.NewHTTPError(http.StatusInternalServerError, "give rating failed").Wrap(err)
 	}
 
@@ -354,11 +383,14 @@ func (h *Handler) DriverGetPendingOrders(c *echo.Context) error {
 		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized user")
 	}
 
-	if claims.Role != helper.RoleDriver {
+	if claims.Role != model.RoleUserDriver {
 		return echo.NewHTTPError(http.StatusUnauthorized, "you're not a driver")
 	}
 
-	orders, err := h.OrderSvc.DriverGetPendingOrders()
+	ctx, cancel := context.WithTimeout(c.Request().Context(), time.Second*20)
+	defer cancel()
+
+	orders, err := h.OrderSvc.DriverGetPendingOrders(ctx)
 	if err != nil {
 		if errors.Is(err, model.ErrNotFound) {
 			return echo.NewHTTPError(http.StatusNotFound, "no pending orders found").Wrap(err)
@@ -383,16 +415,22 @@ func (h *Handler) DriverApplyToTakeOrder(c *echo.Context) error {
 		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized user")
 	}
 
-	if claims.Role != helper.RoleDriver {
+	if claims.Role != model.RoleUserDriver {
 		return echo.NewHTTPError(http.StatusUnauthorized, "you're not a driver")
 	}
 
-	orderID, err := uuid.Parse(c.Param("order_id"))
-	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, "invalid order id format").Wrap(err)
+	orderID := c.Param("order_id")
+	if orderID == "" {
+		return echo.NewHTTPError(http.StatusBadRequest, "order id must not be empty")
 	}
 
-	if err := h.OrderSvc.DriverApplyToTakeOrder(claims.UserID, orderID); err != nil {
+	ctx, cancel := context.WithTimeout(c.Request().Context(), time.Second*20)
+	defer cancel()
+
+	if err := h.OrderSvc.DriverApplyToTakeOrder(ctx, claims.UserID, orderID); err != nil {
+		if errors.Is(err, model.ErrNotFound) {
+			return echo.NewHTTPError(http.StatusNotFound, "nothing found").Wrap(err)
+		}
 		return echo.NewHTTPError(http.StatusInternalServerError, "apply to take order failed").Wrap(err)
 	}
 
@@ -412,20 +450,55 @@ func (h *Handler) DriverCompleteOrder(c *echo.Context) error {
 		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized user")
 	}
 
-	if claims.Role != helper.RoleDriver {
+	if claims.Role != model.RoleUserDriver {
 		return echo.NewHTTPError(http.StatusUnauthorized, "you're not a driver")
 	}
 
-	orderID, err := uuid.Parse(c.Param("order_id"))
-	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, "invalid order id format").Wrap(err)
+	orderID := c.Param("order_id")
+	if orderID == "" {
+		return echo.NewHTTPError(http.StatusBadRequest, "order id must not be empty")
 	}
 
-	if err := h.OrderSvc.MarkOrderAsDone(orderID, claims.UserID); err != nil {
+	ctx, cancel := context.WithTimeout(c.Request().Context(), time.Second*20)
+	defer cancel()
+
+	if err := h.OrderSvc.DriverCompleteOrder(ctx, orderID, claims.UserID); err != nil {
+		if errors.Is(err, model.ErrNotFound) {
+			return echo.NewHTTPError(http.StatusNotFound, "nothing found").Wrap(err)
+		}
 		return echo.NewHTTPError(http.StatusInternalServerError, "mark order as done failed").Wrap(err)
 	}
 
 	return c.JSON(http.StatusCreated, Response{
 		Message: http.StatusText(http.StatusCreated),
 	})
+}
+
+func (h *Handler) XenditWebhook(c *echo.Context) error {
+	var payload XenditWebhookRequest
+	if err := c.Bind(&payload); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, "invalid request body").Wrap(err)
+	}
+
+	if err := h.Validate.Struct(payload); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, "invalid request body").Wrap(err)
+	}
+
+	split := strings.Split(payload.Data.ReferenceID, "_")
+
+	var paymentType model.PaymentType
+	if strings.HasPrefix(payload.Data.ReferenceID, string(model.PaymentGatewayRefIDPrefixTopUp)) {
+		paymentType = model.PaymentTypeTopUp
+	} else if strings.HasPrefix(payload.Data.ReferenceID, string(model.PaymentGatewayRefIDPrefixOrder)) {
+		paymentType = model.PaymentTypeOrder
+	}
+
+	ctx, cancel := context.WithTimeout(c.Request().Context(), time.Second*20)
+	defer cancel()
+
+	if err := h.UserSvc.PaymentGatewayWebhook(ctx, split[1], paymentType, int(payload.Data.Amount)); err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "webhook error").Wrap(err)
+	}
+	
+	return c.JSON(http.StatusOK, Response{Message: http.StatusText(http.StatusOK)})
 }

@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/airlangga-hub/food-delivery-app/order/model"
@@ -13,6 +14,7 @@ type CustomerSQLRepository interface {
 	GetDrivers(ctx context.Context, orderID uuid.UUID) ([]model.Driver, error)
 	ChooseDriver(ctx context.Context, orderID, driverID uuid.UUID) (model.Order, error)
 	GiveRating(ctx context.Context, orderID uuid.UUID, rating int) error
+	GetOrdersByUserID(ctx context.Context, userID uuid.UUID, role model.RoleUser) ([]model.Order, error)
 }
 
 type CustomerPaymentGatewayRepository interface {
@@ -93,4 +95,23 @@ func (s *customerService) GiveRating(ctx context.Context, orderID uuid.UUID, rat
 		return fmt.Errorf("order.service.GiveRating: %w", err)
 	}
 	return nil
+}
+
+func (s *customerService) CreatePaymentSession(ctx context.Context, paymentType model.PaymentType, userID uuid.UUID, userEmail string, amount int, items []model.PaymentGatewayItem) (model.PaymentGatewayResponse, error) {
+	paymentGatewayResp, err := s.customerPaymentGatewayRepo.CreatePaymentSession(ctx, paymentType, userID, userEmail, amount, items)
+	if err != nil {
+		return model.PaymentGatewayResponse{}, fmt.Errorf("order.service.CreatePaymentSession: %w", err)
+	}
+	return paymentGatewayResp, nil
+}
+
+func (s *customerService) GetOrdersByUserID(ctx context.Context, userID uuid.UUID, role model.RoleUser) ([]model.Order, error) {
+	orders, err := s.customerSqlRepo.GetOrdersByUserID(ctx, userID, role)
+	if err != nil {
+		if errors.Is(err, model.ErrNotFound) {
+			return nil, fmt.Errorf("order.service.GetOrdersByUserID (no rows found): %w", err)
+		}
+		return nil, fmt.Errorf("order.service.GetOrdersByUserID: %w", err)
+	}
+	return orders, nil
 }
