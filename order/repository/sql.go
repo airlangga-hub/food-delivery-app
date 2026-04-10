@@ -423,7 +423,7 @@ func (r *sqlRepository) GetDrivers(ctx context.Context, orderID uuid.UUID) ([]mo
 					ON r.order_id = o.id
 			      WHERE
 					o.driver_id = dp.user_id
-			), 0.0) AS avg_rating
+			), 0.0) AS avg_rating,
 			dp.first_name,
 			dp.last_name,
 			dp.bike,
