@@ -94,6 +94,12 @@ func main() {
 		logger.Error("error pinging supabase", slog.Any("error", err))
 		return
 	}
+	
+	_, err = sqlDB.Exec("SET search_path TO final_project")
+	if err != nil {
+		logger.Error("error setting search path in supabase", slog.Any("error", err))
+		return
+	}
 
 	// dependency injection
 	orderClient := orderpb.NewOrderServiceClient(orderCC)
