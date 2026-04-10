@@ -428,14 +428,14 @@ func (r *sqlRepository) GetDrivers(ctx context.Context, orderID uuid.UUID) ([]mo
 			dp.last_name,
 			dp.bike,
 			dp.license_plate,
-			dp.phone_number,
+			dp.phone_number
 		FROM
 		    	final_project.order_applicants op
 		JOIN
 		    	final_project.driver_profiles dp
 			ON dp.user_id = op.driver_id
 		WHERE
-		    	op.order_id = $1;`,
+		    	op.order_id = $1`,
 		orderID,
 	)
 	if err != nil {
