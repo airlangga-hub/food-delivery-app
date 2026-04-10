@@ -89,8 +89,8 @@ func (s *userService) TopUpBalance(ctx context.Context, userID, userEmail string
 	return model.PaymentLink{PaymentLink: resp.PaymentLink}, nil
 }
 
-func (s *userService) GetUserInfo(ctx context.Context, email string) (model.UserInfo, error) {
-	resp, err := s.userClient.GetUserInfo(ctx, &userpb.GetUserInfoRequest{Email: email})
+func (s *userService) GetUserInfo(ctx context.Context, email string, role model.RoleUser) (model.UserInfo, error) {
+	resp, err := s.userClient.GetUserInfo(ctx, &userpb.GetUserInfoRequest{Email: email, Role: string(role)})
 
 	if err != nil {
 		st, ok := status.FromError(err)

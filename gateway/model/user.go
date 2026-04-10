@@ -5,7 +5,7 @@ type UserRegister struct {
 	LastName    string `json:"last_name"`
 	Email       string `json:"email"`
 	Password    string `json:"password"`
-	Address     string `json:"address"`
+	Address     string `json:"address,omitempty"`
 	PhoneNumber string `json:"phone_number"`
 }
 

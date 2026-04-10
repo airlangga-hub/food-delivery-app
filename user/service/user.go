@@ -28,7 +28,7 @@ type UserSQLRepository interface {
 	UpdateLedger(ctx context.Context, userID uuid.UUID, reason model.LedgerReason, amount int) error
 	RegisterCustomer(ctx context.Context, user model.UserRegister) (model.UserInfo, error)
 	Login(ctx context.Context, email string) (model.UserLogin, error)
-	GetUserInfo(ctx context.Context, email string) (model.UserInfo, error)
+	GetUserInfo(ctx context.Context, email string, role model.RoleUser) (model.UserInfo, error)
 }
 
 type userService struct {
@@ -84,8 +84,8 @@ func (s *userService) Login(ctx context.Context, email string, password string) 
 	return token, nil
 }
 
-func (s *userService) GetUserInfo(ctx context.Context, email string) (model.UserInfo, error) {
-	userInfo, err := s.userSqlRepository.GetUserInfo(ctx, email)
+func (s *userService) GetUserInfo(ctx context.Context, email string, role model.RoleUser) (model.UserInfo, error) {
+	userInfo, err := s.userSqlRepository.GetUserInfo(ctx, email, role)
 	if err != nil {
 		return model.UserInfo{}, fmt.Errorf("user.service.GetUserInfo: %w", err)
 	}

@@ -18,7 +18,7 @@ type UserService interface {
 	RegisterCustomer(ctx context.Context, user model.UserRegister) (model.UserInfo, error)
 	Login(ctx context.Context, email, password string) (string, error)
 	TopUpBalance(ctx context.Context, userID, userEmail string, amount int) (model.PaymentLink, error)
-	GetUserInfo(ctx context.Context, email string) (model.UserInfo, error)
+	GetUserInfo(ctx context.Context, email string, role model.RoleUser) (model.UserInfo, error)
 	PaymentGatewayWebhook(ctx context.Context, userID string, paymentType model.PaymentType, amount int) error
 }
 
@@ -148,7 +148,7 @@ func (h *Handler) GetUserInfo(c *echo.Context) error {
 	ctx, cancel := context.WithTimeout(c.Request().Context(), time.Second*20)
 	defer cancel()
 
-	userInfo, err := h.UserSvc.GetUserInfo(ctx, claims.Subject)
+	userInfo, err := h.UserSvc.GetUserInfo(ctx, claims.Subject, claims.Role)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "get user info failed").Wrap(err)
 	}

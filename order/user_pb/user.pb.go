@@ -160,6 +160,7 @@ func (x *LoginRequest) GetPassword() string {
 type GetUserInfoRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Email         string                 `protobuf:"bytes,1,opt,name=email,proto3" json:"email,omitempty"`
+	Role          string                 `protobuf:"bytes,2,opt,name=role,proto3" json:"role,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -197,6 +198,13 @@ func (*GetUserInfoRequest) Descriptor() ([]byte, []int) {
 func (x *GetUserInfoRequest) GetEmail() string {
 	if x != nil {
 		return x.Email
+	}
+	return ""
+}
+
+func (x *GetUserInfoRequest) GetRole() string {
+	if x != nil {
+		return x.Role
 	}
 	return ""
 }
@@ -1037,9 +1045,10 @@ const file_user_proto_rawDesc = "" +
 	"\fphone_number\x18\x06 \x01(\tR\vphoneNumber\"@\n" +
 	"\fLoginRequest\x12\x14\n" +
 	"\x05email\x18\x01 \x01(\tR\x05email\x12\x1a\n" +
-	"\bpassword\x18\x02 \x01(\tR\bpassword\"*\n" +
+	"\bpassword\x18\x02 \x01(\tR\bpassword\">\n" +
 	"\x12GetUserInfoRequest\x12\x14\n" +
-	"\x05email\x18\x01 \x01(\tR\x05email\"e\n" +
+	"\x05email\x18\x01 \x01(\tR\x05email\x12\x12\n" +
+	"\x04role\x18\x02 \x01(\tR\x04role\"e\n" +
 	"\x13TopUpBalanceRequest\x12\x17\n" +
 	"\auser_id\x18\x01 \x01(\tR\x06userId\x12\x1d\n" +
 	"\n" +

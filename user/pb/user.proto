@@ -19,6 +19,7 @@ message LoginRequest {
 
 message GetUserInfoRequest {
   string email = 1;
+  string role = 2;
 }
 
 message TopUpBalanceRequest {
