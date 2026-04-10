@@ -499,6 +499,6 @@ func (h *Handler) XenditWebhook(c *echo.Context) error {
 	if err := h.UserSvc.PaymentGatewayWebhook(ctx, split[1], paymentType, int(payload.Data.Amount)); err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "webhook error").Wrap(err)
 	}
-	
+
 	return c.JSON(http.StatusOK, Response{Message: http.StatusText(http.StatusOK)})
 }

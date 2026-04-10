@@ -4,7 +4,7 @@
 // - protoc             v6.33.1
 // source: order.proto
 
-package pb
+package order_pb
 
 import (
 	context "context"
@@ -20,15 +20,15 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	OrderService_CreateOrder_FullMethodName            = "/pb.OrderService/CreateOrder"
-	OrderService_GetDrivers_FullMethodName             = "/pb.OrderService/GetDrivers"
-	OrderService_ChooseDriver_FullMethodName           = "/pb.OrderService/ChooseDriver"
-	OrderService_GiveRating_FullMethodName             = "/pb.OrderService/GiveRating"
-	OrderService_DriverGetPendingOrders_FullMethodName = "/pb.OrderService/DriverGetPendingOrders"
-	OrderService_DriverApplyForOrder_FullMethodName    = "/pb.OrderService/DriverApplyForOrder"
-	OrderService_DriverCompleteOrder_FullMethodName    = "/pb.OrderService/DriverCompleteOrder"
-	OrderService_CreatePaymentSession_FullMethodName   = "/pb.OrderService/CreatePaymentSession"
-	OrderService_GetOrdersByUserID_FullMethodName      = "/pb.OrderService/GetOrdersByUserID"
+	OrderService_CreateOrder_FullMethodName            = "/order_pb.OrderService/CreateOrder"
+	OrderService_GetDrivers_FullMethodName             = "/order_pb.OrderService/GetDrivers"
+	OrderService_ChooseDriver_FullMethodName           = "/order_pb.OrderService/ChooseDriver"
+	OrderService_GiveRating_FullMethodName             = "/order_pb.OrderService/GiveRating"
+	OrderService_DriverGetPendingOrders_FullMethodName = "/order_pb.OrderService/DriverGetPendingOrders"
+	OrderService_DriverApplyForOrder_FullMethodName    = "/order_pb.OrderService/DriverApplyForOrder"
+	OrderService_DriverCompleteOrder_FullMethodName    = "/order_pb.OrderService/DriverCompleteOrder"
+	OrderService_CreatePaymentSession_FullMethodName   = "/order_pb.OrderService/CreatePaymentSession"
+	OrderService_GetOrdersByUserID_FullMethodName      = "/order_pb.OrderService/GetOrdersByUserID"
 )
 
 // OrderServiceClient is the client API for OrderService service.
@@ -381,7 +381,7 @@ func _OrderService_GetOrdersByUserID_Handler(srv interface{}, ctx context.Contex
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var OrderService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "pb.OrderService",
+	ServiceName: "order_pb.OrderService",
 	HandlerType: (*OrderServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{

@@ -41,7 +41,7 @@ func (r *sqlRepository) CreateOrder(ctx context.Context, userID uuid.UUID, order
 	rows, err := tx.QueryContext(
 		ctx,
 		`UPDATE
-			items AS i
+			final_project.items AS i
 		SET
 			stock = i.stock - v.qty
 		FROM
@@ -101,7 +101,7 @@ func (r *sqlRepository) CreateOrder(ctx context.Context, userID uuid.UUID, order
 	var orderID uuid.UUID
 	err = tx.QueryRowContext(
 		ctx,
-		`INSERT INTO orders (customer_id, order_status, delivery_fee, total_fee)
+		`INSERT INTO final_project.orders (customer_id, order_status, delivery_fee, total_fee)
 		VALUES ($1, $2, $3, $4)
 		RETURNING id`,
 		userID, model.OrderStatusSearchingForDriver, order.DeliveryFee, totalFee,
@@ -111,7 +111,7 @@ func (r *sqlRepository) CreateOrder(ctx context.Context, userID uuid.UUID, order
 	}
 
 	// batch insert order items
-	stmt, err := tx.PrepareContext(ctx, "COPY order_items (order_id, item_id, quantity) FROM STDIN")
+	stmt, err := tx.PrepareContext(ctx, "COPY final_project.order_items (order_id, item_id, quantity) FROM STDIN")
 	if err != nil {
 		return model.Order{}, fmt.Errorf("order.customer_repo.CreateOrder (tx.PrepareContext): %w", err)
 	}
@@ -149,12 +149,12 @@ func (r *sqlRepository) GetOrderByOrderID(ctx context.Context, tx *sql.Tx, order
 		     FROM ratings
 		     JOIN orders ON ratings.order_id = orders.id
 		     WHERE orders.driver_id = o.driver_id) as avg_rating
-		FROM orders o
-		JOIN customer_profiles cp ON o.customer_id = cp.user_id
-		JOIN order_items oi ON o.id = oi.order_id
-		JOIN items i ON oi.item_id = i.id
-		JOIN restaurants r ON i.restaurant_id = r.id
-		LEFT JOIN driver_profiles dp ON o.driver_id = dp.user_id
+		FROM final_project.orders o
+		JOIN final_project.customer_profiles cp ON o.customer_id = cp.user_id
+		JOIN final_project.order_items oi ON o.id = oi.order_id
+		JOIN final_project.items i ON oi.item_id = i.id
+		JOIN final_project.restaurants r ON i.restaurant_id = r.id
+		LEFT JOIN final_project.driver_profiles dp ON o.driver_id = dp.user_id
 		WHERE o.id = $1`,
 		orderID,
 	)
@@ -284,17 +284,17 @@ func (r *sqlRepository) GetOrdersByUserID(ctx context.Context, userID uuid.UUID,
 			dp.phone_number,
 			(SELECT COALESCE(AVG(rating), 0) FROM ratings JOIN orders ON ratings.order_id = orders.id WHERE orders.driver_id = o.driver_id) as avg_rating
 		FROM
-			orders o
+			final_project.orders o
 		JOIN
-			customer_profiles cp ON o.customer_id = cp.user_id
+			final_project.customer_profiles cp ON o.customer_id = cp.user_id
 		JOIN
-			order_items oi ON o.id = oi.order_id
+			final_project.order_items oi ON o.id = oi.order_id
 		JOIN
-			items i ON oi.item_id = i.id
+			final_project.items i ON oi.item_id = i.id
 		JOIN
-			restaurants r ON i.restaurant_id = r.id
+			final_project.restaurants r ON i.restaurant_id = r.id
 		LEFT JOIN
-			driver_profiles dp ON o.driver_id = dp.user_id
+			final_project.driver_profiles dp ON o.driver_id = dp.user_id
 		WHERE
 			o.%s = $1`, filterCol)
 
@@ -430,9 +430,9 @@ func (r *sqlRepository) GetDrivers(ctx context.Context, orderID uuid.UUID) ([]mo
 			dp.license_plate,
 			dp.phone_number,
 		FROM
-		    	order_applicants op
+		    	final_project.order_applicants op
 		JOIN
-		    	driver_profiles dp
+		    	final_project.driver_profiles dp
 			ON dp.user_id = op.driver_id
 		WHERE
 		    	op.order_id = $1;`,
@@ -503,7 +503,7 @@ type UpdateOrderParams struct {
 }
 
 func (r *sqlRepository) UpdateOrder(ctx context.Context, tx *sql.Tx, orderID uuid.UUID, params UpdateOrderParams) error {
-	query := "UPDATE orders SET updated_at = NOW()"
+	query := "UPDATE final_project.orders SET updated_at = NOW()"
 	args := []any{orderID}
 	argCount := 2
 
@@ -540,12 +540,12 @@ func (r *sqlRepository) GiveRating(ctx context.Context, orderID uuid.UUID, ratin
 	result, err := r.db.ExecContext(
 		ctx,
 		`INSERT INTO
-			ratings (order_id, rating)
+			final_project.ratings (order_id, rating)
 		SELECT
 			$1,
 			$2
 		FROM
-			orders
+			final_project.orders
 		WHERE
 			id = $1 AND
 			order_status = $3
@@ -588,15 +588,15 @@ func (r *sqlRepository) DriverGetPendingOrders(ctx context.Context) ([]model.Ord
 			o.total_fee,
 			o.id
 		FROM
-			orders o
+			final_project.orders o
 		JOIN
-			customer_profiles cp ON o.customer_id = cp.user_id
+			final_project.customer_profiles cp ON o.customer_id = cp.user_id
 		JOIN
-			order_items oi ON o.id = oi.order_id
+			final_project.order_items oi ON o.id = oi.order_id
 		JOIN
-			items i ON oi.item_id = i.id
+			final_project.items i ON oi.item_id = i.id
 		JOIN
-			restaurants r ON i.restaurant_id = r.id
+			final_project.restaurants r ON i.restaurant_id = r.id
 		WHERE
 			o.order_status = $1`,
 		model.OrderStatusSearchingForDriver,
@@ -687,10 +687,10 @@ func (r *sqlRepository) DriverApplyForOrder(ctx context.Context, orderID uuid.UU
 	result, err := r.db.ExecContext(
 		ctx,
 		`INSERT INTO
-			order_applicants (order_id, driver_id)
+			final_project.order_applicants (order_id, driver_id)
 		SELECT $1, $2
 		FROM
-			orders
+			final_project.orders
 		WHERE
 			id = $1 AND
 			order_status = $3
@@ -718,7 +718,7 @@ func (r *sqlRepository) DriverCompleteOrder(ctx context.Context, orderID uuid.UU
 		ctx,
 		`WITH completed_order AS (
 			UPDATE
-				orders
+				final_project.orders
 			SET
 				order_status = $3,
 				updated_at = NOW()
@@ -730,7 +730,7 @@ func (r *sqlRepository) DriverCompleteOrder(ctx context.Context, orderID uuid.UU
 				total_fee
 		)
 		INSERT INTO
-			ledgers (user_id, amount, reason)
+			final_project.ledgers (user_id, amount, reason)
 		SELECT
 			$2, total_fee, $5
 		FROM

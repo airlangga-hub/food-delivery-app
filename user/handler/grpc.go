@@ -5,7 +5,7 @@ import (
 	"errors"
 
 	"github.com/airlangga-hub/food-delivery-app/user/model"
-	"github.com/airlangga-hub/food-delivery-app/user/pb"
+	pb "github.com/airlangga-hub/food-delivery-app/user/pb"
 	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/v2/bson"
 	"google.golang.org/grpc/codes"

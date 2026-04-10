@@ -77,7 +77,7 @@ func (r *xenditRepository) CreatePaymentSession(ctx context.Context, paymentType
 		return model.PaymentGatewayResponse{}, fmt.Errorf("user.repository.CreatePaymentSession (validate.Struct): %w", err)
 	}
 
-	var buf *bytes.Buffer
+	buf := new(bytes.Buffer)
 	if err := json.NewEncoder(buf).Encode(payload); err != nil {
 		return model.PaymentGatewayResponse{}, fmt.Errorf("user.repository.CreatePaymentSession (JSON encoding): %w", err)
 	}
