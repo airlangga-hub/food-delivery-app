@@ -112,7 +112,7 @@ func (r *sqlRepository) GetUserInfo(ctx context.Context, email string) (model.Us
 			cp.phone_number,
 			COALESCE((
 				SELECT SUM(amount)
-				FROM ledgers
+				FROM final_project.ledgers
 				WHERE user_id = u.id
 			), 0) AS balance
 		FROM
