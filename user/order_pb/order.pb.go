@@ -4,7 +4,7 @@
 // 	protoc        v6.33.1
 // source: order.proto
 
-package pb
+package order_pb
 
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
@@ -1642,18 +1642,18 @@ var File_order_proto protoreflect.FileDescriptor
 
 const file_order_proto_rawDesc = "" +
 	"\n" +
-	"\vorder.proto\x12\x02pb\x1a\x1bgoogle/protobuf/empty.proto\"T\n" +
+	"\vorder.proto\x12\border_pb\x1a\x1bgoogle/protobuf/empty.proto\"Z\n" +
 	"\aOrderIn\x12!\n" +
-	"\fdelivery_fee\x18\x01 \x01(\x03R\vdeliveryFee\x12&\n" +
-	"\bitems_in\x18\x02 \x03(\v2\v.pb.ItemsInR\aitemsIn\"5\n" +
+	"\fdelivery_fee\x18\x01 \x01(\x03R\vdeliveryFee\x12,\n" +
+	"\bitems_in\x18\x02 \x03(\v2\x11.order_pb.ItemsInR\aitemsIn\"5\n" +
 	"\aItemsIn\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1a\n" +
-	"\bquantity\x18\x02 \x01(\x03R\bquantity\"o\n" +
+	"\bquantity\x18\x02 \x01(\x03R\bquantity\"u\n" +
 	"\x12CreateOrderRequest\x12\x17\n" +
 	"\auser_id\x18\x01 \x01(\tR\x06userId\x12\x1d\n" +
 	"\n" +
-	"user_email\x18\x02 \x01(\tR\tuserEmail\x12!\n" +
-	"\x05order\x18\x03 \x01(\v2\v.pb.OrderInR\x05order\".\n" +
+	"user_email\x18\x02 \x01(\tR\tuserEmail\x12'\n" +
+	"\x05order\x18\x03 \x01(\v2\x11.order_pb.OrderInR\x05order\".\n" +
 	"\x11GetDriversRequest\x12\x19\n" +
 	"\border_id\x18\x01 \x01(\tR\aorderId\"M\n" +
 	"\x13ChooseDriverRequest\x12\x19\n" +
@@ -1667,38 +1667,36 @@ const file_order_proto_rawDesc = "" +
 	"\tdriver_id\x18\x02 \x01(\tR\bdriverId\"T\n" +
 	"\x1aDriverCompleteOrderRequest\x12\x19\n" +
 	"\border_id\x18\x01 \x01(\tR\aorderId\x12\x1b\n" +
-	"\tdriver_id\x18\x02 \x01(\tR\bdriverId\"j\n" +
+	"\tdriver_id\x18\x02 \x01(\tR\bdriverId\"p\n" +
 	"\n" +
 	"Restaurant\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x18\n" +
-	"\aaddress\x18\x03 \x01(\tR\aaddress\x12\x1e\n" +
-	"\x05items\x18\x04 \x03(\v2\b.pb.ItemR\x05items\"\\\n" +
+	"\aaddress\x18\x03 \x01(\tR\aaddress\x12$\n" +
+	"\x05items\x18\x04 \x03(\v2\x0e.order_pb.ItemR\x05items\"\\\n" +
 	"\x04Item\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x14\n" +
 	"\x05price\x18\x03 \x01(\x03R\x05price\x12\x1a\n" +
-	"\bquantity\x18\x04 \x01(\x03R\bquantity\"\xbc\x02\n" +
+	"\bquantity\x18\x04 \x01(\x03R\bquantity\"\xc2\x02\n" +
 	"\x13CreateOrderResponse\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\x120\n" +
-	"\vrestaurants\x18\x02 \x03(\v2\x0e.pb.RestaurantR\vrestaurants\x12)\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x126\n" +
+	"\vrestaurants\x18\x02 \x03(\v2\x14.order_pb.RestaurantR\vrestaurants\x12)\n" +
 	"\x10delivery_address\x18\x03 \x01(\tR\x0fdeliveryAddress\x122\n" +
 	"\x15customer_phone_number\x18\x04 \x01(\tR\x13customerPhoneNumber\x12!\n" +
 	"\forder_status\x18\x05 \x01(\tR\vorderStatus\x12!\n" +
 	"\fdelivery_fee\x18\x06 \x01(\x03R\vdeliveryFee\x12\x1b\n" +
 	"\ttotal_fee\x18\a \x01(\x03R\btotalFee\x12!\n" +
-	"\fpayment_link\x18\b \x01(\tR\vpaymentLink\":\n" +
-	"\x12GetDriversResponse\x12$\n" +
-	"\adrivers\x18\x01 \x03(\v2\n" +
-	".pb.DriverR\adrivers\"\xe1\x02\n" +
+	"\fpayment_link\x18\b \x01(\tR\vpaymentLink\"@\n" +
+	"\x12GetDriversResponse\x12*\n" +
+	"\adrivers\x18\x01 \x03(\v2\x10.order_pb.DriverR\adrivers\"\xed\x02\n" +
 	"\x14ChooseDriverResponse\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\x120\n" +
-	"\vrestaurants\x18\x02 \x03(\v2\x0e.pb.RestaurantR\vrestaurants\x12)\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x126\n" +
+	"\vrestaurants\x18\x02 \x03(\v2\x14.order_pb.RestaurantR\vrestaurants\x12)\n" +
 	"\x10delivery_address\x18\x03 \x01(\tR\x0fdeliveryAddress\x122\n" +
 	"\x15customer_phone_number\x18\x04 \x01(\tR\x13customerPhoneNumber\x12!\n" +
-	"\forder_status\x18\x05 \x01(\tR\vorderStatus\x12\"\n" +
-	"\x06driver\x18\x06 \x01(\v2\n" +
-	".pb.DriverR\x06driver\x12!\n" +
+	"\forder_status\x18\x05 \x01(\tR\vorderStatus\x12(\n" +
+	"\x06driver\x18\x06 \x01(\v2\x10.order_pb.DriverR\x06driver\x12!\n" +
 	"\fdelivery_fee\x18\a \x01(\x03R\vdeliveryFee\x12\x1b\n" +
 	"\ttotal_fee\x18\b \x01(\x03R\btotalFee\x12!\n" +
 	"\fpayment_link\x18\t \x01(\tR\vpaymentLink\"\xaf\x01\n" +
@@ -1709,20 +1707,19 @@ const file_order_proto_rawDesc = "" +
 	"\x04bike\x18\x04 \x01(\tR\x04bike\x12#\n" +
 	"\rlicense_plate\x18\x05 \x01(\tR\flicensePlate\x12!\n" +
 	"\fphone_number\x18\x06 \x01(\tR\vphoneNumber\"\x14\n" +
-	"\x12GiveRatingResponse\"C\n" +
-	"\x1eDriverGetPendingOrdersResponse\x12!\n" +
-	"\x06orders\x18\x01 \x03(\v2\t.pb.OrderR\x06orders\"\xd2\x02\n" +
+	"\x12GiveRatingResponse\"I\n" +
+	"\x1eDriverGetPendingOrdersResponse\x12'\n" +
+	"\x06orders\x18\x01 \x03(\v2\x0f.order_pb.OrderR\x06orders\"\xde\x02\n" +
 	"\x05Order\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\x120\n" +
-	"\vrestaurants\x18\x02 \x03(\v2\x0e.pb.RestaurantR\vrestaurants\x12)\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x126\n" +
+	"\vrestaurants\x18\x02 \x03(\v2\x14.order_pb.RestaurantR\vrestaurants\x12)\n" +
 	"\x10delivery_address\x18\x03 \x01(\tR\x0fdeliveryAddress\x122\n" +
 	"\x15customer_phone_number\x18\x04 \x01(\tR\x13customerPhoneNumber\x12!\n" +
 	"\forder_status\x18\x05 \x01(\tR\vorderStatus\x12!\n" +
 	"\fdelivery_fee\x18\x06 \x01(\x03R\vdeliveryFee\x12\x1b\n" +
 	"\ttotal_fee\x18\a \x01(\x03R\btotalFee\x12!\n" +
-	"\fpayment_link\x18\b \x01(\tR\vpaymentLink\x12\"\n" +
-	"\x06driver\x18\t \x01(\v2\n" +
-	".pb.DriverR\x06driver\"\x1d\n" +
+	"\fpayment_link\x18\b \x01(\tR\vpaymentLink\x12(\n" +
+	"\x06driver\x18\t \x01(\v2\x10.order_pb.DriverR\x06driver\"\x1d\n" +
 	"\x1bDriverApplyForOrderResponse\"\x1d\n" +
 	"\x1bDriverCompleteOrderResponse\"\xf3\x01\n" +
 	"\x12PaymentGatewayItem\x12!\n" +
@@ -1733,14 +1730,14 @@ const file_order_proto_rawDesc = "" +
 	"\bcategory\x18\x05 \x01(\tR\bcategory\x12&\n" +
 	"\x0fnet_unit_amount\x18\x06 \x01(\x03R\rnetUnitAmount\x12\x1a\n" +
 	"\bquantity\x18\a \x01(\x03R\bquantity\x12\x10\n" +
-	"\x03url\x18\b \x01(\tR\x03url\"\xbe\x01\n" +
+	"\x03url\x18\b \x01(\tR\x03url\"\xc4\x01\n" +
 	"\x1bCreatePaymentSessionRequest\x12!\n" +
 	"\fpayment_type\x18\x01 \x01(\tR\vpaymentType\x12\x17\n" +
 	"\auser_id\x18\x02 \x01(\tR\x06userId\x12\x1d\n" +
 	"\n" +
 	"user_email\x18\x03 \x01(\tR\tuserEmail\x12\x16\n" +
-	"\x06amount\x18\x04 \x01(\x03R\x06amount\x12,\n" +
-	"\x05items\x18\x05 \x03(\v2\x16.pb.PaymentGatewayItemR\x05items\"\xb4\x05\n" +
+	"\x06amount\x18\x04 \x01(\x03R\x06amount\x122\n" +
+	"\x05items\x18\x05 \x03(\v2\x1c.order_pb.PaymentGatewayItemR\x05items\"\xba\x05\n" +
 	"\x1cCreatePaymentSessionResponse\x12,\n" +
 	"\x12payment_session_id\x18\x01 \x01(\tR\x10paymentSessionId\x12\x18\n" +
 	"\acreated\x18\x02 \x01(\tR\acreated\x12\x18\n" +
@@ -1761,28 +1758,28 @@ const file_order_proto_rawDesc = "" +
 	"\vcustomer_id\x18\x0e \x01(\tR\n" +
 	"customerId\x12%\n" +
 	"\x0ecapture_method\x18\x0f \x01(\tR\rcaptureMethod\x12 \n" +
-	"\vdescription\x18\x10 \x01(\tR\vdescription\x12,\n" +
-	"\x05items\x18\x11 \x03(\v2\x16.pb.PaymentGatewayItemR\x05items\x12,\n" +
+	"\vdescription\x18\x10 \x01(\tR\vdescription\x122\n" +
+	"\x05items\x18\x11 \x03(\v2\x1c.order_pb.PaymentGatewayItemR\x05items\x12,\n" +
 	"\x12success_return_url\x18\x12 \x01(\tR\x10successReturnUrl\x12*\n" +
 	"\x11cancel_return_url\x18\x13 \x01(\tR\x0fcancelReturnUrl\x12(\n" +
 	"\x10payment_link_url\x18\x14 \x01(\tR\x0epaymentLinkUrl\"G\n" +
 	"\x18GetOrdersByUserIDRequest\x12\x17\n" +
 	"\auser_id\x18\x01 \x01(\tR\x06userId\x12\x12\n" +
-	"\x04role\x18\x02 \x01(\tR\x04role\">\n" +
-	"\x19GetOrdersByUserIDResponse\x12!\n" +
-	"\x06orders\x18\x01 \x03(\v2\t.pb.OrderR\x06orders2\xbe\x05\n" +
-	"\fOrderService\x12>\n" +
-	"\vCreateOrder\x12\x16.pb.CreateOrderRequest\x1a\x17.pb.CreateOrderResponse\x12;\n" +
+	"\x04role\x18\x02 \x01(\tR\x04role\"D\n" +
+	"\x19GetOrdersByUserIDResponse\x12'\n" +
+	"\x06orders\x18\x01 \x03(\v2\x0f.order_pb.OrderR\x06orders2\xa4\x06\n" +
+	"\fOrderService\x12J\n" +
+	"\vCreateOrder\x12\x1c.order_pb.CreateOrderRequest\x1a\x1d.order_pb.CreateOrderResponse\x12G\n" +
 	"\n" +
-	"GetDrivers\x12\x15.pb.GetDriversRequest\x1a\x16.pb.GetDriversResponse\x12A\n" +
-	"\fChooseDriver\x12\x17.pb.ChooseDriverRequest\x1a\x18.pb.ChooseDriverResponse\x12;\n" +
+	"GetDrivers\x12\x1b.order_pb.GetDriversRequest\x1a\x1c.order_pb.GetDriversResponse\x12M\n" +
+	"\fChooseDriver\x12\x1d.order_pb.ChooseDriverRequest\x1a\x1e.order_pb.ChooseDriverResponse\x12G\n" +
 	"\n" +
-	"GiveRating\x12\x15.pb.GiveRatingRequest\x1a\x16.pb.GiveRatingResponse\x12T\n" +
-	"\x16DriverGetPendingOrders\x12\x16.google.protobuf.Empty\x1a\".pb.DriverGetPendingOrdersResponse\x12V\n" +
-	"\x13DriverApplyForOrder\x12\x1e.pb.DriverApplyForOrderRequest\x1a\x1f.pb.DriverApplyForOrderResponse\x12V\n" +
-	"\x13DriverCompleteOrder\x12\x1e.pb.DriverCompleteOrderRequest\x1a\x1f.pb.DriverCompleteOrderResponse\x12Y\n" +
-	"\x14CreatePaymentSession\x12\x1f.pb.CreatePaymentSessionRequest\x1a .pb.CreatePaymentSessionResponse\x12P\n" +
-	"\x11GetOrdersByUserID\x12\x1c.pb.GetOrdersByUserIDRequest\x1a\x1d.pb.GetOrdersByUserIDResponseB5Z3github.com/airlangga-hub/food-delivery-app/order/pbb\x06proto3"
+	"GiveRating\x12\x1b.order_pb.GiveRatingRequest\x1a\x1c.order_pb.GiveRatingResponse\x12Z\n" +
+	"\x16DriverGetPendingOrders\x12\x16.google.protobuf.Empty\x1a(.order_pb.DriverGetPendingOrdersResponse\x12b\n" +
+	"\x13DriverApplyForOrder\x12$.order_pb.DriverApplyForOrderRequest\x1a%.order_pb.DriverApplyForOrderResponse\x12b\n" +
+	"\x13DriverCompleteOrder\x12$.order_pb.DriverCompleteOrderRequest\x1a%.order_pb.DriverCompleteOrderResponse\x12e\n" +
+	"\x14CreatePaymentSession\x12%.order_pb.CreatePaymentSessionRequest\x1a&.order_pb.CreatePaymentSessionResponse\x12\\\n" +
+	"\x11GetOrdersByUserID\x12\".order_pb.GetOrdersByUserIDRequest\x1a#.order_pb.GetOrdersByUserIDResponseB;Z9github.com/airlangga-hub/food-delivery-app/order/order_pbb\x06proto3"
 
 var (
 	file_order_proto_rawDescOnce sync.Once
@@ -1798,64 +1795,64 @@ func file_order_proto_rawDescGZIP() []byte {
 
 var file_order_proto_msgTypes = make([]protoimpl.MessageInfo, 24)
 var file_order_proto_goTypes = []any{
-	(*OrderIn)(nil),                        // 0: pb.OrderIn
-	(*ItemsIn)(nil),                        // 1: pb.ItemsIn
-	(*CreateOrderRequest)(nil),             // 2: pb.CreateOrderRequest
-	(*GetDriversRequest)(nil),              // 3: pb.GetDriversRequest
-	(*ChooseDriverRequest)(nil),            // 4: pb.ChooseDriverRequest
-	(*GiveRatingRequest)(nil),              // 5: pb.GiveRatingRequest
-	(*DriverApplyForOrderRequest)(nil),     // 6: pb.DriverApplyForOrderRequest
-	(*DriverCompleteOrderRequest)(nil),     // 7: pb.DriverCompleteOrderRequest
-	(*Restaurant)(nil),                     // 8: pb.Restaurant
-	(*Item)(nil),                           // 9: pb.Item
-	(*CreateOrderResponse)(nil),            // 10: pb.CreateOrderResponse
-	(*GetDriversResponse)(nil),             // 11: pb.GetDriversResponse
-	(*ChooseDriverResponse)(nil),           // 12: pb.ChooseDriverResponse
-	(*Driver)(nil),                         // 13: pb.Driver
-	(*GiveRatingResponse)(nil),             // 14: pb.GiveRatingResponse
-	(*DriverGetPendingOrdersResponse)(nil), // 15: pb.DriverGetPendingOrdersResponse
-	(*Order)(nil),                          // 16: pb.Order
-	(*DriverApplyForOrderResponse)(nil),    // 17: pb.DriverApplyForOrderResponse
-	(*DriverCompleteOrderResponse)(nil),    // 18: pb.DriverCompleteOrderResponse
-	(*PaymentGatewayItem)(nil),             // 19: pb.PaymentGatewayItem
-	(*CreatePaymentSessionRequest)(nil),    // 20: pb.CreatePaymentSessionRequest
-	(*CreatePaymentSessionResponse)(nil),   // 21: pb.CreatePaymentSessionResponse
-	(*GetOrdersByUserIDRequest)(nil),       // 22: pb.GetOrdersByUserIDRequest
-	(*GetOrdersByUserIDResponse)(nil),      // 23: pb.GetOrdersByUserIDResponse
+	(*OrderIn)(nil),                        // 0: order_pb.OrderIn
+	(*ItemsIn)(nil),                        // 1: order_pb.ItemsIn
+	(*CreateOrderRequest)(nil),             // 2: order_pb.CreateOrderRequest
+	(*GetDriversRequest)(nil),              // 3: order_pb.GetDriversRequest
+	(*ChooseDriverRequest)(nil),            // 4: order_pb.ChooseDriverRequest
+	(*GiveRatingRequest)(nil),              // 5: order_pb.GiveRatingRequest
+	(*DriverApplyForOrderRequest)(nil),     // 6: order_pb.DriverApplyForOrderRequest
+	(*DriverCompleteOrderRequest)(nil),     // 7: order_pb.DriverCompleteOrderRequest
+	(*Restaurant)(nil),                     // 8: order_pb.Restaurant
+	(*Item)(nil),                           // 9: order_pb.Item
+	(*CreateOrderResponse)(nil),            // 10: order_pb.CreateOrderResponse
+	(*GetDriversResponse)(nil),             // 11: order_pb.GetDriversResponse
+	(*ChooseDriverResponse)(nil),           // 12: order_pb.ChooseDriverResponse
+	(*Driver)(nil),                         // 13: order_pb.Driver
+	(*GiveRatingResponse)(nil),             // 14: order_pb.GiveRatingResponse
+	(*DriverGetPendingOrdersResponse)(nil), // 15: order_pb.DriverGetPendingOrdersResponse
+	(*Order)(nil),                          // 16: order_pb.Order
+	(*DriverApplyForOrderResponse)(nil),    // 17: order_pb.DriverApplyForOrderResponse
+	(*DriverCompleteOrderResponse)(nil),    // 18: order_pb.DriverCompleteOrderResponse
+	(*PaymentGatewayItem)(nil),             // 19: order_pb.PaymentGatewayItem
+	(*CreatePaymentSessionRequest)(nil),    // 20: order_pb.CreatePaymentSessionRequest
+	(*CreatePaymentSessionResponse)(nil),   // 21: order_pb.CreatePaymentSessionResponse
+	(*GetOrdersByUserIDRequest)(nil),       // 22: order_pb.GetOrdersByUserIDRequest
+	(*GetOrdersByUserIDResponse)(nil),      // 23: order_pb.GetOrdersByUserIDResponse
 	(*emptypb.Empty)(nil),                  // 24: google.protobuf.Empty
 }
 var file_order_proto_depIdxs = []int32{
-	1,  // 0: pb.OrderIn.items_in:type_name -> pb.ItemsIn
-	0,  // 1: pb.CreateOrderRequest.order:type_name -> pb.OrderIn
-	9,  // 2: pb.Restaurant.items:type_name -> pb.Item
-	8,  // 3: pb.CreateOrderResponse.restaurants:type_name -> pb.Restaurant
-	13, // 4: pb.GetDriversResponse.drivers:type_name -> pb.Driver
-	8,  // 5: pb.ChooseDriverResponse.restaurants:type_name -> pb.Restaurant
-	13, // 6: pb.ChooseDriverResponse.driver:type_name -> pb.Driver
-	16, // 7: pb.DriverGetPendingOrdersResponse.orders:type_name -> pb.Order
-	8,  // 8: pb.Order.restaurants:type_name -> pb.Restaurant
-	13, // 9: pb.Order.driver:type_name -> pb.Driver
-	19, // 10: pb.CreatePaymentSessionRequest.items:type_name -> pb.PaymentGatewayItem
-	19, // 11: pb.CreatePaymentSessionResponse.items:type_name -> pb.PaymentGatewayItem
-	16, // 12: pb.GetOrdersByUserIDResponse.orders:type_name -> pb.Order
-	2,  // 13: pb.OrderService.CreateOrder:input_type -> pb.CreateOrderRequest
-	3,  // 14: pb.OrderService.GetDrivers:input_type -> pb.GetDriversRequest
-	4,  // 15: pb.OrderService.ChooseDriver:input_type -> pb.ChooseDriverRequest
-	5,  // 16: pb.OrderService.GiveRating:input_type -> pb.GiveRatingRequest
-	24, // 17: pb.OrderService.DriverGetPendingOrders:input_type -> google.protobuf.Empty
-	6,  // 18: pb.OrderService.DriverApplyForOrder:input_type -> pb.DriverApplyForOrderRequest
-	7,  // 19: pb.OrderService.DriverCompleteOrder:input_type -> pb.DriverCompleteOrderRequest
-	20, // 20: pb.OrderService.CreatePaymentSession:input_type -> pb.CreatePaymentSessionRequest
-	22, // 21: pb.OrderService.GetOrdersByUserID:input_type -> pb.GetOrdersByUserIDRequest
-	10, // 22: pb.OrderService.CreateOrder:output_type -> pb.CreateOrderResponse
-	11, // 23: pb.OrderService.GetDrivers:output_type -> pb.GetDriversResponse
-	12, // 24: pb.OrderService.ChooseDriver:output_type -> pb.ChooseDriverResponse
-	14, // 25: pb.OrderService.GiveRating:output_type -> pb.GiveRatingResponse
-	15, // 26: pb.OrderService.DriverGetPendingOrders:output_type -> pb.DriverGetPendingOrdersResponse
-	17, // 27: pb.OrderService.DriverApplyForOrder:output_type -> pb.DriverApplyForOrderResponse
-	18, // 28: pb.OrderService.DriverCompleteOrder:output_type -> pb.DriverCompleteOrderResponse
-	21, // 29: pb.OrderService.CreatePaymentSession:output_type -> pb.CreatePaymentSessionResponse
-	23, // 30: pb.OrderService.GetOrdersByUserID:output_type -> pb.GetOrdersByUserIDResponse
+	1,  // 0: order_pb.OrderIn.items_in:type_name -> order_pb.ItemsIn
+	0,  // 1: order_pb.CreateOrderRequest.order:type_name -> order_pb.OrderIn
+	9,  // 2: order_pb.Restaurant.items:type_name -> order_pb.Item
+	8,  // 3: order_pb.CreateOrderResponse.restaurants:type_name -> order_pb.Restaurant
+	13, // 4: order_pb.GetDriversResponse.drivers:type_name -> order_pb.Driver
+	8,  // 5: order_pb.ChooseDriverResponse.restaurants:type_name -> order_pb.Restaurant
+	13, // 6: order_pb.ChooseDriverResponse.driver:type_name -> order_pb.Driver
+	16, // 7: order_pb.DriverGetPendingOrdersResponse.orders:type_name -> order_pb.Order
+	8,  // 8: order_pb.Order.restaurants:type_name -> order_pb.Restaurant
+	13, // 9: order_pb.Order.driver:type_name -> order_pb.Driver
+	19, // 10: order_pb.CreatePaymentSessionRequest.items:type_name -> order_pb.PaymentGatewayItem
+	19, // 11: order_pb.CreatePaymentSessionResponse.items:type_name -> order_pb.PaymentGatewayItem
+	16, // 12: order_pb.GetOrdersByUserIDResponse.orders:type_name -> order_pb.Order
+	2,  // 13: order_pb.OrderService.CreateOrder:input_type -> order_pb.CreateOrderRequest
+	3,  // 14: order_pb.OrderService.GetDrivers:input_type -> order_pb.GetDriversRequest
+	4,  // 15: order_pb.OrderService.ChooseDriver:input_type -> order_pb.ChooseDriverRequest
+	5,  // 16: order_pb.OrderService.GiveRating:input_type -> order_pb.GiveRatingRequest
+	24, // 17: order_pb.OrderService.DriverGetPendingOrders:input_type -> google.protobuf.Empty
+	6,  // 18: order_pb.OrderService.DriverApplyForOrder:input_type -> order_pb.DriverApplyForOrderRequest
+	7,  // 19: order_pb.OrderService.DriverCompleteOrder:input_type -> order_pb.DriverCompleteOrderRequest
+	20, // 20: order_pb.OrderService.CreatePaymentSession:input_type -> order_pb.CreatePaymentSessionRequest
+	22, // 21: order_pb.OrderService.GetOrdersByUserID:input_type -> order_pb.GetOrdersByUserIDRequest
+	10, // 22: order_pb.OrderService.CreateOrder:output_type -> order_pb.CreateOrderResponse
+	11, // 23: order_pb.OrderService.GetDrivers:output_type -> order_pb.GetDriversResponse
+	12, // 24: order_pb.OrderService.ChooseDriver:output_type -> order_pb.ChooseDriverResponse
+	14, // 25: order_pb.OrderService.GiveRating:output_type -> order_pb.GiveRatingResponse
+	15, // 26: order_pb.OrderService.DriverGetPendingOrders:output_type -> order_pb.DriverGetPendingOrdersResponse
+	17, // 27: order_pb.OrderService.DriverApplyForOrder:output_type -> order_pb.DriverApplyForOrderResponse
+	18, // 28: order_pb.OrderService.DriverCompleteOrder:output_type -> order_pb.DriverCompleteOrderResponse
+	21, // 29: order_pb.OrderService.CreatePaymentSession:output_type -> order_pb.CreatePaymentSessionResponse
+	23, // 30: order_pb.OrderService.GetOrdersByUserID:output_type -> order_pb.GetOrdersByUserIDResponse
 	22, // [22:31] is the sub-list for method output_type
 	13, // [13:22] is the sub-list for method input_type
 	13, // [13:13] is the sub-list for extension type_name

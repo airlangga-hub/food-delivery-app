@@ -1,9 +1,9 @@
 syntax = "proto3";
-package pb;
+package order_pb;
 
 import "google/protobuf/empty.proto";
 
-option go_package = "github.com/airlangga-hub/food-delivery-app/order/pb";
+option go_package = "github.com/airlangga-hub/food-delivery-app/order/order_pb";
 
 message OrderIn {
   int64 delivery_fee = 1;

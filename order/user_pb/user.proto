@@ -1,7 +1,7 @@
 syntax = "proto3";
 package user_pb;
 
-option go_package = "github.com/airlangga-hub/food-delivery-app/user/pb";
+option go_package = "github.com/airlangga-hub/food-delivery-app/user/user_pb";
 
 message RegisterCustomerRequest {
   string first_name = 1;

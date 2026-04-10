@@ -15,7 +15,7 @@ import (
 	"github.com/airlangga-hub/food-delivery-app/order/auth"
 	"github.com/airlangga-hub/food-delivery-app/order/handler"
 	"github.com/airlangga-hub/food-delivery-app/order/middleware"
-	"github.com/airlangga-hub/food-delivery-app/order/pb"
+	"github.com/airlangga-hub/food-delivery-app/order/order_pb"
 	"github.com/airlangga-hub/food-delivery-app/order/repository"
 	"github.com/airlangga-hub/food-delivery-app/order/service"
 	userpb "github.com/airlangga-hub/food-delivery-app/order/user_pb"

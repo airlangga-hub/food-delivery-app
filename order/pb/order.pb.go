@@ -4,7 +4,7 @@
 // 	protoc        v6.33.1
 // source: order.proto
 
-package pb
+package order_pb
 
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
@@ -1779,7 +1779,7 @@ const file_order_proto_rawDesc = "" +
 	"\x13DriverApplyForOrder\x12$.order_pb.DriverApplyForOrderRequest\x1a%.order_pb.DriverApplyForOrderResponse\x12b\n" +
 	"\x13DriverCompleteOrder\x12$.order_pb.DriverCompleteOrderRequest\x1a%.order_pb.DriverCompleteOrderResponse\x12e\n" +
 	"\x14CreatePaymentSession\x12%.order_pb.CreatePaymentSessionRequest\x1a&.order_pb.CreatePaymentSessionResponse\x12\\\n" +
-	"\x11GetOrdersByUserID\x12\".order_pb.GetOrdersByUserIDRequest\x1a#.order_pb.GetOrdersByUserIDResponseB5Z3github.com/airlangga-hub/food-delivery-app/order/pbb\x06proto3"
+	"\x11GetOrdersByUserID\x12\".order_pb.GetOrdersByUserIDRequest\x1a#.order_pb.GetOrdersByUserIDResponseB;Z9github.com/airlangga-hub/food-delivery-app/order/order_pbb\x06proto3"
 
 var (
 	file_order_proto_rawDescOnce sync.Once

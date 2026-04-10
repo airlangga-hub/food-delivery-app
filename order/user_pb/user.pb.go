@@ -4,7 +4,7 @@
 // 	protoc        v6.33.1
 // source: user.proto
 
-package pb
+package user_pb
 
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
@@ -1117,7 +1117,7 @@ const file_user_proto_rawDesc = "" +
 	"\vGetUserInfo\x12\x1b.user_pb.GetUserInfoRequest\x1a\x1c.user_pb.GetUserInfoResponse\x12K\n" +
 	"\fTopUpBalance\x12\x1c.user_pb.TopUpBalanceRequest\x1a\x1d.user_pb.TopUpBalanceResponse\x12f\n" +
 	"\x15PaymentGatewayWebhook\x12%.user_pb.PaymentGatewayWebhookRequest\x1a&.user_pb.PaymentGatewayWebhookResponse\x12r\n" +
-	"\x19CreateCreatePaymentRecord\x12).user_pb.CreateCreatePaymentRecordRequest\x1a*.user_pb.CreateCreatePaymentRecordResponseB4Z2github.com/airlangga-hub/food-delivery-app/user/pbb\x06proto3"
+	"\x19CreateCreatePaymentRecord\x12).user_pb.CreateCreatePaymentRecordRequest\x1a*.user_pb.CreateCreatePaymentRecordResponseB9Z7github.com/airlangga-hub/food-delivery-app/user/user_pbb\x06proto3"
 
 var (
 	file_user_proto_rawDescOnce sync.Once
