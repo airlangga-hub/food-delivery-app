@@ -5,7 +5,7 @@ import (
 	"errors"
 
 	"github.com/airlangga-hub/food-delivery-app/order/model"
-	"github.com/airlangga-hub/food-delivery-app/order/order_pb"
+	pb "github.com/airlangga-hub/food-delivery-app/order/pb"
 	"github.com/google/uuid"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
