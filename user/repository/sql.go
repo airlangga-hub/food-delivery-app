@@ -28,7 +28,7 @@ func (r *sqlRepository) UpdateLedger(ctx context.Context, userID uuid.UUID, reas
 	_, err := r.db.ExecContext(
 		ctx,
 		`INSERT INTO
-			ledgers (user_id, amount, reason)
+			final_project.ledgers (user_id, amount, reason)
 		VALUES
 			($1, $2, $3)`,
 		userID, finalAmount, string(reason),
