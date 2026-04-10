@@ -18,3 +18,115 @@ Group two application for Hacktiv8 phase three final project.
 | [gRPC](https://grpc.io/)                        | A high performance, open source universal RPC framework.              |
 | [Supabase](https://supabase.com/)               | Cloud-based PostgreSQL platform for reliable data storage.            |
 | [Xendit](https://www.xendit.co)                 | Payment gateway integration for automated transaction handling.       |
+
+## Project Structure
+
+```
+food-delivery-app/
+├── gateway/
+│   ├── auth/
+│   │   └── auth.go            
+│   ├── handler/
+│   │   ├── entity.go
+│   │   └── handler.go
+│   ├── helper/
+│   │   └── jwt.go  
+│   ├── model/
+│   │   ├── const.go
+│   │   ├── error.go
+│   │   ├── order.go
+│   │   └── user.go
+│   ├── order_pb/
+│   │   ├── order_grpc.pb.go
+│   │   ├── order.pb.go
+│   │   └── order.proto
+│   ├── service/
+│   │   ├── order_service.go
+│   │   └── user_service.go
+│   ├── user_pb/
+│   │   ├── user_grpc.pb.go
+│   │   ├── user.pb.go
+│   │   └── user.proto
+│   ├── Dockerfile
+│   ├── go.mod
+│   ├── go.sum
+│   └── main.go
+├── order/                  
+│   ├── auth/
+│   │   └── auth.go            
+│   ├── handler/
+│   │   └── grpc.go
+│   ├── helper/
+│   │   └── ptr.go  
+│   ├── middleware/
+│   │   └── middleware.go
+│   ├── model/
+│   │   ├── const.go
+│   │   ├── error.go
+│   │   ├── order.go
+│   │   ├── payment_gateway.go
+│   │   └── payment_record.go
+│   ├── pb/
+│   │   ├── order_grpc.pb.go
+│   │   ├── order.pb.go
+│   │   └── order.proto
+│   ├── repository/
+│   │   ├── mongo.go
+│   │   ├── sql_entity.go
+│   │   ├── sql.go
+│   │   ├── xendit_entity.go
+│   │   └── xendit.go
+│   ├── service/
+│   │   ├── customer.go
+│   │   └── driver.go
+│   ├── user_pb/
+│   │   ├── user_grpc.pb.go
+│   │   ├── user.pb.go
+│   │   └── user.proto
+│   ├── Dockerfile
+│   ├── go.mod
+│   ├── go.sum
+│   └── main.go           
+├── user/                 
+│   ├── auth/
+│   │   └── auth.go            
+│   ├── handler/
+│   │   └── grpc.go
+│   ├── helper/
+│   │   └── jwt.go
+│   ├── middleware/
+│   │   └── middleware.go  
+│   ├── model/
+│   │   ├── const.go
+│   │   ├── error.go
+│   │   ├── mailjet.go
+│   │   ├── payment_gateway.go
+│   │   ├── payment_record.go
+│   │   └── user.go
+│   ├── order_pb/
+│   │   ├── order_grpc.pb.go
+│   │   ├── order.pb.go
+│   │   └── order.proto
+│   ├── pb/
+│   │   ├── user_grpc.pb.go
+│   │   ├── user.pb.go
+│   │   └── user.proto
+│   ├── repository/
+│   │   ├── mongo.go
+│   │   ├── payment_gateway.go
+│   │   └── sql.go
+│   ├── service/
+│   │   └── user.go
+│   ├── user_pb/
+│   │   └── database/
+│   │       └── database.go
+│   ├── Dockerfile
+│   ├── go.mod
+│   ├── go.sum
+│   └── main.go        
+├── .env.example   
+├── .gitignore
+├── docker-compose.local.yaml      
+├── docker-compose.yaml      
+└── Makefile                
+```
