@@ -113,7 +113,6 @@ func main() {
 	c := cron.New(cron.WithSeconds())
 
 	_, err = c.AddFunc("0 */1 * * * *", func() {
-		logger.Info("Cron: Starting email cronjob...")
 		ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
 		defer cancel()
 
