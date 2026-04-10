@@ -1026,7 +1026,7 @@ var File_user_proto protoreflect.FileDescriptor
 const file_user_proto_rawDesc = "" +
 	"\n" +
 	"\n" +
-	"user.proto\x12\x02pb\"\xc4\x01\n" +
+	"user.proto\x12\auser_pb\"\xc4\x01\n" +
 	"\x17RegisterCustomerRequest\x12\x1d\n" +
 	"\n" +
 	"first_name\x18\x01 \x01(\tR\tfirstName\x12\x1b\n" +
@@ -1069,14 +1069,14 @@ const file_user_proto_rawDesc = "" +
 	"\abalance\x18\x06 \x01(\x03R\abalance\"9\n" +
 	"\x14TopUpBalanceResponse\x12!\n" +
 	"\fpayment_link\x18\x01 \x01(\tR\vpaymentLink\"\x1f\n" +
-	"\x1dPaymentGatewayWebhookResponse\"\xe4\x01\n" +
+	"\x1dPaymentGatewayWebhookResponse\"\xe9\x01\n" +
 	" CreateCreatePaymentRecordRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x14\n" +
 	"\x05email\x18\x02 \x01(\tR\x05email\x12!\n" +
 	"\femail_status\x18\x03 \x01(\tR\vemailStatus\x12!\n" +
-	"\fpayment_type\x18\x04 \x01(\tR\vpaymentType\x12T\n" +
-	"\x18payment_gateway_response\x18\x05 \x01(\v2\x1a.pb.PaymentGatewayResponseR\x16paymentGatewayResponse\"#\n" +
-	"!CreateCreatePaymentRecordResponse\"\xae\x05\n" +
+	"\fpayment_type\x18\x04 \x01(\tR\vpaymentType\x12Y\n" +
+	"\x18payment_gateway_response\x18\x05 \x01(\v2\x1f.user_pb.PaymentGatewayResponseR\x16paymentGatewayResponse\"#\n" +
+	"!CreateCreatePaymentRecordResponse\"\xb3\x05\n" +
 	"\x16PaymentGatewayResponse\x12,\n" +
 	"\x12payment_session_id\x18\x01 \x01(\tR\x10paymentSessionId\x12\x18\n" +
 	"\acreated\x18\x02 \x01(\tR\acreated\x12\x18\n" +
@@ -1097,8 +1097,8 @@ const file_user_proto_rawDesc = "" +
 	"\vcustomer_id\x18\x0e \x01(\tR\n" +
 	"customerId\x12%\n" +
 	"\x0ecapture_method\x18\x0f \x01(\tR\rcaptureMethod\x12 \n" +
-	"\vdescription\x18\x10 \x01(\tR\vdescription\x12,\n" +
-	"\x05items\x18\x11 \x03(\v2\x16.pb.PaymentGatewayItemR\x05items\x12,\n" +
+	"\vdescription\x18\x10 \x01(\tR\vdescription\x121\n" +
+	"\x05items\x18\x11 \x03(\v2\x1b.user_pb.PaymentGatewayItemR\x05items\x12,\n" +
 	"\x12success_return_url\x18\x12 \x01(\tR\x10successReturnUrl\x12*\n" +
 	"\x11cancel_return_url\x18\x13 \x01(\tR\x0fcancelReturnUrl\x12(\n" +
 	"\x10payment_link_url\x18\x14 \x01(\tR\x0epaymentLinkUrl\"\xf3\x01\n" +
@@ -1110,14 +1110,14 @@ const file_user_proto_rawDesc = "" +
 	"\bcategory\x18\x05 \x01(\tR\bcategory\x12&\n" +
 	"\x0fnet_unit_amount\x18\x06 \x01(\x03R\rnetUnitAmount\x12\x1a\n" +
 	"\bquantity\x18\a \x01(\x03R\bquantity\x12\x10\n" +
-	"\x03url\x18\b \x01(\tR\x03url2\xd5\x03\n" +
-	"\vUserService\x12M\n" +
-	"\x10RegisterCustomer\x12\x1b.pb.RegisterCustomerRequest\x1a\x1c.pb.RegisterCustomerResponse\x12,\n" +
-	"\x05Login\x12\x10.pb.LoginRequest\x1a\x11.pb.LoginResponse\x12>\n" +
-	"\vGetUserInfo\x12\x16.pb.GetUserInfoRequest\x1a\x17.pb.GetUserInfoResponse\x12A\n" +
-	"\fTopUpBalance\x12\x17.pb.TopUpBalanceRequest\x1a\x18.pb.TopUpBalanceResponse\x12\\\n" +
-	"\x15PaymentGatewayWebhook\x12 .pb.PaymentGatewayWebhookRequest\x1a!.pb.PaymentGatewayWebhookResponse\x12h\n" +
-	"\x19CreateCreatePaymentRecord\x12$.pb.CreateCreatePaymentRecordRequest\x1a%.pb.CreateCreatePaymentRecordResponseB4Z2github.com/airlangga-hub/food-delivery-app/user/pbb\x06proto3"
+	"\x03url\x18\b \x01(\tR\x03url2\x91\x04\n" +
+	"\vUserService\x12W\n" +
+	"\x10RegisterCustomer\x12 .user_pb.RegisterCustomerRequest\x1a!.user_pb.RegisterCustomerResponse\x126\n" +
+	"\x05Login\x12\x15.user_pb.LoginRequest\x1a\x16.user_pb.LoginResponse\x12H\n" +
+	"\vGetUserInfo\x12\x1b.user_pb.GetUserInfoRequest\x1a\x1c.user_pb.GetUserInfoResponse\x12K\n" +
+	"\fTopUpBalance\x12\x1c.user_pb.TopUpBalanceRequest\x1a\x1d.user_pb.TopUpBalanceResponse\x12f\n" +
+	"\x15PaymentGatewayWebhook\x12%.user_pb.PaymentGatewayWebhookRequest\x1a&.user_pb.PaymentGatewayWebhookResponse\x12r\n" +
+	"\x19CreateCreatePaymentRecord\x12).user_pb.CreateCreatePaymentRecordRequest\x1a*.user_pb.CreateCreatePaymentRecordResponseB4Z2github.com/airlangga-hub/food-delivery-app/user/pbb\x06proto3"
 
 var (
 	file_user_proto_rawDescOnce sync.Once
@@ -1133,36 +1133,36 @@ func file_user_proto_rawDescGZIP() []byte {
 
 var file_user_proto_msgTypes = make([]protoimpl.MessageInfo, 14)
 var file_user_proto_goTypes = []any{
-	(*RegisterCustomerRequest)(nil),           // 0: pb.RegisterCustomerRequest
-	(*LoginRequest)(nil),                      // 1: pb.LoginRequest
-	(*GetUserInfoRequest)(nil),                // 2: pb.GetUserInfoRequest
-	(*TopUpBalanceRequest)(nil),               // 3: pb.TopUpBalanceRequest
-	(*PaymentGatewayWebhookRequest)(nil),      // 4: pb.PaymentGatewayWebhookRequest
-	(*RegisterCustomerResponse)(nil),          // 5: pb.RegisterCustomerResponse
-	(*LoginResponse)(nil),                     // 6: pb.LoginResponse
-	(*GetUserInfoResponse)(nil),               // 7: pb.GetUserInfoResponse
-	(*TopUpBalanceResponse)(nil),              // 8: pb.TopUpBalanceResponse
-	(*PaymentGatewayWebhookResponse)(nil),     // 9: pb.PaymentGatewayWebhookResponse
-	(*CreateCreatePaymentRecordRequest)(nil),  // 10: pb.CreateCreatePaymentRecordRequest
-	(*CreateCreatePaymentRecordResponse)(nil), // 11: pb.CreateCreatePaymentRecordResponse
-	(*PaymentGatewayResponse)(nil),            // 12: pb.PaymentGatewayResponse
-	(*PaymentGatewayItem)(nil),                // 13: pb.PaymentGatewayItem
+	(*RegisterCustomerRequest)(nil),           // 0: user_pb.RegisterCustomerRequest
+	(*LoginRequest)(nil),                      // 1: user_pb.LoginRequest
+	(*GetUserInfoRequest)(nil),                // 2: user_pb.GetUserInfoRequest
+	(*TopUpBalanceRequest)(nil),               // 3: user_pb.TopUpBalanceRequest
+	(*PaymentGatewayWebhookRequest)(nil),      // 4: user_pb.PaymentGatewayWebhookRequest
+	(*RegisterCustomerResponse)(nil),          // 5: user_pb.RegisterCustomerResponse
+	(*LoginResponse)(nil),                     // 6: user_pb.LoginResponse
+	(*GetUserInfoResponse)(nil),               // 7: user_pb.GetUserInfoResponse
+	(*TopUpBalanceResponse)(nil),              // 8: user_pb.TopUpBalanceResponse
+	(*PaymentGatewayWebhookResponse)(nil),     // 9: user_pb.PaymentGatewayWebhookResponse
+	(*CreateCreatePaymentRecordRequest)(nil),  // 10: user_pb.CreateCreatePaymentRecordRequest
+	(*CreateCreatePaymentRecordResponse)(nil), // 11: user_pb.CreateCreatePaymentRecordResponse
+	(*PaymentGatewayResponse)(nil),            // 12: user_pb.PaymentGatewayResponse
+	(*PaymentGatewayItem)(nil),                // 13: user_pb.PaymentGatewayItem
 }
 var file_user_proto_depIdxs = []int32{
-	12, // 0: pb.CreateCreatePaymentRecordRequest.payment_gateway_response:type_name -> pb.PaymentGatewayResponse
-	13, // 1: pb.PaymentGatewayResponse.items:type_name -> pb.PaymentGatewayItem
-	0,  // 2: pb.UserService.RegisterCustomer:input_type -> pb.RegisterCustomerRequest
-	1,  // 3: pb.UserService.Login:input_type -> pb.LoginRequest
-	2,  // 4: pb.UserService.GetUserInfo:input_type -> pb.GetUserInfoRequest
-	3,  // 5: pb.UserService.TopUpBalance:input_type -> pb.TopUpBalanceRequest
-	4,  // 6: pb.UserService.PaymentGatewayWebhook:input_type -> pb.PaymentGatewayWebhookRequest
-	10, // 7: pb.UserService.CreateCreatePaymentRecord:input_type -> pb.CreateCreatePaymentRecordRequest
-	5,  // 8: pb.UserService.RegisterCustomer:output_type -> pb.RegisterCustomerResponse
-	6,  // 9: pb.UserService.Login:output_type -> pb.LoginResponse
-	7,  // 10: pb.UserService.GetUserInfo:output_type -> pb.GetUserInfoResponse
-	8,  // 11: pb.UserService.TopUpBalance:output_type -> pb.TopUpBalanceResponse
-	9,  // 12: pb.UserService.PaymentGatewayWebhook:output_type -> pb.PaymentGatewayWebhookResponse
-	11, // 13: pb.UserService.CreateCreatePaymentRecord:output_type -> pb.CreateCreatePaymentRecordResponse
+	12, // 0: user_pb.CreateCreatePaymentRecordRequest.payment_gateway_response:type_name -> user_pb.PaymentGatewayResponse
+	13, // 1: user_pb.PaymentGatewayResponse.items:type_name -> user_pb.PaymentGatewayItem
+	0,  // 2: user_pb.UserService.RegisterCustomer:input_type -> user_pb.RegisterCustomerRequest
+	1,  // 3: user_pb.UserService.Login:input_type -> user_pb.LoginRequest
+	2,  // 4: user_pb.UserService.GetUserInfo:input_type -> user_pb.GetUserInfoRequest
+	3,  // 5: user_pb.UserService.TopUpBalance:input_type -> user_pb.TopUpBalanceRequest
+	4,  // 6: user_pb.UserService.PaymentGatewayWebhook:input_type -> user_pb.PaymentGatewayWebhookRequest
+	10, // 7: user_pb.UserService.CreateCreatePaymentRecord:input_type -> user_pb.CreateCreatePaymentRecordRequest
+	5,  // 8: user_pb.UserService.RegisterCustomer:output_type -> user_pb.RegisterCustomerResponse
+	6,  // 9: user_pb.UserService.Login:output_type -> user_pb.LoginResponse
+	7,  // 10: user_pb.UserService.GetUserInfo:output_type -> user_pb.GetUserInfoResponse
+	8,  // 11: user_pb.UserService.TopUpBalance:output_type -> user_pb.TopUpBalanceResponse
+	9,  // 12: user_pb.UserService.PaymentGatewayWebhook:output_type -> user_pb.PaymentGatewayWebhookResponse
+	11, // 13: user_pb.UserService.CreateCreatePaymentRecord:output_type -> user_pb.CreateCreatePaymentRecordResponse
 	8,  // [8:14] is the sub-list for method output_type
 	2,  // [2:8] is the sub-list for method input_type
 	2,  // [2:2] is the sub-list for extension type_name
