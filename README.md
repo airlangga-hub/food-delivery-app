@@ -130,3 +130,20 @@ food-delivery-app/
 ├── docker-compose.yaml      
 └── Makefile                
 ```
+
+## Installation & How to Run
+1. Clone the repository
+```
+git clone https://github.com/airlangga-hub/food-delivery-app.git
+cd food-delivery-app
+```
+
+2. Install dependencies
+```
+go mod tidy
+```
+
+3. Run the application
+```
+go run gateway/main.go
+```
