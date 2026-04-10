@@ -1,7 +1,7 @@
 CREATE TABLE "users" (
   "id" uuid PRIMARY KEY DEFAULT (gen_random_uuid()),
   "email" varchar(50),
-  "password_hash" varchar(50),
+  "password_hash" varchar(200),
   "role" varchar(10)
 );
 
